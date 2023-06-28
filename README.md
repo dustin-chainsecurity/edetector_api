@@ -1,1 +1,1 @@
-# edetector API
+# eDetector API
