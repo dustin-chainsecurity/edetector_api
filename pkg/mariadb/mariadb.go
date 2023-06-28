@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"edetector_API/config"
 	"fmt"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var DB *sql.DB
