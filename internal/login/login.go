@@ -3,7 +3,8 @@ package login
 import (
 	"net/http"
 	"github.com/gin-gonic/gin"
-	_ "crypto/md5"
+	"crypto/md5"
+	"encoding/hex"
 )
 
 type LoginRequest struct {
@@ -25,7 +26,7 @@ type LoginResponse struct {
 	User    User   `json:"user"`
 }
 
-func Init(c *gin.Context) {
+func Handle(c *gin.Context) {
 
 	// Receive request
 	var req LoginRequest
@@ -33,6 +34,9 @@ func Init(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	// Check password
+	
 
 	
 

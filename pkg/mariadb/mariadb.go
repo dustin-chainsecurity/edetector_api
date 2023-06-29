@@ -24,5 +24,6 @@ func Connect_init() error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("DB Connected")
 	return nil
 }

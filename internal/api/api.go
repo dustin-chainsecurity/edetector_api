@@ -26,7 +26,7 @@ func API_init() {
 	router.Use(cors.New(corsConfig))
 
 	// Login
-	router.POST("/member/login", login.Init)
+	router.POST("/member/login", login.Handle)
 
 
 	router.Run(":5000")
