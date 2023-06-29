@@ -7,10 +7,15 @@ import (
 	"edetector_API/pkg/mariadb"
 	"edetector_API/config"
 	"edetector_API/pkg/logger"
-	"edetector_API/internal/login"
 )
 
 func API_init() {
+
+	// Load configuration
+	if config.LoadConfig() == nil {
+		fmt.Println("Error loading config file")
+		return
+	}
 
 	// Init Logger
 	logger.InitLogger(config.Viper.GetString("WORKER_LOG_FILE"))
@@ -31,7 +36,7 @@ func API_init() {
 	router.Use(cors.New(corsConfig))
 
 	// Login
-	router.POST("/member/login", login.Handle)
+	router.POST("/member/login", login)
 
 
 	router.Run(":5000")
