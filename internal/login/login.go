@@ -38,8 +38,6 @@ func Handle(c *gin.Context) {
 	// Check password
 	
 
-	
-
 	// Create response
 	res := LoginResponse{
 		Success: true,
