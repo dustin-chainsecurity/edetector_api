@@ -3,8 +3,8 @@ package login
 import (
 	"net/http"
 	"github.com/gin-gonic/gin"
-	"crypto/md5"
-	"encoding/hex"
+	_ "crypto/md5"
+	_ "encoding/hex"
 )
 
 type LoginRequest struct {
