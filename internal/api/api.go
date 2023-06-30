@@ -35,8 +35,15 @@ func API_init() {
     router.RedirectFixedPath = true
 	router.Use(cors.New(corsConfig))
 
-	// Login
+	// Functions
 	router.POST("/member/login", login)
+	router.GET("/dashboard/serverState", serverState)
+	router.GET("/dashboard/agentState", agentState)
+	router.GET("/dashboard/ccConnectCount", connectCount)
+	router.GET("/dashboard/riskProgram", riskProgram)
+	router.GET("/dashboard/riskComputer", riskComputer)
+	router.GET("/detect/timeList", timeList)
+	router.GET("/searchEvidence/DetectDevices", detectDevices)
 
 
 	router.Run(":5000")

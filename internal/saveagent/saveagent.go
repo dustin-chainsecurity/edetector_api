@@ -12,14 +12,16 @@ import (
 
 type Request struct {
 	IP   string `json:"ip"`
-	Port int    `json:"port"`
+	Port string    `json:"port"`
+	DetectPort string `json:"detect_port"`
 }
 
 func main() {
 
 	request := Request {
 		IP: "192.168.200.161",
-		Port: 5000,
+		Port: "5000",
+		DetectPort: "5001",
 	}
 
 	// Marshal payload into JSON
@@ -31,7 +33,7 @@ func main() {
 
 	// Create an HTTP request
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", "http://127.0.0.1:5000/receive-exe", bytes.NewBuffer(payload))
+	req, err := http.NewRequest("POST", "http://192.168.200.167:8080/agent", bytes.NewBuffer(payload))
 	if err != nil {
 		logger.Error("Error creating HTTP request: " + err.Error())
 		return
