@@ -1,12 +1,14 @@
 package api
 
 import (
-	"net/http"
-	"github.com/gin-gonic/gin"
 	"crypto/md5"
-	"encoding/hex"
-	"edetector_API/pkg/mariadb"
+	"database/sql"
 	"edetector_API/pkg/logger"
+	"edetector_API/pkg/mariadb"
+	"encoding/hex"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type LoginRequest struct {
@@ -41,44 +43,56 @@ func login(c *gin.Context) {
 	// Receive request
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
 		return
 	}
 
-	// Get user data
-	stmt, err := mariadb.DB.Prepare("SELECT id, username, password FROM user WHERE username = ?")
-	if err != nil {
-		logger.Error("Error preparing stmt to get user data: " + err.Error())
-	}
-	row := stmt.QueryRow(req.Username)
-	user_data := UserInfo{}
-	err = row.Scan(&user_data.ID, &user_data.Username, &user_data.Password)
-	if err != nil {
-		logger.Error("Error scanning user data: " + err.Error())
-	}
-
-	// Get user_info data
-	stmt, err = mariadb.DB.Prepare("SELECT token, email FROM user_info WHERE id = ?")
-	if err != nil {
-		logger.Error("Error preparing stmt to get user_info data: " + err.Error())
-	}
-	row = stmt.QueryRow(user_data.ID)
-	err = row.Scan(&user_data.Token, &user_data.Email)
-	if err != nil {
-		logger.Error("Error scanning user_info data: " + err.Error())
-	}
-
-	// Check user password
 	var message string
-	var verified bool
-	hash := md5.Sum([]byte(req.Password))
-	encoded := hex.EncodeToString(hash[:])
-	if encoded == user_data.Password {
-		message = "login successed"
-		verified = true
-	} else {
-		message = "login error"
-		verified = false
+	exist := true
+	verified := false
+
+	// Get user data
+	user_info := UserInfo{
+		ID: -1,
+		Username: "Nil",
+		Password: "Nil",
+		Email: "Nil",
+		Token: "Nil",
+	}
+
+	query := "SELECT id, password FROM user WHERE username = ?"
+	err := mariadb.DB.QueryRow(query, req.Username).Scan(&user_info.ID, &user_info.Password)
+	if err != nil {
+		// Username not exist
+		if err == sql.ErrNoRows {
+			exist = false
+			message = "username not exist"
+		}
+		logger.Error("Error retrieving password: " + err.Error())
+	}
+
+	if exist {
+		// Check user password
+		hash := md5.Sum([]byte(req.Password))
+		encoded := hex.EncodeToString(hash[:])
+		if encoded == user_info.Password {
+			message = "login success"
+			verified = true
+		} else {
+			message = "password incorrect"
+			verified = false
+			user_info.ID = -1
+			user_info.Username = "Nil"
+		}
+
+		if verified {
+			// Get user_info data
+			query = "SELECT token, email FROM user_info WHERE id = ?"
+			err := mariadb.DB.QueryRow(query, user_info.ID).Scan(&user_info.Token, &user_info.Email)
+			if err != nil {
+				logger.Error("Error retrieving user_info: " + err.Error())
+			}
+		}
 	}
 
 	// Create response
@@ -87,10 +101,10 @@ func login(c *gin.Context) {
 		Message: message,
 		Code:    200,
 		User: User{
-			ID:       user_data.ID,
-			Username: req.Username,
-			Email:    user_data.Email,
-			Token:    user_data.Token,
+			ID:       user_info.ID,
+			Username: user_info.Username,
+			Email:    user_info.Email,
+			Token:    user_info.Token,
 		},
 	}
 
