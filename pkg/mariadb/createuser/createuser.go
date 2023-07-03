@@ -61,7 +61,7 @@ func createUserInfoTable() error {
 	createTableSQL := `
 		CREATE TABLE IF NOT EXISTS user_info (
 			id INT NOT NULL,
-			token VARCHAR(45) NOT NULL,
+			token VARCHAR(200) NOT NULL,
 			email VARCHAR(45) NOT NULL,
 			FOREIGN KEY (id) REFERENCES user(id)
 		);
@@ -73,6 +73,4 @@ func createUserInfoTable() error {
 	fmt.Println("user_info table added")
 	return nil
 }
-
-
 

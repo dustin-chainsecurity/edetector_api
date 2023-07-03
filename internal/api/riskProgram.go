@@ -5,11 +5,6 @@ import (
 	"github.com/gin-gonic/gin"	
 )
 
-type riskProgramResponse struct {
-	IsSuccess bool `json:"isSuccess"`
-	Data riskProgramParams `json:"Data"`
-}
-
 type riskProgramParams struct {
 	ComputerId int `json:"computerId"`
 	RiskLevel int `json:"riskLevel"`
@@ -21,7 +16,7 @@ type riskProgramParams struct {
 
 func riskProgram(c *gin.Context) {
 
-	res := riskProgramResponse{
+	res := Response{
 		IsSuccess: true,
 		Data: riskProgramParams{
 			ComputerId: 12,

@@ -7,8 +7,10 @@ import (
 	"edetector_API/pkg/mariadb"
 	"encoding/hex"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/dgrijalva/jwt-go"
 )
 
 type LoginRequest struct {
@@ -36,6 +38,14 @@ type UserInfo struct {
 	Password string
 	Email    string
 	Token    string
+}
+
+// Expiration time for the token (1 hour)
+var tokenExpiration = time.Hour
+
+// Custom Claims structure for JWT
+type CustomClaims struct {
+	jwt.StandardClaims
 }
 
 func login(c *gin.Context) {
@@ -86,9 +96,41 @@ func login(c *gin.Context) {
 		}
 
 		if verified {
+			// Create a new token
+			token := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaims{
+				StandardClaims: jwt.StandardClaims{
+					ExpiresAt: time.Now().Add(tokenExpiration).Unix(),
+				},
+			})
+
+			// Sign the token with your secret key
+			var jwtSecret = []byte(user_info.Username)
+			tokenString, err := token.SignedString(jwtSecret)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+				return
+			}
+
+			// Set the token as a cookie
+			cookie := &http.Cookie{
+				Name:     "token",
+				Value:    tokenString,
+				Expires:  time.Now().Add(tokenExpiration),
+				HttpOnly: true,
+			}
+			http.SetCookie(c.Writer, cookie)
+			user_info.Token = tokenString
+
+			// Update user token
+			query = "UPDATE user_info SET token = ? WHERE id = ?"
+			_, err = mariadb.DB.Exec(query, tokenString, user_info.ID)
+			if err != nil {
+				logger.Error("Error updating token: " + err.Error())
+			}
+
 			// Get user_info data
-			query = "SELECT token, email FROM user_info WHERE id = ?"
-			err := mariadb.DB.QueryRow(query, user_info.ID).Scan(&user_info.Token, &user_info.Email)
+			query = "SELECT email FROM user_info WHERE id = ?"
+			err = mariadb.DB.QueryRow(query, user_info.ID).Scan(&user_info.Email)
 			if err != nil {
 				logger.Error("Error retrieving user_info: " + err.Error())
 			}

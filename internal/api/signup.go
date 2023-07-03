@@ -1,11 +1,8 @@
 package api
 
 import (
-	_ "crypto/md5"
-	_ "database/sql"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
-	_ "encoding/hex"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

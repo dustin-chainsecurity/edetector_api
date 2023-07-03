@@ -45,6 +45,7 @@ func API_init() {
 	router.GET("/dashboard/riskComputer", riskComputer)
 	router.GET("/detect/timeList", timeList)
 	router.GET("/searchEvidence/DetectDevices", detectDevices)
+	router.GET("/changeDetectMode", changeDetectMode)
 
 	router.Run(":5000")
 }

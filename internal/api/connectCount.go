@@ -5,18 +5,13 @@ import (
 	"github.com/gin-gonic/gin"	
 )
 
-type connectCountResponse struct {
-	IsSuccess bool `json:"isSuccess"`
-	Data connectCountParams `json:"Data"`
-}
-
 type connectCountParams struct {
 	ConnectCount int `json:"ccConnectCount"`
 }
 
 func connectCount(c *gin.Context) {
 
-	res := connectCountResponse{
+	res := Response{
 		IsSuccess: true,
 		Data: connectCountParams{
 			ConnectCount: 10,

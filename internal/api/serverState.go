@@ -5,11 +5,6 @@ import (
 	"github.com/gin-gonic/gin"	
 )
 
-type serverStateResponse struct {
-	IsSuccess bool `json:"isSuccess"`
-	Data serverParams `json:"Data"`
-}
-
 type serverParams struct {
 	CPU int `json:"cpu"`
 	RAMALL int `json:"RAMALL"`
@@ -19,7 +14,7 @@ type serverParams struct {
 
 func serverState(c *gin.Context) {
 
-	res := serverStateResponse{
+	res := Response{
 		IsSuccess: true,
 		Data: serverParams{
 			CPU: 98,
