@@ -1,4 +1,4 @@
-package api
+package member
 
 import (
 	"crypto/md5"
@@ -48,7 +48,7 @@ type CustomClaims struct {
 	jwt.StandardClaims
 }
 
-func login(c *gin.Context) {
+func Login(c *gin.Context) {
 
 	// Receive request
 	var req LoginRequest

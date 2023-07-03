@@ -1,4 +1,4 @@
-package api
+package searchEvidence
 
 import (
 	"net/http"
@@ -38,7 +38,7 @@ type detectDevicesResponse struct {
 	Data         []device `json:"Data"`
 }
 
-func detectDevices(c *gin.Context) {
+func DetectDevices(c *gin.Context) {
 	// page := c.Query("pages")
 
 	// Simulate generating the response data based on the requested page

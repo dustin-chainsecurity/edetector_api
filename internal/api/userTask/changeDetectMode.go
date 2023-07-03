@@ -1,4 +1,4 @@
-package api
+package userTask
 
 import (
 	"edetector_API/pkg/logger"
@@ -27,7 +27,7 @@ type taskResponse struct {
 	Message string `json:"message"`
 }
 
-func changeDetectMode(c *gin.Context) {
+func ChangeDetectMode(c *gin.Context) {
 
 	req := taskPacket{
 		Key:  "agent_uuid",

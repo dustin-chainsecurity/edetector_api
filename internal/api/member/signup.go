@@ -1,4 +1,4 @@
-package api
+package member
 
 import (
 	"edetector_API/pkg/logger"
@@ -20,7 +20,7 @@ type SignUpResponse struct {
 	Message string `json:"message"`
 }
 
-func signup(c *gin.Context) {
+func Signup(c *gin.Context) {
 
 	// Receive request
 	var req SignUpRequest

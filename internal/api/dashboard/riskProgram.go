@@ -1,4 +1,4 @@
-package api
+package dashboard
 
 import (
 	"net/http"
@@ -14,7 +14,7 @@ type riskProgramParams struct {
 	ProgramPath string `json:"programPath"`
 }
 
-func riskProgram(c *gin.Context) {
+func RiskProgram(c *gin.Context) {
 
 	res := Response{
 		IsSuccess: true,

@@ -1,12 +1,18 @@
 package api
 
 import (
-	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/gin-contrib/cors"
-	"edetector_API/pkg/mariadb"
 	"edetector_API/config"
+	"edetector_API/internal/api/userTask"
+	"edetector_API/internal/api/member"
+	"edetector_API/internal/api/dashboard"
+	"edetector_API/internal/api/detect"
+	"edetector_API/internal/api/searchEvidence"
 	"edetector_API/pkg/logger"
+	"edetector_API/pkg/mariadb"
+	"fmt"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 func API_init() {
@@ -32,20 +38,20 @@ func API_init() {
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
-    router.RedirectFixedPath = true
+	router.RedirectFixedPath = true
 	router.Use(cors.New(corsConfig))
 
 	// Functions
-	router.POST("/member/login", login)
-	router.POST("/signup", signup)
-	router.GET("/dashboard/serverState", serverState)
-	router.GET("/dashboard/agentState", agentState)
-	router.GET("/dashboard/ccConnectCount", connectCount)
-	router.GET("/dashboard/riskProgram", riskProgram)
-	router.GET("/dashboard/riskComputer", riskComputer)
-	router.GET("/detect/timeList", timeList)
-	router.GET("/searchEvidence/DetectDevices", detectDevices)
-	router.GET("/changeDetectMode", changeDetectMode)
+	router.POST("/member/login", member.Login)
+	router.POST("/member/signup", member.Signup)
+	router.GET("/dashboard/serverState", dashboard.ServerState)
+	router.GET("/dashboard/agentState", dashboard.AgentState)
+	router.GET("/dashboard/ccConnectCount", dashboard.ConnectCount)
+	router.GET("/dashboard/riskProgram", dashboard.RiskProgram)
+	router.GET("/dashboard/riskComputer", dashboard.RiskComputer)
+	router.GET("/detect/timeList", detect.TimeList)
+	router.GET("/searchEvidence/DetectDevices", searchEvidence.DetectDevices)
+	router.GET("/userTask/changeDetectMode", userTask.ChangeDetectMode)
 
 	router.Run(":5000")
 }

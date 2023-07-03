@@ -1,4 +1,4 @@
-package api
+package detect
 
 import (
 	"net/http"
@@ -11,7 +11,7 @@ type timeListParams struct {
 	FileSummaryDownloadTimeList []string `json:"fileSummaryDownloadTimeList"`
 }
 
-func timeList(c *gin.Context) {
+func TimeList(c *gin.Context) {
 
 	res := Response{
 		IsSuccess: true,

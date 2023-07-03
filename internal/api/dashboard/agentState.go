@@ -1,4 +1,4 @@
-package api
+package dashboard
 
 import (
 	"net/http"
@@ -15,7 +15,7 @@ type agentParams struct {
 	AgentIsConnect bool `json:"agentIsConnect"`
 }
 
-func agentState(c *gin.Context) {
+func AgentState(c *gin.Context) {
 
 	res := agentStateResponse{
 		IsSuccess: true,

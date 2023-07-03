@@ -1,4 +1,4 @@
-package api
+package dashboard
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ type riskComputerParams struct {
 	RiskLevel int `json:"riskLevel"`
 }
 
-func riskComputer(c *gin.Context) {
+func RiskComputer(c *gin.Context) {
 
 	res := Response{
 		IsSuccess: true,

@@ -1,4 +1,4 @@
-package api
+package dashboard
 
 import (
 	"net/http"
@@ -9,7 +9,7 @@ type connectCountParams struct {
 	ConnectCount int `json:"ccConnectCount"`
 }
 
-func connectCount(c *gin.Context) {
+func ConnectCount(c *gin.Context) {
 
 	res := Response{
 		IsSuccess: true,

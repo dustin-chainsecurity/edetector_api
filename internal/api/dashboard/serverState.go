@@ -1,4 +1,4 @@
-package api
+package dashboard
 
 import (
 	"net/http"
@@ -12,7 +12,7 @@ type serverParams struct {
 	Storage int `json:"storage"`
 }
 
-func serverState(c *gin.Context) {
+func ServerState(c *gin.Context) {
 
 	res := Response{
 		IsSuccess: true,
