@@ -11,32 +11,24 @@ import (
 )
 
 type taskPacket struct {
-	Key     string `json:"key"`
-	Work    string `json:"work"`
-	User    string `json:"user"`
-	Message interface{} `json:"message"`
-}
-
-type changeDetectModeMsg struct {
-	Process bool `json:"process"`
-	Network bool `json:"network"`
+	Key      string      `json:"key"`
+	Work     string      `json:"work"`
+	User     string      `json:"user"`
+	Message  interface{} `json:"message"`
 }
 
 type taskResponse struct {
-	IsSuccess bool `json:"isSuccess"`
-	Message string `json:"message"`
+	IsSuccess bool   `json:"isSuccess"`
+	Message   string `json:"message"`
 }
 
 func ChangeDetectMode(c *gin.Context) {
 
 	req := taskPacket{
-		Key:  "agent_uuid",
-		Work: "CHANGE_DETECT_MODE",
-		User: "user_id",
-		Message: changeDetectModeMsg{
-			Process: true,
-			Network: true,
-		},
+		Key:  "8beba472f3f44cabbbb44fd232171933",
+		Work: "ChangeDetectMode",
+		User: "1",
+		Message: "0|0",
 	}
 
 	reqJSON, err := json.Marshal(req)
