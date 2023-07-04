@@ -2,7 +2,7 @@ package api
 
 import (
 	"edetector_API/config"
-	"edetector_API/internal/api/userTask"
+	"edetector_API/internal/api/task"
 	"edetector_API/internal/api/member"
 	"edetector_API/internal/api/dashboard"
 	"edetector_API/internal/api/detect"
@@ -51,7 +51,7 @@ func API_init() {
 	router.GET("/dashboard/riskComputer", dashboard.RiskComputer)
 	router.GET("/detect/timeList", detect.TimeList)
 	router.GET("/searchEvidence/DetectDevices", searchEvidence.DetectDevices)
-	router.GET("/userTask/changeDetectMode", userTask.ChangeDetectMode)
+	router.POST("/task/changeDetectMode", task.ChangeDetectMode)
 
 	router.Run(":5000")
 }

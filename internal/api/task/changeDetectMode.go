@@ -1,4 +1,4 @@
-package userTask
+package task
 
 import (
 	"edetector_API/pkg/logger"
@@ -28,7 +28,7 @@ func ChangeDetectMode(c *gin.Context) {
 		Key:  "8beba472f3f44cabbbb44fd232171933",
 		Work: "ChangeDetectMode",
 		User: "1",
-		Message: "0|0",
+		Message: "0|1",
 	}
 
 	reqJSON, err := json.Marshal(req)
@@ -49,6 +49,8 @@ func ChangeDetectMode(c *gin.Context) {
 		logger.Error("Error sending request: " + err.Error())
 	}
 
+	// Change client setting
+
 	// Receive the response
 	responseJSON := make([]byte, 1024)
 	_, err = conn.Read(responseJSON)
@@ -58,6 +60,7 @@ func ChangeDetectMode(c *gin.Context) {
 
 	// Parse the JSON response
 	var response taskResponse
+	fmt.Println(response)
 	err = json.Unmarshal(responseJSON, &response)
 	if err != nil {
 		logger.Error("Error parsing JSON response: " + err.Error())
