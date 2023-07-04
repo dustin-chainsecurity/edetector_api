@@ -10,21 +10,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type taskPacket struct {
-	Key      string      `json:"key"`
-	Work     string      `json:"work"`
-	User     string      `json:"user"`
-	Message  interface{} `json:"message"`
-}
+func ChangeDetectMode(c *gin.Context, conn net.Conn) {
 
-type taskResponse struct {
-	IsSuccess bool   `json:"isSuccess"`
-	Message   string `json:"message"`
-}
-
-func ChangeDetectMode(c *gin.Context) {
-
-	req := taskPacket{
+	req := TaskPacket{
 		Key:  "8beba472f3f44cabbbb44fd232171933",
 		Work: "ChangeDetectMode",
 		User: "1",
@@ -35,13 +23,6 @@ func ChangeDetectMode(c *gin.Context) {
 	if err != nil {
 		logger.Error("Error coverting req to JSON: " + err.Error())
 	}
-
-	// Set up TCP connection
-	conn, err := net.Dial("tcp", "192.168.200.163:1990")
-	if err != nil {
-		logger.Error("Error connecting to TCP server: " + err.Error())
-	}
-	defer conn.Close()
 
 	// Send the JSON request
 	_, err = conn.Write(reqJSON)
@@ -59,7 +40,7 @@ func ChangeDetectMode(c *gin.Context) {
 	}
 
 	// Parse the JSON response
-	var response taskResponse
+	var response TaskResponse
 	fmt.Println(response)
 	err = json.Unmarshal(responseJSON, &response)
 	if err != nil {

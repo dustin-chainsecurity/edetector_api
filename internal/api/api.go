@@ -9,11 +9,15 @@ import (
 	"edetector_API/internal/api/searchEvidence"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
+	"edetector_API/pkg/tcp"
 	"fmt"
+	"net"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
+
+var err error
 
 func API_init() {
 
@@ -27,11 +31,18 @@ func API_init() {
 	logger.InitLogger(config.Viper.GetString("WORKER_LOG_FILE"))
 	fmt.Println("logger is enabled please check all out info in log file: ", config.Viper.GetString("WORKER_LOG_FILE"))
 
+	// Set up TCP connection
+	var conn net.Conn
+	if conn, err = tcp.Connect_init(); err != nil {
+		logger.Error("Error setting up TCP connection: " + err.Error())
+		return
+	}
+	defer conn.Close()
+
 	// Connect to MariaDB
-	if err := mariadb.Connect_init(); err != nil {
+	if err = mariadb.Connect_init(); err != nil {
 		logger.Error("Error connecting to mariadb: " + err.Error())
-	} else {
-		fmt.Println("Connected to MariaDB")
+		return
 	}
 
 	// Routing
@@ -51,7 +62,11 @@ func API_init() {
 	router.GET("/dashboard/riskComputer", dashboard.RiskComputer)
 	router.GET("/detect/timeList", detect.TimeList)
 	router.GET("/searchEvidence/DetectDevices", searchEvidence.DetectDevices)
-	router.POST("/task/changeDetectMode", task.ChangeDetectMode)
+
+	// User Tasks
+	router.POST("/task/changeDetectMode", func(c *gin.Context) {
+		task.ChangeDetectMode(c, conn)
+	})
 
 	router.Run(":5000")
 }

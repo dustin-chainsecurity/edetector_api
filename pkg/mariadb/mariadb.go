@@ -19,11 +19,10 @@ func Connect_init() error {
 	dbName := config.Viper.GetString("MARIADB_DATABASE")
 
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
-	fmt.Println(connectionString)
 	DB, err = sql.Open("mysql", connectionString)
 	if err != nil {
 		return err
 	}
-	fmt.Println("DB Connected")
+	fmt.Println("MARIADB Connected")
 	return nil
 }
