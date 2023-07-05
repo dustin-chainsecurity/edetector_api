@@ -1,0 +1,9 @@
+package api
+
+import (
+	
+)
+
+func webSocket(w http.ResponseWriter, r *http.Request) {
+
+}

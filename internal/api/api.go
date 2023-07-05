@@ -14,6 +14,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	// "github.com/gorilla/websocket"
 )
 
 var err error
@@ -46,6 +47,7 @@ func API_init() {
 
 	// Functions
 	router.POST("/member/login", member.Login)
+	router.POST("/member/loginWithToken", member.LoginWithToken)
 	router.POST("/member/signup", member.Signup)
 	router.GET("/dashboard/serverState", dashboard.ServerState)
 	router.GET("/dashboard/agentState", dashboard.AgentState)
@@ -64,6 +66,11 @@ func API_init() {
 		taskGroup.POST("/startGetDrive", task.StartGetDrive)
 		taskGroup.POST("/startCollect", task.StartCollect)
 	}
+
+	// Web Socket
+    router.GET("/ws", func(c *gin.Context) {
+        // serveWs(c.Writer, c.Request)
+    })
 
 	router.Run(":5000")
 }
