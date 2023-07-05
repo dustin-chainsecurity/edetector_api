@@ -1,10 +1,16 @@
 package task
 
+type TaskRequest struct {
+	Key      string      `json:"key"`
+	User     string      `json:"user"`
+	Message  interface{} `json:"message"`
+}
+
 type TaskPacket struct {
-	Key      string      `json:"Key"`
-	Work     string      `json:"Work"`
-	User     string      `json:"User"`
-	Message  interface{} `json:"Message"`
+	Key      string      `json:"key"`
+	Work     string      `json:"work"`
+	User     string      `json:"user"`
+	Message  interface{} `json:"message"`
 }
 
 type TaskResponse struct {

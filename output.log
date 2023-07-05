@@ -1,3 +1,0 @@
-{"level":"error","ts":"2023-07-04T18:12:42.920+0800","msg":"Error parsing JSON response: invalid character '\\x00' after top-level value","func":"task.ChangeDetectMode","file":"/home/angel/edetector_API/internal/api/task/changeDetectMode.go","line":66}
-{"level":"error","ts":"2023-07-04T18:13:18.489+0800","msg":"Error receiving response: EOF","func":"task.ChangeDetectMode","file":"/home/angel/edetector_API/internal/api/task/changeDetectMode.go","line":58}
-{"level":"error","ts":"2023-07-04T18:13:18.490+0800","msg":"Error parsing JSON response: invalid character '\\x00' looking for beginning of value","func":"task.ChangeDetectMode","file":"/home/angel/edetector_API/internal/api/task/changeDetectMode.go","line":66}

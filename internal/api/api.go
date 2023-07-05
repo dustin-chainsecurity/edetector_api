@@ -9,7 +9,6 @@ import (
 	"edetector_API/internal/api/searchEvidence"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
-	"edetector_API/pkg/tcp"
 	"fmt"
 	"net"
 
@@ -18,6 +17,7 @@ import (
 )
 
 var err error
+var conn net.Conn
 
 func API_init() {
 
@@ -30,14 +30,6 @@ func API_init() {
 	// Init Logger
 	logger.InitLogger(config.Viper.GetString("WORKER_LOG_FILE"))
 	fmt.Println("logger is enabled please check all out info in log file: ", config.Viper.GetString("WORKER_LOG_FILE"))
-
-	// Set up TCP connection
-	var conn net.Conn
-	if conn, err = tcp.Connect_init(); err != nil {
-		logger.Error("Error setting up TCP connection: " + err.Error())
-		return
-	}
-	defer conn.Close()
 
 	// Connect to MariaDB
 	if err = mariadb.Connect_init(); err != nil {
@@ -64,9 +56,14 @@ func API_init() {
 	router.GET("/searchEvidence/DetectDevices", searchEvidence.DetectDevices)
 
 	// User Tasks
-	router.POST("/task/changeDetectMode", func(c *gin.Context) {
-		task.ChangeDetectMode(c, conn)
-	})
+	taskGroup := router.Group("/task")
+	taskGroup.Use(EstablishTCPConnection()) 
+	{
+		taskGroup.POST("/changeDetectMode", task.ChangeDetectMode)
+		taskGroup.POST("/startScan", task.StartScan)
+		taskGroup.POST("/startGetDrive", task.StartGetDrive)
+		taskGroup.POST("/startCollect", task.StartCollect)
+	}
 
 	router.Run(":5000")
 }

@@ -10,49 +10,77 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ChangeDetectMode(c *gin.Context, conn net.Conn) {
+func ChangeDetectMode(c *gin.Context) {
 
-	req := TaskPacket{
-		Key:  "8beba472f3f44cabbbb44fd232171933",
-		Work: "ChangeDetectMode",
-		User: "1",
-		Message: "0|1",
+	// Get the TCP connection from the Gin context
+	conn, ok := c.Get("tcpConnection")
+	if !ok {
+		// TCP connection not found in context
+		c.JSON(http.StatusInternalServerError, gin.H{"Error": "Failed to get TCP connection"})
+		return
 	}
 
-	reqJSON, err := json.Marshal(req)
+	// Type assertion to convert the connection to the appropriate type
+	tcpConn, ok := conn.(net.Conn)
+	if !ok {
+		// Invalid TCP connection type
+		c.JSON(http.StatusInternalServerError, gin.H{"Error": "Invalid TCP connection"})
+		return
+	}
+
+	// Receive user request
+	var req TaskRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		return
+	}
+
+	// Generate server request
+	ServerReq := TaskPacket{
+		Key:  req.Key,
+		Work: "ChangeDetectMode",
+		User: req.User,
+		Message: req.Message,
+	}
+
+	// Convert to JSON
+	reqJSON, err := json.Marshal(ServerReq)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"Failed to convert req to JSON": err.Error()})
 		logger.Error("Error coverting req to JSON: " + err.Error())
+		return
 	}
 
 	// Send the JSON request
-	_, err = conn.Write(reqJSON)
+	_, err = tcpConn.Write(reqJSON)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"Error sending request to working server": err.Error()})
 		logger.Error("Error sending request: " + err.Error())
+		return
 	}
 
-	// Change client setting
+	// Functioning
 
 	// Receive the response
-	responseJSON := make([]byte, 1024)
-	_, err = conn.Read(responseJSON)
+	buf := make([]byte, 1024)
+	reslen, err := tcpConn.Read(buf)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"Error receiving response": err.Error()})
 		logger.Error("Error receiving response: " + err.Error())
+		return
 	}
 
 	// Parse the JSON response
 	var response TaskResponse
-	fmt.Println(response)
-	err = json.Unmarshal(responseJSON, &response)
+	err = json.Unmarshal(buf[:reslen], &response)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"Error parsing JSON response": err.Error()})
 		logger.Error("Error parsing JSON response: " + err.Error())
+		return
 	}
-
 	fmt.Println("Response:", response.Message)
 
-	res := struct{
-		IsSuccess bool `json:"isSuccess"`
-		Message string `json:"message"`
-	}{
+	res := TaskResponse {
 		IsSuccess: response.IsSuccess,
 		Message: response.Message,
 	}
