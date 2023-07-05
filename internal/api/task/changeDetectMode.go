@@ -44,11 +44,12 @@ func ChangeDetectMode(c *gin.Context) {
 			Message: "Nothing changed",
 		}
 		c.JSON(http.StatusOK, res)
+		return
 	}
 
 	// update agent settings
-	query = "UPDATE user_info SET processreport = ?, networkreport = ? WHERE id = ?"
-	_, err = mariadb.DB.Exec(query, new_process, new_network)
+	query = "UPDATE client_setting SET processreport = ?, networkreport = ? WHERE client_id = ?"
+	_, err = mariadb.DB.Exec(query, new_process, new_network, req.Key)
 	if err != nil {
 		logger.Error("Error updating client setting: " + err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"Error updating client setting": err.Error()})
