@@ -38,6 +38,8 @@ func Signup(c *gin.Context) {
 	err := mariadb.DB.QueryRow(query, req.Username).Scan(&exist)
 	if err != nil {
 		logger.Error("Error checking username existence: " + err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"Error checking username existence": err.Error()})
+		return		
 	}
 
 	if !exist {
@@ -47,6 +49,8 @@ func Signup(c *gin.Context) {
 		_, err = mariadb.DB.Exec(query, req.Username, req.Password)
 		if err != nil {
 			logger.Error("Error storing user data: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"Error storing user data": err.Error()})
+			return
 		}
 
 		// Retrieve user id
@@ -55,6 +59,8 @@ func Signup(c *gin.Context) {
 		err := mariadb.DB.QueryRow(query, req.Username).Scan(&userId)
 		if err != nil {
 			logger.Error("Error retrieving user id: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"Error retrieving user id": err.Error()})
+			return
 		}
 
 		// Storing other user data
@@ -62,6 +68,8 @@ func Signup(c *gin.Context) {
 		_, err = mariadb.DB.Exec(query, userId, req.Token, req.Email)
 		if err != nil {
 			logger.Error("Error storing user data: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"Error storing user data": err.Error()})
+			return
 		}
 		verified = true
 		message = "signup success"

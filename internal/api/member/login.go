@@ -77,8 +77,11 @@ func Login(c *gin.Context) {
 		if err == sql.ErrNoRows {
 			exist = false
 			message = "username not exist"
+		} else {
+			logger.Error("Error retrieving password: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"Error retrieving password": err.Error()})
+			return
 		}
-		logger.Error("Error retrieving password: " + err.Error())
 	}
 
 	if exist {
@@ -107,7 +110,8 @@ func Login(c *gin.Context) {
 			var jwtSecret = []byte(user_info.Username)
 			tokenString, err := token.SignedString(jwtSecret)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+				logger.Error("Error generating token: " + err.Error())
+				c.JSON(http.StatusInternalServerError, gin.H{"Error generating token": err.Error()})
 				return
 			}
 
@@ -126,6 +130,8 @@ func Login(c *gin.Context) {
 			_, err = mariadb.DB.Exec(query, tokenString, user_info.ID)
 			if err != nil {
 				logger.Error("Error updating token: " + err.Error())
+				c.JSON(http.StatusInternalServerError, gin.H{"Error updating token": err.Error()})
+				return
 			}
 
 			// Get user_info data
@@ -133,6 +139,8 @@ func Login(c *gin.Context) {
 			err = mariadb.DB.QueryRow(query, user_info.ID).Scan(&user_info.Email)
 			if err != nil {
 				logger.Error("Error retrieving user_info: " + err.Error())
+				c.JSON(http.StatusInternalServerError, gin.H{"Error retrieving user_info": err.Error()})
+				return
 			}
 		}
 	}
