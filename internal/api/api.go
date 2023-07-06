@@ -9,34 +9,20 @@ import (
 	"edetector_API/internal/api/searchEvidence"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
+	"edetector_API/pkg/redis"
 	"fmt"
 	"net"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	// "github.com/gorilla/websocket"
 )
 
 var err error
 var conn net.Conn
 
-func API_init() {
+func Main() {
 
-	// Load configuration
-	if config.LoadConfig() == nil {
-		fmt.Println("Error loading config file")
-		return
-	}
-
-	// Init Logger
-	logger.InitLogger(config.Viper.GetString("WORKER_LOG_FILE"))
-	fmt.Println("logger is enabled please check all out info in log file: ", config.Viper.GetString("WORKER_LOG_FILE"))
-
-	// Connect to MariaDB
-	if err = mariadb.Connect_init(); err != nil {
-		logger.Error("Error connecting to mariadb: " + err.Error())
-		return
-	}
+	API_init()
 
 	// Routing
 	router := gin.Default()
@@ -69,8 +55,33 @@ func API_init() {
 
 	// Web Socket
     router.GET("/ws", func(c *gin.Context) {
-        // serveWs(c.Writer, c.Request)
+        webSocket(c.Writer, c.Request)
     })
 
 	router.Run(":5000")
+}
+
+func API_init() {
+
+	// Load configuration
+	if config.LoadConfig() == nil {
+		fmt.Println("Error loading config file")
+		return
+	}
+
+	// Init Logger
+	logger.InitLogger(config.Viper.GetString("WORKER_LOG_FILE"))
+	fmt.Println("logger is enabled please check all out info in log file: ", config.Viper.GetString("WORKER_LOG_FILE"))
+
+	// Connect to Redis
+	if db := redis.Redis_init(); db == nil {
+		logger.Error("Error connecting to redis")
+		return
+	}
+
+	// Connect to MariaDB
+	if err = mariadb.Connect_init(); err != nil {
+		logger.Error("Error connecting to mariadb: " + err.Error())
+		return
+	}
 }

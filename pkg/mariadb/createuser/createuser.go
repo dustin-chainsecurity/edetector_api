@@ -39,6 +39,18 @@ func main() {
 		logger.Error("Failed to create user info table: " + err.Error())
 		return
 	}
+
+	// Create group_info table
+	if err = createGroupInfoTable(); err != nil {
+		fmt.Println("Failed to create group_info table: " + err.Error())
+		return
+	}
+
+	// Create user info table
+	if err = createClientGroupTable(); err != nil {
+		fmt.Println("Failed to create client_group info table: " + err.Error())
+		return
+	}
 }
 
 func createUserTable() error {
@@ -74,3 +86,38 @@ func createUserInfoTable() error {
 	return nil
 }
 
+func createClientGroupTable() error {
+	createTableSQL := `
+		CREATE TABLE IF NOT EXISTS client_group (
+			client_id varchar(45) NOT NULL,
+			group_id INT NOT NULL,
+			PRIMARY KEY (client_id, group_id),
+			FOREIGN KEY (client_id) REFERENCES client(client_id),
+			FOREIGN KEY (group_id) REFERENCES group_info(group_id)
+		);
+	`
+	_, err := mariadb.DB.Exec(createTableSQL)
+	if err != nil {
+		return err
+	}
+	fmt.Println("group_info table added")
+	return nil
+}
+
+func createGroupInfoTable() error {
+	createTableSQL := `
+		CREATE TABLE IF NOT EXISTS group_info (
+			group_id INT AUTO_INCREMENT PRIMARY KEY,
+			group_name VARCHAR(45) NOT NULL,
+			description VARCHAR(1000) NOT NULL,
+			range_begin VARCHAR(45) NOT NULL,
+			range_end VARCHAR(45) NOT NULL
+		);
+	`
+	_, err := mariadb.DB.Exec(createTableSQL)
+	if err != nil {
+		return err
+	}
+	fmt.Println("client_group table added")
+	return nil
+}
