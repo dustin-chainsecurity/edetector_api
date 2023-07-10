@@ -31,17 +31,24 @@ func Main() {
 	router.RedirectFixedPath = true
 	router.Use(cors.New(corsConfig))
 
-	// Functions
+	// Login
 	router.POST("/member/login", member.Login)
 	router.POST("/member/loginWithToken", member.LoginWithToken)
-	router.POST("/member/signup", member.Signup)
+
+	// Search Evidence
+	router.GET("/searchEvidence/detectDevices", searchEvidence.DetectDevices)
+	router.POST("/searchEvidence/sendMission", searchEvidence.SendMission)
+    router.GET("/searchEvidence/refreshDevices", func(c *gin.Context) {
+        webSocket(c.Writer, c.Request)
+    })	
+
+	// Dashboard
 	router.GET("/dashboard/serverState", dashboard.ServerState)
 	router.GET("/dashboard/agentState", dashboard.AgentState)
 	router.GET("/dashboard/ccConnectCount", dashboard.ConnectCount)
 	router.GET("/dashboard/riskProgram", dashboard.RiskProgram)
 	router.GET("/dashboard/riskComputer", dashboard.RiskComputer)
 	router.GET("/detect/timeList", detect.TimeList)
-	router.GET("/searchEvidence/DetectDevices", searchEvidence.DetectDevices)
 
 	// User Tasks
 	taskGroup := router.Group("/task")
@@ -52,11 +59,6 @@ func Main() {
 		taskGroup.POST("/startGetDrive", task.StartGetDrive)
 		taskGroup.POST("/startCollect", task.StartCollect)
 	}
-
-	// Web Socket
-    router.GET("/ws", func(c *gin.Context) {
-        webSocket(c.Writer, c.Request)
-    })
 
 	router.Run(":5000")
 }

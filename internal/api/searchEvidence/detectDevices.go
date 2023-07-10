@@ -1,71 +1,115 @@
 package searchEvidence
 
 import (
+	"edetector_API/pkg/logger"
+	"edetector_API/pkg/mariadb"
+	"edetector_API/pkg/redis"
+	"encoding/json"
 	"net/http"
 	"github.com/gin-gonic/gin"
 )
 
-type certificationDate struct {
-	Date int    `json:"date"`
-	Time string `json:"time"`
+type dateForm struct {
+	Date   string    `json:"date"`
+	Time   string    `json:"time"`
 }
 
-type tableDownloadDate struct {
-	Date int    `json:"date"`
-	Time string `json:"time"`
+type processing struct {
+	IsFinish    bool   `json:"isFinish"`
+	Progress    int    `json:"progress"`
+	FinishTime  int    `json:"finishTime"` 
 }
 
 type device struct {
-	DeviceID           string             `json:"deviceId"`
-	Connection         bool               `json:"connection"`
-	InnerIP            string             `json:"innerIP"`
-	DeviceName         string             `json:"deviceName"`
-	SubGroup           []string           `json:"subGroup"`
-	DetectionMode      bool               `json:"detectionMode"`
-	ScanTime           []string           `json:"scanTime"`
-	ScanFinishTime     int64              `json:"scanFinishTime"`
-	CertificationDate  certificationDate  `json:"CertificationDate"`
-	TraceFinishTime    int64              `json:"traceFinishTime"`
-	TableDownloadDate  tableDownloadDate  `json:"tableDownloadDate"`
-	TableFinishTime    int64              `json:"tableFinishTime"`
-	ImageFinishTime    int64              `json:"ImageFinishTime"`
+	DeviceID           string         `json:"deviceId"`
+	Connection         bool           `json:"connection"`
+	InnerIP            string         `json:"innerIP"`
+	DeviceName         string         `json:"deviceName"`
+	SubGroup           []string       `json:"subGroup"`
+	DetectionMode      bool           `json:"detectionMode"`
+	ScanTime           []string       `json:"scanTime"`
+	ScanFinishTime     processing     `json:"scanFinishTime"`
+	CertificationDate  dateForm       `json:"certificationDate"`
+	TraceFinishTime    processing     `json:"traceFinishTime"`
+	TableDownloadDate  dateForm       `json:"tableDownloadDate"`
+	TableFinishTime    processing     `json:"tableFinishTime"`
+	ImageFinishTime    processing     `json:"imageFinishTime"`
+}
+ 
+type detectDevicesResponse struct {
+	IsSuccess    bool      `json:"isSuccess"`
+	Data         []device  `json:"data"`
 }
 
-type detectDevicesResponse struct {
-	IsSuccess    bool     `json:"isSuccess"`
-	TotalPages   int      `json:"totalPages"`
-	TotalDevices int      `json:"totalDevices"`
-	Data         []device `json:"Data"`
+type onlineStatus struct {
+	Status int     `json:"Status"`
+	Time   string  `json:"Time"`	
 }
 
 func DetectDevices(c *gin.Context) {
-	// page := c.Query("pages")
 
-	// Simulate generating the response data based on the requested page
-	data := []device{
-		{
-			DeviceID:          "deviceIDNumber1",
-			Connection:        true,
-			InnerIP:           "1.2.4.69.69",
-			DeviceName:        "PC-01",
-			SubGroup:          []string{"group1", "group2"},
-			DetectionMode:     true,
-			ScanTime:          []string{"0000", "1200", "2400"},
-			ScanFinishTime:    1687332360,
-			CertificationDate: certificationDate{Date: 1, Time: "2400"},
-			TraceFinishTime:   1687332360,
-			TableDownloadDate: tableDownloadDate{Date: 1, Time: "2400"},
-			TableFinishTime:   1687332360,
-			ImageFinishTime:   1687332360,
-		},
+	query := `
+		SELECT C.client_id, C.ip, S.networkreport, S.processreport, I.computername 
+		FROM client AS C
+		JOIN client_setting AS S ON C.client_id = S.client_id
+		JOIN client_info AS I ON S.client_id = I.client_id
+	`
+	rows, err := mariadb.DB.Query(query)
+	if err != nil {
+		logger.Error("Error retrieving device info: " + err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"Error retrieving device info": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	devices := []device{}
+
+	for rows.Next() {
+
+        var d device
+		var process, network int
+        err = rows.Scan(
+            &d.DeviceID,
+            &d.InnerIP,
+			&network,
+			&process,
+            &d.DeviceName,
+        )
+        if err != nil {
+			logger.Error("Error scanning device info: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"Error scanning device info": err.Error()})
+			return
+        }
+
+		// detection mode
+		if process == 0 && network == 0 {
+			d.DetectionMode = false
+		} else {
+			d.DetectionMode = true
+		}
+
+		// connection
+		var status onlineStatus
+		statusString := redis.Redis_get(d.DeviceID)
+		err = json.Unmarshal([]byte(statusString), &status)
+		if err != nil {
+			logger.Error("Error unmarshal online status: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"Error unmarshal online status": err.Error()})
+			return
+		}
+		if status.Status == 1 {
+			d.Connection = true
+		} else {
+			d.Connection = false
+		}
+
+        devices = append(devices, d)
 	}
 
 	// Create the response object
 	res := detectDevicesResponse{
 		IsSuccess:    true,
-		TotalPages:   5,
-		TotalDevices: 49,
-		Data:         data,
+		Data:         devices,
 	}
 
 	c.JSON(http.StatusOK, res)

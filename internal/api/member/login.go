@@ -5,12 +5,11 @@ import (
 	"database/sql"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
+	"edetector_API/pkg/token"
 	"encoding/hex"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/dgrijalva/jwt-go"
 )
 
 type LoginRequest struct {
@@ -19,9 +18,7 @@ type LoginRequest struct {
 }
 
 type User struct {
-	ID       int    `json:"id"`
 	Username string `json:"username"`
-	Email    string `json:"email"`
 	Token    string `json:"token"`
 }
 
@@ -33,19 +30,10 @@ type LoginResponse struct {
 }
 
 type UserInfo struct {
-	ID int
-	Username string
-	Password string
-	Email    string
-	Token    string
-}
-
-// Expiration time for the token (1 hour)
-var tokenExpiration = time.Hour
-
-// Custom Claims structure for JWT
-type CustomClaims struct {
-	jwt.StandardClaims
+	ID        int
+	Username  string
+	Password  string
+	Token     string
 }
 
 func Login(c *gin.Context) {
@@ -53,7 +41,8 @@ func Login(c *gin.Context) {
 	// Receive request
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"Invalid request format": err.Error()})
+		logger.Error("Invalid request format: " + err.Error())
 		return
 	}
 
@@ -66,12 +55,11 @@ func Login(c *gin.Context) {
 		ID: -1,
 		Username: "Nil",
 		Password: "Nil",
-		Email: "Nil",
 		Token: "Nil",
 	}
 
-	query := "SELECT id, password FROM user WHERE username = ?"
-	err := mariadb.DB.QueryRow(query, req.Username).Scan(&user_info.ID, &user_info.Password)
+	query := "SELECT password FROM user WHERE username = ?"
+	err := mariadb.DB.QueryRow(query, req.Username).Scan(&user_info.Password)
 	if err != nil {
 		// Username not exist
 		if err == sql.ErrNoRows {
@@ -99,47 +87,21 @@ func Login(c *gin.Context) {
 		}
 
 		if verified {
-			// Create a new token
-			token := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaims{
-				StandardClaims: jwt.StandardClaims{
-					ExpiresAt: time.Now().Add(tokenExpiration).Unix(),
-				},
-			})
-
-			// Sign the token with your secret key
-			var jwtSecret = []byte(user_info.Username)
-			tokenString, err := token.SignedString(jwtSecret)
+			// Generate token
+			token, err := token.Generate()
 			if err != nil {
 				logger.Error("Error generating token: " + err.Error())
 				c.JSON(http.StatusInternalServerError, gin.H{"Error generating token": err.Error()})
-				return
+				return				
 			}
-
-			// Set the token as a cookie
-			cookie := &http.Cookie{
-				Name:     "token",
-				Value:    tokenString,
-				Expires:  time.Now().Add(tokenExpiration),
-				HttpOnly: true,
-			}
-			http.SetCookie(c.Writer, cookie)
-			user_info.Token = tokenString
+			user_info.Token = token
 
 			// Update user token
 			query = "UPDATE user_info SET token = ? WHERE id = ?"
-			_, err = mariadb.DB.Exec(query, tokenString, user_info.ID)
+			_, err = mariadb.DB.Exec(query, token, user_info.ID)
 			if err != nil {
 				logger.Error("Error updating token: " + err.Error())
 				c.JSON(http.StatusInternalServerError, gin.H{"Error updating token": err.Error()})
-				return
-			}
-
-			// Get user_info data
-			query = "SELECT email FROM user_info WHERE id = ?"
-			err = mariadb.DB.QueryRow(query, user_info.ID).Scan(&user_info.Email)
-			if err != nil {
-				logger.Error("Error retrieving user_info: " + err.Error())
-				c.JSON(http.StatusInternalServerError, gin.H{"Error retrieving user_info": err.Error()})
 				return
 			}
 		}
@@ -151,9 +113,7 @@ func Login(c *gin.Context) {
 		Message: message,
 		Code:    200,
 		User: User{
-			ID:       user_info.ID,
 			Username: user_info.Username,
-			Email:    user_info.Email,
 			Token:    user_info.Token,
 		},
 	}
