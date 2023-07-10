@@ -1,12 +1,10 @@
 package member
 
 import (
-	"crypto/md5"
 	"database/sql"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
 	"edetector_API/pkg/token"
-	"encoding/hex"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -25,7 +23,6 @@ type User struct {
 type LoginResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
-	Code    int    `json:"code"`
 	User    User   `json:"user"`
 }
 
@@ -46,9 +43,8 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	var message string
-	exist := true
-	verified := false
+	var message = "login success"
+	var verified = true
 
 	// Get user data
 	user_info := UserInfo{
@@ -58,52 +54,35 @@ func Login(c *gin.Context) {
 		Token:    "Nil",
 	}
 
-	query := "SELECT password FROM user WHERE username = ?"
-	err := mariadb.DB.QueryRow(query, req.Username).Scan(&user_info.Password)
+	query := "SELECT id FROM user WHERE username = ? AND password = MD5(?)"
+	err := mariadb.DB.QueryRow(query, req.Username, req.Password).Scan(&user_info.ID)
 	if err != nil {
-		// Username not exist
+		// Username not exist or wrong password
 		if err == sql.ErrNoRows {
-			exist = false
-			message = "username not exist"
+			message = "wrong username or password"
+			verified = false
+			user_info.ID = -1
 		} else {
-			logger.Error("Error retrieving password: " + err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{"Error retrieving password": err.Error()})
+			logger.Error("Error checking user info: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"Error checking user info": err.Error()})
 			return
 		}
 	}
 
-	if exist {
-		// Check user password
-		hash := md5.Sum([]byte(req.Password))
-		encoded := hex.EncodeToString(hash[:])
-		if encoded == user_info.Password {
-			message = "login success"
-			verified = true
-		} else {
-			message = "password incorrect"
-			verified = false
-			user_info.ID = -1
-			user_info.Username = "Nil"
-		}
+	if verified {
 
-		if verified {
-			// Generate token
-			token, err := token.Generate()
-			if err != nil {
-				logger.Error("Error generating token: " + err.Error())
-				c.JSON(http.StatusInternalServerError, gin.H{"Error generating token": err.Error()})
-				return
-			}
-			user_info.Token = token
+		user_info.Username = req.Username
+		
+		// Generate token
+		user_info.Token = token.Generate()
 
-			// Update user token
-			query = "UPDATE user_info SET token = ? WHERE id = ?"
-			_, err = mariadb.DB.Exec(query, token, user_info.ID)
-			if err != nil {
-				logger.Error("Error updating token: " + err.Error())
-				c.JSON(http.StatusInternalServerError, gin.H{"Error updating token": err.Error()})
-				return
-			}
+		// Update user token
+		query = "UPDATE user_info SET token = ?, token_time = CURRENT_TIMESTAMP WHERE id = ?"
+		_, err = mariadb.DB.Exec(query, user_info.Token, user_info.ID)
+		if err != nil {
+			logger.Error("Error updating token: " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"Error updating token": err.Error()})
+			return
 		}
 	}
 
@@ -111,7 +90,6 @@ func Login(c *gin.Context) {
 	res := LoginResponse{
 		Success: verified,
 		Message: message,
-		Code:    200,
 		User: User{
 			Username: user_info.Username,
 			Token:    user_info.Token,
@@ -120,6 +98,3 @@ func Login(c *gin.Context) {
 
 	c.JSON(http.StatusOK, res)
 }
-
-// INSERT INTO user (username, password) VALUES ('example_username', 'example_password');
-// INSERT INTO user_info (id, token, email) VALUES (1, 'loremipsumdolorsitamet', 'chiehyu@exampe.com');

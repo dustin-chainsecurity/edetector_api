@@ -1,0 +1,2 @@
+{"level":"error","ts":"2023-07-10T18:25:44.156+0800","msg":"Error verifying token: token not exist","func":"member.LoginWithToken","file":"/home/angel/edetector_API/internal/api/member/loginWithToken.go","line":29}
+{"level":"error","ts":"2023-07-10T18:26:07.576+0800","msg":"Error verifying token: token not exist","func":"member.LoginWithToken","file":"/home/angel/edetector_API/internal/api/member/loginWithToken.go","line":29}

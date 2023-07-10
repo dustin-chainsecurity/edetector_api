@@ -74,6 +74,7 @@ func createUserInfoTable() error {
 		CREATE TABLE IF NOT EXISTS user_info (
 			id INT NOT NULL,
 			token VARCHAR(200) NOT NULL,
+			token_time TIMESTAMP,
 			email VARCHAR(45) NOT NULL,
 			FOREIGN KEY (id) REFERENCES user(id)
 		);

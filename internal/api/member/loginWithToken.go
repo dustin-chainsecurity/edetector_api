@@ -52,7 +52,6 @@ func LoginWithToken(c *gin.Context) {
 	res := LoginResponse{
 		Success: verified,
 		Message: message,
-		Code:    200,
 		User: User{
 			Username: username,
 			Token:    token,
