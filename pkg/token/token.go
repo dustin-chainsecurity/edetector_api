@@ -58,7 +58,7 @@ func Verify(token string) (int, error) {
 }
 
 func generateRandomTokenValue() (string, error) {
-
+	//change to uuid token
 	tokenValueBytes := make([]byte, 32) // 32 bytes = 256 bits
 	_, err := rand.Read(tokenValueBytes)
 	if err != nil {

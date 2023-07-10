@@ -30,10 +30,10 @@ type LoginResponse struct {
 }
 
 type UserInfo struct {
-	ID        int
-	Username  string
-	Password  string
-	Token     string
+	ID       int
+	Username string
+	Password string
+	Token    string
 }
 
 func Login(c *gin.Context) {
@@ -52,14 +52,14 @@ func Login(c *gin.Context) {
 
 	// Get user data
 	user_info := UserInfo{
-		ID: -1,
+		ID:       -1,
 		Username: "Nil",
 		Password: "Nil",
-		Token: "Nil",
+		Token:    "Nil",
 	}
 
-	query := "SELECT id, password FROM user WHERE username = ?"
-	err := mariadb.DB.QueryRow(query, req.Username).Scan(&user_info.ID, &user_info.Password)
+	query := "SELECT password FROM user WHERE username = ?"
+	err := mariadb.DB.QueryRow(query, req.Username).Scan(&user_info.Password)
 	if err != nil {
 		// Username not exist
 		if err == sql.ErrNoRows {
@@ -92,7 +92,7 @@ func Login(c *gin.Context) {
 			if err != nil {
 				logger.Error("Error generating token: " + err.Error())
 				c.JSON(http.StatusInternalServerError, gin.H{"Error generating token": err.Error()})
-				return				
+				return
 			}
 			user_info.Token = token
 

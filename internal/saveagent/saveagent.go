@@ -2,25 +2,25 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"edetector_API/pkg/logger"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
 )
 
 type Request struct {
-	IP   string `json:"ip"`
-	Port string    `json:"port"`
+	IP         string `json:"ip"`
+	Port       string `json:"port"`
 	DetectPort string `json:"detect_port"`
 }
 
 func main() {
 
-	request := Request {
-		IP: "192.168.200.161",
-		Port: "5000",
+	request := Request{
+		IP:         "192.168.200.161",
+		Port:       "5000",
 		DetectPort: "5001",
 	}
 
@@ -33,7 +33,7 @@ func main() {
 
 	// Create an HTTP request
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", "http://192.168.200.167:8080/agent", bytes.NewBuffer(payload))
+	req, err := http.NewRequest("POST", "http://192.168.200.167:8080/agent", bytes.NewBuffer(payload)) // need port change
 	if err != nil {
 		logger.Error("Error creating HTTP request: " + err.Error())
 		return
