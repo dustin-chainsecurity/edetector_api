@@ -2,6 +2,8 @@ package token
 
 import (
 	"crypto/rand"
+	"database/sql"
+	"edetector_API/pkg/mariadb"
 	"encoding/base64"
 	"fmt"
 	"strconv"
@@ -20,21 +22,39 @@ func Generate() (string, error) {
 	return token, nil
 }
 
-func Verify(token string) (bool, error) {
+func Verify(token string) (int, error) {
 
+	var userId = -1
+
+	// check token format
 	parts := strings.Split(token, ":")
 	if len(parts) != 2 {
-		return false, fmt.Errorf("invalid token format")
+		return userId, fmt.Errorf("invalid token format")
 	}
 	tokenTime, err := strconv.ParseInt(parts[1], 10, 64)
 	if err != nil {
-		return false, fmt.Errorf("failed to parse token time: %v", err)
+		return userId, fmt.Errorf("failed to parse token time: %v", err)
 	}
+
+	// check if expired
 	expiration := time.Unix(tokenTime, 0).Add(ExpirationPeriod)
 	if time.Now().After(expiration) {
-		return false, fmt.Errorf("token expired")
+		return userId, fmt.Errorf("token expired")
 	}
-	return true, nil
+
+	// check if valid
+	query := "SELECT id FROM user_info WHERE token = ?"
+	err = mariadb.DB.QueryRow(query, token).Scan(&userId)
+	if err != nil {
+		// token not exist
+		if err == sql.ErrNoRows {
+			return userId, fmt.Errorf("token not exist")
+		} else {
+			return userId, fmt.Errorf(err.Error())
+		}
+	}
+
+	return userId, nil
 }
 
 func generateRandomTokenValue() (string, error) {

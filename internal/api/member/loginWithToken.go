@@ -2,6 +2,7 @@ package member
 
 import (
 	"edetector_API/pkg/logger"
+	"edetector_API/pkg/mariadb"
 	"edetector_API/pkg/token"
 	"net/http"
 
@@ -21,30 +22,40 @@ func LoginWithToken(c *gin.Context) {
 	}
 
 	// Verify token
-	verified, err := token.Verify(req.Token)
+	var verified bool
+	userId, err := token.Verify(req.Token)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Error verifying token": err.Error()})
 		logger.Error("Error verifying token: " + err.Error())
 		return
 	}
-	var message string
-	if verified {
-		message = "token verified"
-	} else {
+	var message, username, token string
+	if userId == -1 {
+		verified = false
 		message = "failed"
+		username = "Nil"
+		token = "Nil"
+	} else {
+		verified = true
+		message = "token verified"
+		token = req.Token
+		// Get username
+		query := "SELECT username FROM user WHERE id = ?"
+		err := mariadb.DB.QueryRow(query, userId).Scan(&username)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Error retrieving username": err.Error()})
+			logger.Error("Error retrieving username: " + err.Error())
+			return			
+		}
 	}
-
-	// Create response
-	var Username = "tmp"
-	var Token = "tmp"
 
 	res := LoginResponse{
 		Success: verified,
 		Message: message,
 		Code:    200,
 		User: User{
-			Username: Username,
-			Token:    Token,
+			Username: username,
+			Token:    token,
 		},
 	}
 

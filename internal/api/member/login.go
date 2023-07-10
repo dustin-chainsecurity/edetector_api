@@ -58,8 +58,8 @@ func Login(c *gin.Context) {
 		Token: "Nil",
 	}
 
-	query := "SELECT password FROM user WHERE username = ?"
-	err := mariadb.DB.QueryRow(query, req.Username).Scan(&user_info.Password)
+	query := "SELECT id, password FROM user WHERE username = ?"
+	err := mariadb.DB.QueryRow(query, req.Username).Scan(&user_info.ID, &user_info.Password)
 	if err != nil {
 		// Username not exist
 		if err == sql.ErrNoRows {
