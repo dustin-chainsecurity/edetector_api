@@ -1,9 +1,11 @@
 package task
 
 import (
+	"bytes"
 	"edetector_API/pkg/mariadb"
 	"edetector_API/pkg/redis"
 	"encoding/json"
+	"fmt"
 	"github.com/google/uuid"
 )
 
@@ -41,6 +43,15 @@ func AddTask(deviceId string, work string, msg string) error {
 	if err != nil {
 		return err
 	}
+
+	// fill to 1024 bytes
+	if len(pktString) >= 1024 {
+		return fmt.Errorf("task packet too long")
+	} else {
+		zeroBytes := bytes.Repeat([]byte{0}, 1024 - len(pktString))
+		pktString = append(pktString, zeroBytes...)
+	}
+
 	err = redis.Redis_set(taskId, string(pktString))
 	return err
 }

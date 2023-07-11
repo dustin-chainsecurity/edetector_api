@@ -41,5 +41,3 @@ func SendMission(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, res)
 }
-
-

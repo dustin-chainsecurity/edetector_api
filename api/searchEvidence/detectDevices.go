@@ -27,15 +27,15 @@ type device struct {
 	DeviceName         string         `json:"deviceName"`
 	SubGroup           []string       `json:"subGroup"`
 	DetectionMode      bool           `json:"detectionMode"`
-	ScanTime           []string       `json:"scanTime"`
+	ScanSchedule       []string       `json:"scanTime"`
 	ScanFinishTime     processing     `json:"scanFinishTime"`
-	CertificationDate  dateForm       `json:"certificationDate"`
-	TraceFinishTime    processing     `json:"traceFinishTime"`
-	TableDownloadDate  dateForm       `json:"tableDownloadDate"`
-	TableFinishTime    processing     `json:"tableFinishTime"`
+	CollectSchedule    dateForm       `json:"certificationDate"`
+	CollectFinishTime  processing     `json:"traceFinishTime"`
+	FileSchedule       dateForm       `json:"tableDownloadDate"`
+	FileFinishTime     processing     `json:"tableFinishTime"`
 	ImageFinishTime    processing     `json:"imageFinishTime"`
 }
- 
+
 type detectDevicesResponse struct {
 	IsSuccess    bool      `json:"isSuccess"`
 	Data         []device  `json:"data"`
