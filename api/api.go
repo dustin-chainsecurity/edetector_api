@@ -2,23 +2,20 @@ package api
 
 import (
 	"edetector_API/config"
-	"edetector_API/internal/api/task"
-	"edetector_API/internal/api/member"
-	"edetector_API/internal/api/dashboard"
-	"edetector_API/internal/api/detect"
-	"edetector_API/internal/api/searchEvidence"
+	"edetector_API/api/task"
+	"edetector_API/api/member"
+	"edetector_API/api/dashboard"
+	"edetector_API/api/searchEvidence"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
 	"edetector_API/pkg/redis"
 	"fmt"
-	"net"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 var err error
-var conn net.Conn
 
 func Main() {
 
@@ -37,10 +34,15 @@ func Main() {
 
 	// Search Evidence
 	router.GET("/searchEvidence/detectDevices", searchEvidence.DetectDevices)
-	router.POST("/searchEvidence/sendMission", searchEvidence.SendMission)
-    router.GET("/searchEvidence/refreshDevices", func(c *gin.Context) {
+	router.GET("/searchEvidence/refreshDevices", searchEvidence.RefreshDevices)
+    router.GET("/ws", func(c *gin.Context) {
         webSocket(c.Writer, c.Request)
-    })	
+    })
+
+	// Working Server Tasks
+	taskGroup := router.Group("/task")
+	taskGroup.POST("/sendMission", task.SendMission)
+	taskGroup.POST("/detectionMode", task.DetectionMode)
 
 	// Dashboard
 	router.GET("/dashboard/serverState", dashboard.ServerState)
@@ -48,17 +50,6 @@ func Main() {
 	router.GET("/dashboard/ccConnectCount", dashboard.ConnectCount)
 	router.GET("/dashboard/riskProgram", dashboard.RiskProgram)
 	router.GET("/dashboard/riskComputer", dashboard.RiskComputer)
-	router.GET("/detect/timeList", detect.TimeList)
-
-	// User Tasks
-	taskGroup := router.Group("/task")
-	taskGroup.Use(EstablishTCPConnection()) 
-	{
-		taskGroup.POST("/changeDetectMode", task.ChangeDetectMode)
-		taskGroup.POST("/startScan", task.StartScan)
-		taskGroup.POST("/startGetDrive", task.StartGetDrive)
-		taskGroup.POST("/startCollect", task.StartCollect)
-	}
 
 	router.Run(":5000")
 }

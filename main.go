@@ -1,7 +1,7 @@
 package main
 
 import (
-	"edetector_API/internal/api"
+	"edetector_API/api"
 )
 
 func main() {

@@ -1,7 +1,7 @@
 package member
 
 import (
-	"edetector_API/pkg/logger"
+	"edetector_API/internal/Error"
 	"edetector_API/pkg/mariadb"
 	"net/http"
 
@@ -25,7 +25,7 @@ func Signup(c *gin.Context) {
 	// Receive request
 	var req SignUpRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		Error.Handler(c, err, "Invalid request format")
 		return
 	}
 
@@ -37,9 +37,8 @@ func Signup(c *gin.Context) {
 	query := "SELECT EXISTS(SELECT 1 FROM user WHERE username = ?)"
 	err := mariadb.DB.QueryRow(query, req.Username).Scan(&exist)
 	if err != nil {
-		logger.Error("Error checking username existence: " + err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"Error checking username existence": err.Error()})
-		return		
+		Error.Handler(c, err, "Error checking username existence")
+		return
 	}
 
 	if !exist {
@@ -48,8 +47,7 @@ func Signup(c *gin.Context) {
 		query = "INSERT INTO user (username, password) VALUES (?, MD5(?))"
 		_, err = mariadb.DB.Exec(query, req.Username, req.Password)
 		if err != nil {
-			logger.Error("Error storing user data: " + err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{"Error storing user data": err.Error()})
+			Error.Handler(c, err, "Error storing user data")
 			return
 		}
 
@@ -58,8 +56,7 @@ func Signup(c *gin.Context) {
 		query := "SELECT id FROM user WHERE username = ?"
 		err := mariadb.DB.QueryRow(query, req.Username).Scan(&userId)
 		if err != nil {
-			logger.Error("Error retrieving user id: " + err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{"Error retrieving user id": err.Error()})
+			Error.Handler(c, err, "Error retrieving user id")
 			return
 		}
 
@@ -67,8 +64,7 @@ func Signup(c *gin.Context) {
 		query = "INSERT INTO user_info (id, token, email) VALUES (?, ?, ?)"
 		_, err = mariadb.DB.Exec(query, userId, req.Token, req.Email)
 		if err != nil {
-			logger.Error("Error storing user data: " + err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{"Error storing user data": err.Error()})
+			Error.Handler(c, err, "Error storing user data")
 			return
 		}
 		verified = true

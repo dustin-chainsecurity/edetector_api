@@ -1,9 +1,9 @@
 package member
 
 import (
-	"edetector_API/pkg/logger"
+	"edetector_API/internal/Error"
+	"edetector_API/internal/token"
 	"edetector_API/pkg/mariadb"
-	"edetector_API/pkg/token"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,8 +16,7 @@ func LoginWithToken(c *gin.Context) {
 		Token string `json:"token"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Invalid request format": err.Error()})
-		logger.Error("Invalid request format: " + err.Error())
+		Error.Handler(c, err, "Invalid request format")
 		return
 	}
 
@@ -25,8 +24,7 @@ func LoginWithToken(c *gin.Context) {
 	var verified bool
 	userId, err := token.Verify(req.Token)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error verifying token": err.Error()})
-		logger.Error("Error verifying token: " + err.Error())
+		Error.Handler(c, err, "Error verifying token")
 		return
 	}
 	var message, username, token string
@@ -43,9 +41,8 @@ func LoginWithToken(c *gin.Context) {
 		query := "SELECT username FROM user WHERE id = ?"
 		err := mariadb.DB.QueryRow(query, userId).Scan(&username)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"Error retrieving username": err.Error()})
-			logger.Error("Error retrieving username: " + err.Error())
-			return			
+			Error.Handler(c, err, "Error retrieving username")
+			return
 		}
 	}
 

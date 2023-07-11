@@ -1,34 +1,35 @@
-package api
+package tcp
 
 import (
 	"edetector_API/config"
-	"edetector_API/pkg/logger"
+	Error "edetector_API/internal/error"
 	"fmt"
 	"net"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
+
+var Conn net.Conn
+var err  error
 
 func EstablishTCPConnection() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		// Establish TCP connection if not already established
-		if conn == nil {
+		if Conn == nil {
 			serverIP := config.Viper.GetString("SERVER_IP")
 			serverPort := config.Viper.GetString("SERVER_PORT")
 			connectionString := fmt.Sprintf("%s:%s", serverIP, serverPort)
-			conn, err = net.Dial("tcp", connectionString)
+			Conn, err = net.Dial("tcp", connectionString)
 			if err != nil {
-				logger.Error("Error setting up TCP connection: " + err.Error())
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to establish TCP connection"})
+				Error.Handler(c, err, "Error establishing TCP connection")
 				c.Abort()
 				return
 			}
 		}
 
 		// Set the TCP connection in the Gin context for the downstream handlers
-		c.Set("tcpConnection", conn)
+		c.Set("tcpConnection", Conn)
 		// Proceed to the next handler
 		c.Next()
 	}

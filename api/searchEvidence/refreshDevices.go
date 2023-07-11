@@ -4,6 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SendMission(c *gin.Context) {
+func RefreshDevices(c *gin.Context) {
 	
 }

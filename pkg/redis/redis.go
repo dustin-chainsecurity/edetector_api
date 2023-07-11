@@ -27,11 +27,10 @@ func Redis_close() {
 	RedisClient.Close()
 }
 
-func Redis_set(key string, value string) {
-	RedisClient.Set(context.Background(), key, value, 0)
+func Redis_set(key string, value string) error {
+	return RedisClient.Set(context.Background(), key, value, 0).Err()
 }
 
-func Redis_get(key string) string {
-	val, _ := RedisClient.Get(context.Background(), key).Result()
-	return val
+func Redis_get(key string) (string, error) {
+	return RedisClient.Get(context.Background(), key).Result()
 }

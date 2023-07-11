@@ -2,9 +2,9 @@ package member
 
 import (
 	"database/sql"
-	"edetector_API/pkg/logger"
+	"edetector_API/internal/Error"
+	"edetector_API/internal/token"
 	"edetector_API/pkg/mariadb"
-	"edetector_API/pkg/token"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -38,8 +38,7 @@ func Login(c *gin.Context) {
 	// Receive request
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Invalid request format": err.Error()})
-		logger.Error("Invalid request format: " + err.Error())
+		Error.Handler(c, err, "Invalid request format")
 		return
 	}
 
@@ -63,8 +62,7 @@ func Login(c *gin.Context) {
 			verified = false
 			user_info.ID = -1
 		} else {
-			logger.Error("Error checking user info: " + err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{"Error checking user info": err.Error()})
+			Error.Handler(c, err, "Error checking user info")
 			return
 		}
 	}
@@ -80,8 +78,7 @@ func Login(c *gin.Context) {
 		query = "UPDATE user_info SET token = ?, token_time = CURRENT_TIMESTAMP WHERE id = ?"
 		_, err = mariadb.DB.Exec(query, user_info.Token, user_info.ID)
 		if err != nil {
-			logger.Error("Error updating token: " + err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{"Error updating token": err.Error()})
+			Error.Handler(c, err, "Error updating token")
 			return
 		}
 	}

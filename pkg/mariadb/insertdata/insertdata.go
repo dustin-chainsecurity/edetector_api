@@ -2,7 +2,7 @@ package main
 
 import (
 	"crypto/rand"
-	"edetector_API/internal/api"
+	"edetector_API/api"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
 	"edetector_API/pkg/redis"
