@@ -1,7 +1,7 @@
 package searchEvidence
 
 import (
-	"edetector_API/internal/error"
+	"edetector_API/internal/Error"
 	"edetector_API/pkg/mariadb"
 	"edetector_API/pkg/redis"
 	"encoding/json"
@@ -56,7 +56,7 @@ func DetectDevices(c *gin.Context) {
 	`
 	rows, err := mariadb.DB.Query(query)
 	if err != nil {
-		error.Handler(c, err, "Error retrieving device info")
+		Error.Handler(c, err, "Error retrieving device info")
 		return
 	}
 	defer rows.Close()
@@ -75,7 +75,7 @@ func DetectDevices(c *gin.Context) {
             &d.DeviceName,
         )
         if err != nil {
-			error.Handler(c, err, "Error scanning device info")
+			Error.Handler(c, err, "Error scanning device info")
 			return
         }
 
@@ -90,12 +90,12 @@ func DetectDevices(c *gin.Context) {
 		var status onlineStatus
 		statusString, err := redis.Redis_get(d.DeviceID)
 		if err != nil {
-			error.Handler(c, err, "Error getting online status from redis")
+			Error.Handler(c, err, "Error getting online status from redis")
 			return
 		}		
 		err = json.Unmarshal([]byte(statusString), &status)
 		if err != nil {
-			error.Handler(c, err, "Error unmarshal online status")
+			Error.Handler(c, err, "Error unmarshal online status")
 			return
 		}
 		if status.Status == 1 {
