@@ -2,10 +2,12 @@ package token
 
 import (
 	"database/sql"
+	"edetector_API/internal/Error"
 	"edetector_API/pkg/mariadb"
 	"fmt"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
@@ -44,4 +46,19 @@ func Verify(token string) (int, error) {
 	}
 
 	return userId, nil
+}
+
+func TokenAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Read the token from the header
+		token := c.GetHeader("Authorization")
+		userId, err := Verify(token)
+		if err != nil {
+			Error.Handler(c, err, "Error verifying token from header")
+			c.Abort()
+		} else {
+			c.Set("userID", userId)
+			c.Next()
+		}
+	}
 }

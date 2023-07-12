@@ -1,11 +1,14 @@
 package packet
 
 import (
+	"database/sql"
 	"edetector_API/pkg/mariadb"
 	"edetector_API/pkg/redis"
 	"encoding/json"
 	"fmt"
 	"strings"
+
+	_ "github.com/go-sql-driver/mysql"	
 )
 
 type dateForm struct {
@@ -62,7 +65,17 @@ func ProcessDeviceData() ([]Device, error) {
 
         var d Device
 		var process, network int
-		var scanSchedule, collectSchedule, fileSchedule, scanFinishTime, collectFinishTime, fileFinishTime, imageFinishTime string
+		var scanSchedule, collectSchedule, fileSchedule sql.NullString
+		var scanFinishTime, collectFinishTime, fileFinishTime, imageFinishTime sql.NullString
+		initialProcessing := processing {
+			IsFinish: true,
+			Progress: 0,
+			FinishTime: 0,
+		}
+		d.ScanFinishTime = initialProcessing
+		d.CollectFinishTime = initialProcessing
+		d.FileFinishTime = initialProcessing
+		d.ImageFinishTime = initialProcessing
 
         err = rows.Scan(
             &d.DeviceID,
@@ -116,7 +129,13 @@ func ProcessDeviceData() ([]Device, error) {
 			return devices, err
 		}
 		
-		// process finish time
+		// process ScanFinishTime
+
+		// process CollectFinishTime
+
+		// process FileFinishTime
+
+		// process ImageFinishTime
 
         devices = append(devices, d)
 	}
@@ -124,10 +143,14 @@ func ProcessDeviceData() ([]Device, error) {
 	return devices, nil
 }
 
-func processSchedule(schedule string) (dateForm, error) {
+func processSchedule(schedule sql.NullString) (dateForm, error) {
+	output := dateForm{Date: "", Time: "",}
+	// handle NULL
+	if !schedule.Valid {
+		return output, nil
+	}
 	// schedule: date|time e.g. 11|20
-	partitions := strings.Split(schedule, "|")
-	output := dateForm{}
+	partitions := strings.Split(schedule.String, "|")
 	if len(partitions) == 2 {
 		output = dateForm {
 			Date: partitions[0],
@@ -139,12 +162,16 @@ func processSchedule(schedule string) (dateForm, error) {
 	return output, nil
 }
 
-func processScanSchedule(schedule string) []string {
+func processScanSchedule(schedule sql.NullString) []string {
+	// handle NULL
+	if !schedule.Valid {
+		return nil
+	}
 	// schedule: time,time,time e.g. 11,13,18
-	partitions := strings.Split(schedule, ",")
+	partitions := strings.Split(schedule.String, ",")
 	return partitions
 }
 
-func processFinishTime() {
+func ProcessFinishTime() {
 
 }

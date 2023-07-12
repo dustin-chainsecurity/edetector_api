@@ -6,6 +6,7 @@ import (
 	"edetector_API/api/member"
 	"edetector_API/api/dashboard"
 	"edetector_API/api/searchEvidence"
+	"edetector_API/internal/token"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
 	"edetector_API/pkg/redis"
@@ -25,12 +26,17 @@ func Main() {
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
+	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"}
+	corsConfig.AllowHeaders = []string{"Content-Type", "Accept", "Content-Length", "Authorization", "Origin", "X-Requested-With"}
 	router.RedirectFixedPath = true
 	router.Use(cors.New(corsConfig))
 
 	// Login
 	router.POST("/member/login", member.Login)
 	router.POST("/member/loginWithToken", member.LoginWithToken)
+
+	// Use Token Authentication
+	router.Use(token.TokenAuth())
 
 	// Search Evidence
 	router.GET("/searchEvidence/detectDevices", searchEvidence.DetectDevices)
