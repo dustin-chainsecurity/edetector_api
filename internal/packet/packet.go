@@ -69,8 +69,8 @@ func ProcessDeviceData() ([]Device, error) {
 		var scanFinishTime, collectFinishTime, fileFinishTime, imageFinishTime sql.NullString
 		initialProcessing := processing {
 			IsFinish: true,
-			Progress: 0,
-			FinishTime: 0,
+			Progress: 100,
+			FinishTime: 1689120949,
 		}
 		d.ScanFinishTime = initialProcessing
 		d.CollectFinishTime = initialProcessing
@@ -136,7 +136,9 @@ func ProcessDeviceData() ([]Device, error) {
 		// process FileFinishTime
 
 		// process ImageFinishTime
-
+		d.ScanSchedule = []string {"11", "13","20"}
+		d.CollectSchedule = dateForm{Date:"10", Time:"10"}
+		d.FileSchedule = dateForm{Date:"10", Time:"10"}
         devices = append(devices, d)
 	}
 
@@ -174,4 +176,16 @@ func processScanSchedule(schedule sql.NullString) []string {
 
 func ProcessFinishTime() {
 
+}
+
+func CheckTaskStatus(deviceId string, work string) error {
+
+	var status int
+	query := "SELECT status FROM task WHERE client_id = ? AND type = ? AND status != 3"
+	err := mariadb.DB.QueryRow(query, deviceId, work).Scan(&status)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
