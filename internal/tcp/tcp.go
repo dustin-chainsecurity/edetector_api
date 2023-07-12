@@ -2,7 +2,7 @@ package tcp
 
 import (
 	"edetector_API/config"
-	Error "edetector_API/internal/error"
+	Error "edetector_API/internal/Error"
 	"fmt"
 	"net"
 

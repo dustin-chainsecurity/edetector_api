@@ -3,56 +3,28 @@ package searchEvidence
 import (
 	"edetector_API/internal/Error"
 	"edetector_API/pkg/mariadb"
+	. "edetector_API/internal/device"
 	"edetector_API/pkg/redis"
 	"encoding/json"
 	"net/http"
 	"github.com/gin-gonic/gin"
 )
 
-type dateForm struct {
-	Date   string    `json:"date"`
-	Time   string    `json:"time"`
-}
-
-type processing struct {
-	IsFinish    bool   `json:"isFinish"`
-	Progress    int    `json:"progress"`
-	FinishTime  int    `json:"finishTime"` 
-}
-
-type device struct {
-	DeviceID           string         `json:"deviceId"`
-	Connection         bool           `json:"connection"`
-	InnerIP            string         `json:"innerIP"`
-	DeviceName         string         `json:"deviceName"`
-	SubGroup           []string       `json:"subGroup"`
-	DetectionMode      bool           `json:"detectionMode"`
-	ScanSchedule       []string       `json:"scanTime"`
-	ScanFinishTime     processing     `json:"scanFinishTime"`
-	CollectSchedule    dateForm       `json:"certificationDate"`
-	CollectFinishTime  processing     `json:"traceFinishTime"`
-	FileSchedule       dateForm       `json:"tableDownloadDate"`
-	FileFinishTime     processing     `json:"tableFinishTime"`
-	ImageFinishTime    processing     `json:"imageFinishTime"`
-}
-
 type detectDevicesResponse struct {
-	IsSuccess    bool      `json:"isSuccess"`
-	Data         []device  `json:"data"`
-}
-
-type onlineStatus struct {
-	Status int     `json:"Status"`
-	Time   string  `json:"Time"`	
+	IsSuccess    bool       `json:"isSuccess"`
+	Data         []Device   `json:"data"`
 }
 
 func DetectDevices(c *gin.Context) {
 
 	query := `
-		SELECT C.client_id, C.ip, S.networkreport, S.processreport, I.computername 
+		SELECT C.client_id, C.ip, S.networkreport, S.processreport, I.computername, 
+			T.scan_schedule, T.scan_finish_time, T.collect_schedule, T.collect_finish_time, 
+			T.file_schedule, T.file_finish_time, T.image_finish_time
 		FROM client AS C
 		JOIN client_setting AS S ON C.client_id = S.client_id
 		JOIN client_info AS I ON S.client_id = I.client_id
+		JOIN client_task_status AS T ON I.client_id = T.client_id
 	`
 	rows, err := mariadb.DB.Query(query)
 	if err != nil {
@@ -61,11 +33,11 @@ func DetectDevices(c *gin.Context) {
 	}
 	defer rows.Close()
 
-	devices := []device{}
+	devices := []Device{}
 
 	for rows.Next() {
 
-        var d device
+        var d Device
 		var process, network int
         err = rows.Scan(
             &d.DeviceID,
@@ -87,7 +59,7 @@ func DetectDevices(c *gin.Context) {
 		}
 
 		// connection
-		var status onlineStatus
+		var status OnlineStatus
 		statusString, err := redis.Redis_get(d.DeviceID)
 		if err != nil {
 			Error.Handler(c, err, "Error getting online status from redis")

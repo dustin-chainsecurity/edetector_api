@@ -67,6 +67,14 @@ func main() {
 			return
 		}
 
+		// client_task_status
+		query = "INSERT INTO client_task_status (client_id) VALUES (?)"
+		_, err = mariadb.DB.Exec(query, key)
+		if err != nil {
+			logger.Error("Error storing client_task_status data: " + err.Error())
+			return
+		}
+
 		onlineStatusInfo := ClientOnlineStatus {
 			Status: 1,
 			Time:   "20230706110846",

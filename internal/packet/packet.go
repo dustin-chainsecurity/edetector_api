@@ -1,6 +1,0 @@
-package packet
-
-import (
-
-)
-
