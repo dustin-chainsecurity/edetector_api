@@ -39,8 +39,6 @@ func Verify(token string) (int, error) {
 		return -1, fmt.Errorf("failed to parse token timestamp: %v", err)
 	}
 	expirationTime := parsedTimestamp.Add(ExpirationPeriod)
-	fmt.Println(parsedTimestamp)
-	fmt.Println(expirationTime)
 	if time.Now().After(expirationTime) {
 		return -1, fmt.Errorf("token expired")
 	}

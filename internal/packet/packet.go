@@ -43,14 +43,20 @@ type Device struct {
 func ProcessDeviceData() ([]Device, error) {
 	
 	devices := []Device{}
+	// query := `
+	// SELECT C.client_id, C.ip, S.networkreport, S.processreport, I.computername, 
+	// 	T.scan_schedule, T.scan_finish_time, T.collect_schedule, T.collect_finish_time, 
+	// 	T.file_schedule, T.file_finish_time, T.image_finish_time
+	// FROM client AS C
+	// JOIN client_setting AS S ON C.client_id = S.client_id
+	// JOIN client_info AS I ON S.client_id = I.client_id
+	// JOIN client_task_status AS T ON I.client_id = T.client_id
+	// `
 	query := `
-	SELECT C.client_id, C.ip, S.networkreport, S.processreport, I.computername, 
-		T.scan_schedule, T.scan_finish_time, T.collect_schedule, T.collect_finish_time, 
-		T.file_schedule, T.file_finish_time, T.image_finish_time
+	SELECT C.client_id, C.ip, S.networkreport, S.processreport, I.computername
 	FROM client AS C
 	JOIN client_setting AS S ON C.client_id = S.client_id
 	JOIN client_info AS I ON S.client_id = I.client_id
-	JOIN client_task_status AS T ON I.client_id = T.client_id
 	`
 	rows, err := mariadb.DB.Query(query)
 	if err != nil {
@@ -62,8 +68,7 @@ func ProcessDeviceData() ([]Device, error) {
 
         var d Device
 		var process, network int
-		var scanSchedule, collectSchedule, fileSchedule string
-		var finishTime []string
+		// var scanSchedule, collectSchedule, fileSchedule, scanFinishTime, collectFinishTime, fileFinishTime, imageFinishTime string
 
         err = rows.Scan(
             &d.DeviceID,
@@ -71,13 +76,13 @@ func ProcessDeviceData() ([]Device, error) {
 			&network,
 			&process,
             &d.DeviceName,
-			&scanSchedule,
-			&finishTime[0], // scan
-			&collectSchedule,
-			&finishTime[1], // collect
-			&fileSchedule,
-			&finishTime[2], // file
-			&finishTime[3], // image
+			// &scanSchedule,
+			// &scanFinishTime,
+			// &collectSchedule,
+			// &collectFinishTime,
+			// &fileSchedule,
+			// &fileFinishTime,
+			// &imageFinishTime,
         )
         if err != nil {
 			return devices, err
@@ -107,19 +112,17 @@ func ProcessDeviceData() ([]Device, error) {
 		}
 
 		// process schedule
-		d.ScanSchedule = processScanSchedule(scanSchedule)
-		d.CollectSchedule, err = processSchedule(collectSchedule)
-		if err != nil {
-			return devices, err
-		}
-		d.FileSchedule, err = processSchedule(fileSchedule)
-		if err != nil {
-			return devices, err
-		}
+		// d.ScanSchedule = processScanSchedule(scanSchedule)
+		// d.CollectSchedule, err = processSchedule(collectSchedule)
+		// if err != nil {
+		// 	return devices, err
+		// }
+		// d.FileSchedule, err = processSchedule(fileSchedule)
+		// if err != nil {
+		// 	return devices, err
+		// }
 		
 		// process finish time
-
-
 
         devices = append(devices, d)
 	}
@@ -127,7 +130,7 @@ func ProcessDeviceData() ([]Device, error) {
 	return devices, nil
 }
 
-func processSchedule(schedule string) (dateForm, error) {
+func ProcessSchedule(schedule string) (dateForm, error) {
 	// schedule: date|time e.g. 11|20
 	partitions := strings.Split(schedule, "|")
 	output := dateForm{}
@@ -142,7 +145,7 @@ func processSchedule(schedule string) (dateForm, error) {
 	return output, nil
 }
 
-func processScanSchedule(schedule string) []string {
+func ProcessScanSchedule(schedule string) []string {
 	// schedule: time,time,time e.g. 11,13,18
 	partitions := strings.Split(schedule, ",")
 	return partitions
