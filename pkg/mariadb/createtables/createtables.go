@@ -67,6 +67,7 @@ var TaskSQL = `
 CREATE TABLE IF NOT EXISTS task (
 	task_id varchar(45) NOT NULL,
 	client_id varchar(45) NOT NULL,
+	type varchar(45) NOT NULL,
 	status INT NOT NULL,
 	timestamp TIMESTAMP NOT NULL,
 	PRIMARY KEY (task_id),
@@ -91,7 +92,7 @@ func main() {
 	defer mariadb.DB.Close()
 
 	// Create table
-	if err = createTable(ClientTaskStatusSQL); err != nil {
+	if err = createTable(TaskSQL); err != nil {
 		fmt.Println("Failed to create table: " + err.Error())
 		return
 	}

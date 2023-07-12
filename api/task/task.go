@@ -24,8 +24,8 @@ func AddTask(deviceId string, work string, msg string) error {
 	taskId := uuid.NewString()
 
 	// store into mariaDB
-	query := "INSERT INTO task (task_id, client_id, status, timestamp) VALUES (?, ?, ?, CURRENT_TIMESTAMP)"
-	_, err := mariadb.DB.Exec(query, taskId, deviceId, 0)
+	query := "INSERT INTO task (task_id, client_id, type, status, timestamp) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)"
+	_, err := mariadb.DB.Exec(query, taskId, deviceId, work, 0)
 	if err != nil {
 		return err
 	}
