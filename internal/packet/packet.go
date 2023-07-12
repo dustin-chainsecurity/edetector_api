@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"	
 )
@@ -130,15 +131,29 @@ func ProcessDeviceData() ([]Device, error) {
 		}
 		
 		// process ScanFinishTime
+		d.ScanFinishTime, err = processFinishTime(d.DeviceID, "StartScan", scanFinishTime)
+		if err != nil {
+			return devices, err
+		}
 
 		// process CollectFinishTime
+		d.CollectFinishTime, err = processFinishTime(d.DeviceID, "StartCollect", collectFinishTime)
+		if err != nil {
+			return devices, err
+		}
 
 		// process FileFinishTime
+		d.FileFinishTime, err = processFinishTime(d.DeviceID, "StartGetDrive", fileFinishTime)
+		if err != nil {
+			return devices, err
+		}
 
 		// process ImageFinishTime
-		d.ScanSchedule = []string {"11", "13","20"}
-		d.CollectSchedule = dateForm{Date:"10", Time:"10"}
-		d.FileSchedule = dateForm{Date:"10", Time:"10"}
+		d.ImageFinishTime, err = processFinishTime(d.DeviceID, "StartGetImage", imageFinishTime)
+		if err != nil {
+			return devices, err
+		}
+
         devices = append(devices, d)
 	}
 
@@ -174,18 +189,67 @@ func processScanSchedule(schedule sql.NullString) []string {
 	return partitions
 }
 
-func ProcessFinishTime() {
+func processFinishTime(deviceId string, work string, finishtime sql.NullString) (processing, error) {
 
+	output := processing {
+		IsFinish: true,
+		Progress: 0,
+		FinishTime: 0,
+	}
+
+	status, err := getTaskStatus(deviceId, work)
+	if err != nil {
+		return output, err
+	}
+	switch status {
+	case 0, 1:
+		output.IsFinish = false
+		return output, nil
+	case 2:
+		// get progress
+	case 3:
+		if finishtime.Valid {
+			output.FinishTime, err = parseTimestamp(finishtime.String)
+			if err != nil {
+				return output, fmt.Errorf("error parsing finishtime timestamp")
+			}
+		} else {
+			return output, nil
+			// return output, fmt.Errorf(work + " for " + deviceId + " finished but NULL finish time")
+		}
+	}
+	return output, nil
 }
 
-func CheckTaskStatus(deviceId string, work string) error {
-
+func getTaskStatus(deviceId string, work string) (int, error) {
 	var status int
 	query := "SELECT status FROM task WHERE client_id = ? AND type = ? AND status != 3"
 	err := mariadb.DB.QueryRow(query, deviceId, work).Scan(&status)
 	if err != nil {
-		return err
+		if err == sql.ErrNoRows {
+			var count int
+			query = "SELECT COUNT(*) FROM task WHERE client_id = ? AND type = ? AND status = 3"
+			err = mariadb.DB.QueryRow(query, deviceId, work).Scan(&count)
+			if err != nil {
+				return -1, err
+			}
+			if count == 0 {
+				return -1, nil
+			} else {
+				return 3, nil
+			}
+		} else {
+			return -1, err
+		}
 	}
+	return status, nil
+}
 
-	return nil
+func parseTimestamp(timestamp string) (int, error) {
+	layout := "2006-01-02 15:04:05"
+	parsedTimestamp, err := time.Parse(layout, timestamp)
+	if err != nil {
+		return -1, err
+	}
+	return int(parsedTimestamp.Unix()), nil
 }

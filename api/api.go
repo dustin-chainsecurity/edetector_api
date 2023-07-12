@@ -57,7 +57,7 @@ func Main() {
 	router.GET("/dashboard/riskProgram", dashboard.RiskProgram)
 	router.GET("/dashboard/riskComputer", dashboard.RiskComputer)
 
-	router.Run(":5000")
+	router.Run(":5050")
 }
 
 func API_init() {
