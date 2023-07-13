@@ -1,4 +1,4 @@
-package packet
+package searchEvidence
 
 import (
 	"database/sql"
@@ -28,7 +28,7 @@ type onlineStatus struct {
 	Time   string  `json:"Time"`	
 }
 
-type Device struct {
+type device struct {
 	DeviceID           string         `json:"deviceId"`
 	Connection         bool           `json:"connection"`
 	InnerIP            string         `json:"innerIP"`
@@ -44,9 +44,9 @@ type Device struct {
 	ImageFinishTime    processing     `json:"imageFinishTime"`
 }
 
-func ProcessDeviceData() ([]Device, error) {
+func processDeviceData() ([]device, error) {
 	
-	devices := []Device{}
+	devices := []device{}
 	query := `
 	SELECT C.client_id, C.ip, S.networkreport, S.processreport, I.computername, 
 		T.scan_schedule, T.scan_finish_time, T.collect_schedule, T.collect_finish_time, 
@@ -64,7 +64,7 @@ func ProcessDeviceData() ([]Device, error) {
 
 	for rows.Next() {
 
-        var d Device
+        var d device
 		var process, network int
 		var scanSchedule, collectSchedule, fileSchedule sql.NullString
 		var scanFinishTime, collectFinishTime, fileFinishTime, imageFinishTime sql.NullString
@@ -159,6 +159,31 @@ func ProcessDeviceData() ([]Device, error) {
 
 	return devices, nil
 }
+
+func refreshDeviceData(started [][]string, finished [][]string) ([]device, error) {
+	devices := []device{}
+	return devices, nil
+}
+
+// func refreshStartedTasks(started [][]string) ([]device, error) {
+// 	devices := []device{}
+// 	for _, task := range started {
+// 		query := `
+// 		SELECT C.client_id, C.ip, S.networkreport, S.processreport, I.computername, 
+// 			T.scan_schedule, T.scan_finish_time, T.collect_schedule, T.collect_finish_time, 
+// 			T.file_schedule, T.file_finish_time, T.image_finish_time
+// 		FROM client AS C
+// 		JOIN client_setting AS S ON C.client_id = S.client_id
+// 		JOIN client_info AS I ON S.client_id = I.client_id
+// 		JOIN client_task_status AS T ON I.client_id = T.client_id
+// 		WHERE C.client_id = ?
+// 		`
+// 		// err := mariadb.DB.QueryRow(query, task[0])
+
+// 	}
+
+// 	return devices, nil
+// }
 
 func processSchedule(schedule sql.NullString) (dateForm, error) {
 	output := dateForm{Date: "", Time: "",}

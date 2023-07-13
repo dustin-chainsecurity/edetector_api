@@ -105,6 +105,6 @@ func createTable(stmt string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("table added")
+	fmt.Println("success")
 	return nil
 }

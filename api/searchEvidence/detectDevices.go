@@ -2,20 +2,19 @@ package searchEvidence
 
 import (
 	"edetector_API/internal/Error"
-	"edetector_API/internal/packet"
 	"net/http"
 	"github.com/gin-gonic/gin"
 )
 
 type detectDevicesResponse struct {
-	IsSuccess    bool              `json:"isSuccess"`
-	Data         []packet.Device   `json:"data"`
+	IsSuccess    bool       `json:"isSuccess"`
+	Data         []device   `json:"data"`
 }
 
 func DetectDevices(c *gin.Context) {
 
 	// Process device data
-	devices, err := packet.ProcessDeviceData()
+	devices, err := processDeviceData()
 	if err != nil {
 		Error.Handler(c, err, "Error processing device data")
 		return
