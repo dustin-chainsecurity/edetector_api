@@ -57,6 +57,9 @@ func Main() {
 	router.GET("/dashboard/riskProgram", dashboard.RiskProgram)
 	router.GET("/dashboard/riskComputer", dashboard.RiskComputer)
 
+	// Monitor Task Status Change
+	go MonitorStatus()
+
 	router.Run(":5050")
 }
 
