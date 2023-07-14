@@ -22,9 +22,9 @@ func main() {
 	var key, ip, deviceName, query, mac string
 	var err error
 
-	for i := 200; i < 501; i++ {
+	for i := 0; i < 501; i++ {
 
-		key = fmt.Sprintf("deviceIDNumber%d", i)
+		key = fmt.Sprintf("agent%d", i)
 		ip = fmt.Sprintf("192.168.0.%d", i)
 		mac = generateMACAddress()
 		deviceName = fmt.Sprintf("PC-%d", i)
