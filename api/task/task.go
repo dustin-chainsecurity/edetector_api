@@ -4,6 +4,7 @@ import (
 	"edetector_API/pkg/mariadb"
 	"edetector_API/pkg/redis"
 	"encoding/json"
+	"fmt"
 
 	"github.com/google/uuid"
 )
@@ -18,6 +19,19 @@ type TaskPacket struct {
 type TaskResponse struct {
 	IsSuccess  bool   `json:"isSuccess"`
 	Message    string `json:"message"`
+}
+
+type ScheduleScanRequest struct {
+	Mode      bool       `json:"mode"`
+	Time      string     `json:"time"`
+	Devices   []string   `json:"deviceId"`
+}
+
+type ScheduleRequest struct {
+	Mode      bool       `json:"mode"`
+	Date      int        `json:"date"`
+	Time      int        `json:"time"`
+	Devices   []string   `json:"deviceId"`
 }
 
 func AddTask(deviceId string, work string, msg string) error {
@@ -45,4 +59,8 @@ func AddTask(deviceId string, work string, msg string) error {
 
 	err = redis.Redis_set(taskId, string(pktString))
 	return err
+}
+
+func processSchedule(date int, time int) string {
+	return fmt.Sprintf("%d|%d", date, time)
 }

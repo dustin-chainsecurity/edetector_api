@@ -47,6 +47,12 @@ func processRawDevice(r mq.RawDevice) (device, error) {
 	d.InnerIP = r.InnerIP
 	d.DeviceName = r.DeviceName
 
+	// group
+	d.Groups, err = mq.LoadGroups(d.DeviceID)
+	if err != nil {
+		return d, err
+	}
+
 	// detection mode
 	if r.Network == 0 && r.Process == 0 {
 		d.DetectionMode = false
