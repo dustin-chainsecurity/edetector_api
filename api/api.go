@@ -32,6 +32,7 @@ func Main() {
 	router.Use(cors.New(corsConfig))
 
 	// Login
+	router.POST("/member/signup", member.Signup)
 	router.POST("/member/login", member.Login)
 	router.POST("/member/loginWithToken", member.LoginWithToken)
 
@@ -41,8 +42,8 @@ func Main() {
 	// Search Evidence
 	router.GET("/searchEvidence/detectDevices", searchEvidence.DetectDevices)
 	router.GET("/searchEvidence/refreshDevices", searchEvidence.RefreshDevices)
-    router.GET("/ws", func(c *gin.Context) {
-        webSocket(c.Writer, c.Request)
+    router.GET("/searchEvidence/ws", func(c *gin.Context) {
+        searchEvidence.WebSocket(c.Writer, c.Request)
     })
 
 	// Working Server Tasks
