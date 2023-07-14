@@ -2,9 +2,8 @@ package searchEvidence
 
 import (
 	"database/sql"
-	"edetector_API/pkg/mariadb"
-	"edetector_API/pkg/redis"
-	"encoding/json"
+	mq "edetector_API/pkg/mariadb/query"
+	rq "edetector_API/pkg/redis/query"
 	"fmt"
 	"strings"
 	"time"
@@ -23,11 +22,6 @@ type processing struct {
 	FinishTime  int    `json:"finishTime"`
 }
 
-type onlineStatus struct {
-	Status int     `json:"Status"`
-	Time   string  `json:"Time"`	
-}
-
 type device struct {
 	DeviceID           string         `json:"deviceId"`
 	Connection         bool           `json:"connection"`
@@ -44,120 +38,58 @@ type device struct {
 	ImageFinishTime    processing     `json:"imageFinishTime"`
 }
 
-func processDeviceData() ([]device, error) {
-	
-	devices := []device{}
-	query := `
-	SELECT C.client_id, C.ip, S.networkreport, S.processreport, I.computername, 
-		T.scan_schedule, T.scan_finish_time, T.collect_schedule, T.collect_finish_time, 
-		T.file_schedule, T.file_finish_time, T.image_finish_time
-	FROM client AS C
-	JOIN client_setting AS S ON C.client_id = S.client_id
-	JOIN client_info AS I ON S.client_id = I.client_id
-	JOIN client_task_status AS T ON I.client_id = T.client_id
-	`
-	rows, err := mariadb.DB.Query(query)
+
+func processRawDevice(r mq.RawDevice) (device, error) {
+
+	var d device
+	var err error
+	d.DeviceID = r.DeviceID
+	d.InnerIP = r.InnerIP
+	d.DeviceName = r.DeviceName
+
+	// detection mode
+	if r.Network == 0 && r.Process == 0 {
+		d.DetectionMode = false
+	} else {
+		d.DetectionMode = true
+	}
+
+	// connection
+	d.Connection, err = rq.LoadOnlineStatus(d.DeviceID)
 	if err != nil {
-		return devices, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-
-        var d device
-		var process, network int
-		var scanSchedule, collectSchedule, fileSchedule sql.NullString
-		var scanFinishTime, collectFinishTime, fileFinishTime, imageFinishTime sql.NullString
-		initialProcessing := processing {
-			IsFinish: true,
-			Progress: 100,
-			FinishTime: 1689120949,
-		}
-		d.ScanFinishTime = initialProcessing
-		d.CollectFinishTime = initialProcessing
-		d.FileFinishTime = initialProcessing
-		d.ImageFinishTime = initialProcessing
-
-        err = rows.Scan(
-            &d.DeviceID,
-            &d.InnerIP,
-			&network,
-			&process,
-            &d.DeviceName,
-			&scanSchedule,
-			&scanFinishTime,
-			&collectSchedule,
-			&collectFinishTime,
-			&fileSchedule,
-			&fileFinishTime,
-			&imageFinishTime,
-        )
-        if err != nil {
-			return devices, err
-        }
-
-		// process detection mode
-		if process == 0 && network == 0 {
-			d.DetectionMode = false
-		} else {
-			d.DetectionMode = true
-		}
-
-		// process connection
-		var status onlineStatus
-		statusString, err := redis.Redis_get(d.DeviceID)
-		if err != nil {
-			return devices, err
-		}
-		err = json.Unmarshal([]byte(statusString), &status)
-		if err != nil {
-			return devices, err
-		}
-		if status.Status == 1 {
-			d.Connection = true
-		} else {
-			d.Connection = false
-		}
-
-		// process schedule
-		d.ScanSchedule = processScanSchedule(scanSchedule)
-		d.CollectSchedule, err = processSchedule(collectSchedule)
-		if err != nil {
-			return devices, err
-		}
-		d.FileSchedule, err = processSchedule(fileSchedule)
-		if err != nil {
-			return devices, err
-		}
-		
-		// process ScanFinishTime
-		d.ScanFinishTime, err = processFinishTime(d.DeviceID, "StartScan", scanFinishTime)
-		if err != nil {
-			return devices, err
-		}
-
-		// process CollectFinishTime
-		d.CollectFinishTime, err = processFinishTime(d.DeviceID, "StartCollect", collectFinishTime)
-		if err != nil {
-			return devices, err
-		}
-
-		// process FileFinishTime
-		d.FileFinishTime, err = processFinishTime(d.DeviceID, "StartGetDrive", fileFinishTime)
-		if err != nil {
-			return devices, err
-		}
-
-		// process ImageFinishTime
-		d.ImageFinishTime, err = processFinishTime(d.DeviceID, "StartGetImage", imageFinishTime)
-		if err != nil {
-			return devices, err
-		}
-
-        devices = append(devices, d)
+		return d, err
 	}
 
-	return devices, nil
+	// schedule
+	d.ScanSchedule = processScanSchedule(r.ScanSchedule)
+	d.CollectSchedule, err = processSchedule(r.CollectSchedule)
+	if err != nil {
+		return d, err
+	}
+	d.FileSchedule, err = processSchedule(r.FileSchedule)
+	if err != nil {
+		return d, err
+	}
+
+	// finish time
+	d.ScanFinishTime, err = processFinishTime(d.DeviceID, "StartScan", r.ScanFinishTime)
+	if err != nil {
+		return d, err
+	}
+	d.CollectFinishTime, err = processFinishTime(d.DeviceID, "StartCollect", r.CollectFinishTime)
+	if err != nil {
+		return d, err
+	}
+	d.FileFinishTime, err = processFinishTime(d.DeviceID, "StartGetDrive", r.FileFinishTime)
+	if err != nil {
+		return d, err
+	}
+	d.ImageFinishTime, err = processFinishTime(d.DeviceID, "StartGetImage", r.ImageFinishTime)
+	if err != nil {
+		return d, err
+	}
+
+	return d, nil
 }
 
 func processSchedule(schedule sql.NullString) (dateForm, error) {
@@ -186,6 +118,15 @@ func processScanSchedule(schedule sql.NullString) []string {
 	return partitions
 }
 
+func parseTimestamp(timestamp string) (int, error) {
+	layout := "2006-01-02 15:04:05"
+	parsedTimestamp, err := time.Parse(layout, timestamp)
+	if err != nil {
+		return -1, err
+	}
+	return int(parsedTimestamp.Unix()), nil
+}
+
 func processFinishTime(deviceId string, work string, finishtime sql.NullString) (processing, error) {
 
 	output := processing {
@@ -194,19 +135,21 @@ func processFinishTime(deviceId string, work string, finishtime sql.NullString) 
 		FinishTime: 0,
 	}
 
-	status, err := getTaskStatus(deviceId, work)
+	status, progress, err := mq.LoadTaskStatus(deviceId, work)
 	if err != nil {
 		return output, err
 	}
 	switch status {
-	case 0, 1:
+	case -1:                                   //* no tasks yet
+		return output, nil
+	case 0, 1:                                 //* tasks not started
 		output.IsFinish = false
 		return output, nil
-	case 2:
+	case 2:                                    //* working
 		output.IsFinish = false
-		output.Progress = 10
+		output.Progress = progress //! TO BE ADDED: progress function
 		return output, nil
-	case 3:
+	case 3:                                    //* all tasks finished
 		if finishtime.Valid {
 			output.FinishTime, err = parseTimestamp(finishtime.String)
 			if err != nil {
@@ -214,41 +157,8 @@ func processFinishTime(deviceId string, work string, finishtime sql.NullString) 
 			}
 		} else {
 			return output, nil
-			// return output, fmt.Errorf(work + " for " + deviceId + " finished but NULL finish time")
+			//! TO BE CHANGED: return output, fmt.Errorf(work + " for " + deviceId + " finished but NULL finish time")
 		}
 	}
 	return output, nil
-}
-
-func getTaskStatus(deviceId string, work string) (int, error) {
-	var status int
-	query := "SELECT status FROM task WHERE client_id = ? AND type = ? AND status != 3"
-	err := mariadb.DB.QueryRow(query, deviceId, work).Scan(&status)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			var count int
-			query = "SELECT COUNT(*) FROM task WHERE client_id = ? AND type = ? AND status = 3"
-			err = mariadb.DB.QueryRow(query, deviceId, work).Scan(&count)
-			if err != nil {
-				return -1, err
-			}
-			if count == 0 {
-				return -1, nil
-			} else {
-				return 3, nil
-			}
-		} else {
-			return -1, err
-		}
-	}
-	return status, nil
-}
-
-func parseTimestamp(timestamp string) (int, error) {
-	layout := "2006-01-02 15:04:05"
-	parsedTimestamp, err := time.Parse(layout, timestamp)
-	if err != nil {
-		return -1, err
-	}
-	return int(parsedTimestamp.Unix()), nil
 }
