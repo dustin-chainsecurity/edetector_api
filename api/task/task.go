@@ -1,12 +1,9 @@
 package task
 
 import (
-	"edetector_API/internal/channel"
 	"edetector_API/pkg/mariadb"
-	"edetector_API/pkg/mariadb/query"
 	"edetector_API/pkg/redis"
 	"encoding/json"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -48,17 +45,4 @@ func AddTask(deviceId string, work string, msg string) error {
 
 	err = redis.Redis_set(taskId, string(pktString))
 	return err
-}
-
-func MonitorStatus() {
-	for {
-		started_tasks := query.GetStatus("start")
-		finished_tasks := query.GetStatus("finish")
-		if len(started_tasks) > 0 || len(finished_tasks) > 0 {
-			channel.SignalChannel <- "refresh"
-			channel.TaskChangeChannel <- started_tasks
-			channel.TaskChangeChannel <- finished_tasks
-		}
-		time.Sleep(5 * time.Second)
-	}
 }

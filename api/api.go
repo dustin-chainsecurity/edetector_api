@@ -31,6 +31,9 @@ func Main() {
 	router.RedirectFixedPath = true
 	router.Use(cors.New(corsConfig))
 
+	// Backend
+	router.POST("/updateTask", task.Update)
+
 	// Login
 	router.POST("/member/signup", member.Signup)
 	router.POST("/member/login", member.Login)
@@ -41,7 +44,7 @@ func Main() {
 
 	// Search Evidence
 	router.GET("/searchEvidence/detectDevices", searchEvidence.DetectDevices)
-	router.GET("/searchEvidence/refreshDevices", searchEvidence.RefreshDevices)
+	router.POST("/searchEvidence/refresh", searchEvidence.Refresh)
     router.GET("/searchEvidence/ws", func(c *gin.Context) {
         searchEvidence.WebSocket(c.Writer, c.Request)
     })
@@ -57,9 +60,6 @@ func Main() {
 	router.GET("/dashboard/ccConnectCount", dashboard.ConnectCount)
 	router.GET("/dashboard/riskProgram", dashboard.RiskProgram)
 	router.GET("/dashboard/riskComputer", dashboard.RiskComputer)
-
-	// Monitor Task Status Change
-	go task.MonitorStatus()
 
 	router.Run(":5050")
 }
