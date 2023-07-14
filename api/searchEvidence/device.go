@@ -160,48 +160,20 @@ func processDeviceData() ([]device, error) {
 	return devices, nil
 }
 
-func refreshDeviceData(started [][]string, finished [][]string) ([]device, error) {
-	devices := []device{}
-	return devices, nil
-}
-
-// func refreshStartedTasks(started [][]string) ([]device, error) {
-// 	devices := []device{}
-// 	for _, task := range started {
-// 		query := `
-// 		SELECT C.client_id, C.ip, S.networkreport, S.processreport, I.computername, 
-// 			T.scan_schedule, T.scan_finish_time, T.collect_schedule, T.collect_finish_time, 
-// 			T.file_schedule, T.file_finish_time, T.image_finish_time
-// 		FROM client AS C
-// 		JOIN client_setting AS S ON C.client_id = S.client_id
-// 		JOIN client_info AS I ON S.client_id = I.client_id
-// 		JOIN client_task_status AS T ON I.client_id = T.client_id
-// 		WHERE C.client_id = ?
-// 		`
-// 		// err := mariadb.DB.QueryRow(query, task[0])
-
-// 	}
-
-// 	return devices, nil
-// }
-
 func processSchedule(schedule sql.NullString) (dateForm, error) {
-	output := dateForm{Date: "", Time: "",}
 	// handle NULL
 	if !schedule.Valid {
-		return output, nil
+		return dateForm{}, nil
 	}
 	// schedule: date|time e.g. 11|20
 	partitions := strings.Split(schedule.String, "|")
-	if len(partitions) == 2 {
-		output = dateForm {
-			Date: partitions[0],
-			Time: partitions[1],
-		}
-	} else {
-		return output, fmt.Errorf("invalid schedule format")
+	if len(partitions) != 2 {
+		return dateForm{}, fmt.Errorf("invalid schedule format")
 	}
-	return output, nil
+	return dateForm {
+		Date: partitions[0],
+		Time: partitions[1],
+	}, nil
 }
 
 func processScanSchedule(schedule sql.NullString) []string {
@@ -231,7 +203,9 @@ func processFinishTime(deviceId string, work string, finishtime sql.NullString) 
 		output.IsFinish = false
 		return output, nil
 	case 2:
-		// get progress
+		output.IsFinish = false
+		output.Progress = 10
+		return output, nil
 	case 3:
 		if finishtime.Valid {
 			output.FinishTime, err = parseTimestamp(finishtime.String)

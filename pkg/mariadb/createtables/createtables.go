@@ -69,9 +69,8 @@ CREATE TABLE IF NOT EXISTS task (
 	client_id varchar(45) NOT NULL,
 	type varchar(45) NOT NULL,
 	status INT NOT NULL,
+	progress INT NOT NULL,
 	timestamp TIMESTAMP NOT NULL,
-	start BOOLEAN NOT NULL,
-	finish BOOLEAN NOT NULL,
 	PRIMARY KEY (task_id),
 	FOREIGN KEY (client_id) REFERENCES client(client_id)
 );
