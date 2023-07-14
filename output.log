@@ -1,0 +1,1 @@
+{"level":"error","ts":"2023-07-14T17:30:45.250+0800","msg":"Invalid request format: json: cannot unmarshal number into Go struct field ScheduleScanRequest.time of type string","func":"Error.Handler","file":"/home/angel/edetector_API/internal/Error/Error.go","line":14}

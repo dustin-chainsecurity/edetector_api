@@ -53,6 +53,9 @@ func Main() {
 	taskGroup := router.Group("/task")
 	taskGroup.POST("/sendMission", task.SendMission)
 	taskGroup.POST("/detectionMode", task.DetectionMode)
+	taskGroup.POST("/scheduledScan", task.ScheduledScan)
+	taskGroup.POST("/scheduledCollect", task.ScheduledCollect)
+	taskGroup.POST("/scheduledDownload", task.ScheduledDownload)
 
 	// Dashboard
 	router.GET("/dashboard/serverState", dashboard.ServerState)

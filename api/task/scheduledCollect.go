@@ -17,9 +17,9 @@ func ScheduledCollect(c *gin.Context) {
 	}
 
 	for _, deviceId := range req.Devices {
-		err := query.UpdateSchedule(deviceId, "file_schedule", processSchedule(req.Date, req.Time))
+		err := query.UpdateSchedule(deviceId, "collect_schedule", processSchedule(req.Date, req.Time))
 		if err != nil {
-			Error.Handler(c, err, "Error handling file schedule")
+			Error.Handler(c, err, "Error handling collect schedule")
 			return
 		}
 	}
