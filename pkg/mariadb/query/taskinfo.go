@@ -8,7 +8,7 @@ import (
 func LoadTaskStatus(deviceId string, work string) (int, int, error) {
 	var status, progress int
 	query := "SELECT status, progress FROM task WHERE client_id = ? AND type = ? AND status != 3"
-	err := mariadb.DB.QueryRow(query, deviceId, work).Scan(&status)
+	err := mariadb.DB.QueryRow(query, deviceId, work).Scan(&status, &progress)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			var count int

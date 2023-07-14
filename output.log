@@ -1,2 +1,0 @@
-{"level":"error","ts":"2023-07-14T11:04:30.302+0800","msg":"websocket: close 1000 (normal)","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":44}
-{"level":"error","ts":"2023-07-14T11:04:41.450+0800","msg":"websocket: close 1000 (normal)","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":44}

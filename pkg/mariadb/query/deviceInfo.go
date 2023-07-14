@@ -33,18 +33,18 @@ func LoadDeviceInfo(deviceId string) (RawDevice, error) {
 	WHERE C.client_id = ?
 	`
 	err := mariadb.DB.QueryRow(query, deviceId).Scan(
-		d.DeviceID,
-		d.InnerIP,
-		d.Network,
-		d.Process,
-		d.DeviceName,
-		d.ScanSchedule,
-		d.ScanFinishTime,
-		d.CollectSchedule,
-		d.CollectFinishTime,
-		d.FileSchedule,
-		d.FileFinishTime,
-		d.ImageFinishTime,
+		&d.DeviceID,
+		&d.InnerIP,
+		&d.Network,
+		&d.Process,
+		&d.DeviceName,
+		&d.ScanSchedule,
+		&d.ScanFinishTime,
+		&d.CollectSchedule,
+		&d.CollectFinishTime,
+		&d.FileSchedule,
+		&d.FileFinishTime,
+		&d.ImageFinishTime,
 	)
 	if err != nil {
 		return d, err
@@ -73,18 +73,18 @@ func LoadAllDeviceInfo() ([]RawDevice, error) {
 	for rows.Next() {
 		var d RawDevice
 		err := rows.Scan(
-			d.DeviceID,
-			d.InnerIP,
-			d.Network,
-			d.Process,
-			d.DeviceName,
-			d.ScanSchedule,
-			d.ScanFinishTime,
-			d.CollectSchedule,
-			d.CollectFinishTime,
-			d.FileSchedule,
-			d.FileFinishTime,
-			d.ImageFinishTime,
+			&d.DeviceID,
+			&d.InnerIP,
+			&d.Network,
+			&d.Process,
+			&d.DeviceName,
+			&d.ScanSchedule,
+			&d.ScanFinishTime,
+			&d.CollectSchedule,
+			&d.CollectFinishTime,
+			&d.FileSchedule,
+			&d.FileFinishTime,
+			&d.ImageFinishTime,
 		)
 		if err != nil {
 			return devices, err
