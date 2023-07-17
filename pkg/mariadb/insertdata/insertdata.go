@@ -76,7 +76,7 @@ func main() {
 		}
 
 		onlineStatusInfo := ClientOnlineStatus {
-			Status: 1,
+			Status: 0,
 			Time:   "20230706110846",
 		}
 		redis.Redis_set(key, onlineStatusInfo.Marshal())

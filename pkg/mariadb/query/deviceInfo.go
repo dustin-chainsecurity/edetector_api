@@ -49,7 +49,6 @@ func LoadDeviceInfo(deviceId string) (RawDevice, error) {
 	if err != nil {
 		return d, err
 	}
-
 	return d, nil
 }
 
@@ -89,10 +88,8 @@ func LoadAllDeviceInfo() ([]RawDevice, error) {
 		if err != nil {
 			return devices, err
         }
-
 		devices = append(devices, d)
 	}
-
 	return devices, nil
 }
 

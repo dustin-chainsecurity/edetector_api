@@ -115,6 +115,7 @@ func handleSignals(ctx context.Context, conn *websocket.Conn, cancel context.Can
 			case <-ctx.Done():
 				return
 			default:
+                fmt.Println(signal)
                 msg := WsResponse {
                     IsSuccess: true,
                     DeviceId:  []string{signal},
