@@ -10,31 +10,37 @@ import (
 
 type refreshResponse struct {
 	IsSuccess    bool       `json:"isSuccess"`
-	Data         device     `json:"data"`
+	Data         []device     `json:"data"`
 }
 
 func Refresh(c *gin.Context) {
 
 	// Receive request
-	var req struct { DeviceId  string  `json:"deviceId"` }
+	var req struct { Devices  []string  `json:"deviceId"` }
 	if err := c.ShouldBindJSON(&req); err != nil {
 		Error.Handler(c, err, "Invalid request format")
 		return
 	}
 
-	raw_device, err := query.LoadDeviceInfo(req.DeviceId)
-	if err != nil {
-		Error.Handler(c, err, "Error loading raw device data")
-	}
-	device, err := processRawDevice(raw_device)
-	if err != nil {
-		Error.Handler(c, err, "Error processing device data")
+	var devices = []device{}
+	for _, deviceId := range req.Devices {
+		raw_device, err := query.LoadDeviceInfo(deviceId)
+		if err != nil {
+			Error.Handler(c, err, "Error loading raw device data")
+			return
+		}
+		device, err := processRawDevice(raw_device)
+		if err != nil {
+			Error.Handler(c, err, "Error processing device data")
+			return
+		}
+		devices = append(devices, device)
 	}
 
 	// Send response
 	res := refreshResponse {
 		IsSuccess: true,
-		Data: device,
+		Data: devices,
 	}
 	c.JSON(http.StatusOK, res)
 }

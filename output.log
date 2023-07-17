@@ -1,0 +1,18 @@
+{"level":"error","ts":"2023-07-17T14:47:56.117+0800","msg":"websocket: close 1001 (going away)","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":59}
+{"level":"error","ts":"2023-07-17T14:51:21.243+0800","msg":"websocket: close 1005 (no status)","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":59}
+{"level":"error","ts":"2023-07-17T14:51:21.252+0800","msg":"websocket: close 1006 (abnormal closure): unexpected EOF","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":59}
+{"level":"error","ts":"2023-07-17T14:52:43.314+0800","msg":"websocket: close 1005 (no status)","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":59}
+{"level":"error","ts":"2023-07-17T14:52:43.368+0800","msg":"websocket: close 1005 (no status)","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":59}
+{"level":"error","ts":"2023-07-17T14:52:49.289+0800","msg":"token not exist","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":74}
+{"level":"error","ts":"2023-07-17T14:53:27.933+0800","msg":"token not exist","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":74}
+{"level":"error","ts":"2023-07-17T14:53:31.499+0800","msg":"token not exist","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":74}
+{"level":"error","ts":"2023-07-17T14:56:04.918+0800","msg":"token not exist","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":74}
+{"level":"error","ts":"2023-07-17T14:56:06.513+0800","msg":"token not exist","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":74}
+{"level":"error","ts":"2023-07-17T14:57:06.770+0800","msg":"token not exist","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":74}
+{"level":"error","ts":"2023-07-17T14:57:07.970+0800","msg":"token not exist","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":74}
+{"level":"error","ts":"2023-07-17T15:03:47.567+0800","msg":"token not exist","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":74}
+{"level":"error","ts":"2023-07-17T15:04:33.199+0800","msg":"token not exist","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":74}
+{"level":"error","ts":"2023-07-17T15:14:04.032+0800","msg":"token not exist","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":74}
+{"level":"error","ts":"2023-07-17T15:14:09.703+0800","msg":"token not exist","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":74}
+{"level":"error","ts":"2023-07-17T15:14:53.023+0800","msg":"token not exist","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":74}
+{"level":"error","ts":"2023-07-17T15:14:54.806+0800","msg":"token not exist","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":74}

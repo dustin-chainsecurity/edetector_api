@@ -3,6 +3,7 @@ package searchEvidence
 import (
     "context"
 	"edetector_API/internal/channel"
+    "edetector_API/internal/token"
 	"edetector_API/pkg/logger"
 	"fmt"
 	"net/http"
@@ -11,9 +12,23 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+type WsRequest struct {
+    Authorization string  `json:"authorization"`
+    Message       string  `json:"message"`
+}
+
+type WsResponse struct {
+    IsSuccess   bool      `json:"isSuccess"`
+    DeviceId    []string  `json:"deviceId"`
+    Message     string    `json:"message"`
+}
+
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+    CheckOrigin: func(r *http.Request) bool {
+        return true
+	},
 }
 
 func WebSocket(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +39,7 @@ func WebSocket(w http.ResponseWriter, r *http.Request) {
     }
 
     ctx, cancel := context.WithCancel(context.Background())
-    messageChannel := make(chan []byte)
+    messageChannel := make(chan WsResponse)
 
     go readMessages(ctx, conn, cancel, messageChannel)
     go handleSignals(ctx, conn, cancel, messageChannel)
@@ -32,13 +47,14 @@ func WebSocket(w http.ResponseWriter, r *http.Request) {
     go writeMessages(ctx, conn, cancel, messageChannel)
 }
 
-func readMessages(ctx context.Context, conn *websocket.Conn, cancel context.CancelFunc, messageChannel chan []byte) {
+func readMessages(ctx context.Context, conn *websocket.Conn, cancel context.CancelFunc, messageChannel chan WsResponse) {
     for {
         select {
         case <- ctx.Done():
             return
         default:
-            _, p, err := conn.ReadMessage()
+            var req WsRequest
+            err := conn.ReadJSON(&req)
             if err != nil {
                 logger.Error(err.Error())
                 fmt.Println("Error reading message from ws: " + err.Error())
@@ -46,24 +62,39 @@ func readMessages(ctx context.Context, conn *websocket.Conn, cancel context.Canc
                 return
             }
 
-			response := []byte("message: " + string(p) + " received")
+            res := WsResponse {
+                IsSuccess: false,
+                DeviceId:  []string{},
+                Message:   "unauthorized",
+            }
+
+            t := req.Authorization
+            _, err = token.Verify(t)
+            if err != nil {
+                logger.Error(err.Error())
+                cancel()
+                return
+            }
+
+            res.IsSuccess = true
+            res.Message = "message received"
 			select {
 			case <-ctx.Done():
 				return
 			default: 
-                messageChannel <- response
+                messageChannel <- res
 			}
         }
     }
 }
 
-func writeMessages(ctx context.Context, conn *websocket.Conn, cancel context.CancelFunc, messageChannel <-chan []byte) {
+func writeMessages(ctx context.Context, conn *websocket.Conn, cancel context.CancelFunc, messageChannel <-chan WsResponse) {
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case message := <-messageChannel:
-			err := conn.WriteMessage(websocket.TextMessage, message)
+			err := conn.WriteJSON(message)
 			if err != nil {
 				logger.Error(err.Error())
 				fmt.Println("Error sending message to ws: " + err.Error())
@@ -74,7 +105,7 @@ func writeMessages(ctx context.Context, conn *websocket.Conn, cancel context.Can
 	}
 }
 
-func handleSignals(ctx context.Context, conn *websocket.Conn, cancel context.CancelFunc, messageChannel chan []byte) {
+func handleSignals(ctx context.Context, conn *websocket.Conn, cancel context.CancelFunc, messageChannel chan WsResponse) {
     for {
         select {
         case <- ctx.Done():
@@ -84,13 +115,18 @@ func handleSignals(ctx context.Context, conn *websocket.Conn, cancel context.Can
 			case <-ctx.Done():
 				return
 			default:
-                messageChannel <- []byte(signal)
+                msg := WsResponse {
+                    IsSuccess: true,
+                    DeviceId:  []string{signal},
+                    Message:   "refresh devices required",
+                }
+                messageChannel <- msg
 			}
         }
     }
 }
 
-func heartbeat(ctx context.Context, conn *websocket.Conn, cancel context.CancelFunc, messageChannel chan []byte) {
+func heartbeat(ctx context.Context, conn *websocket.Conn, cancel context.CancelFunc, messageChannel chan WsResponse) {
     for {
         select {
         case <- ctx.Done():
@@ -100,8 +136,13 @@ func heartbeat(ctx context.Context, conn *websocket.Conn, cancel context.CancelF
             case <- ctx.Done():
                 return
             default:
-                messageChannel <- []byte("connection check")
                 time.Sleep(30 * time.Second)
+                msg := WsResponse {
+                    IsSuccess: true,
+                    DeviceId:  []string{},
+                    Message:   "connection check",
+                }
+                messageChannel <- msg
             }
         }
     }

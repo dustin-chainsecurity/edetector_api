@@ -1,16 +1,17 @@
 package api
 
 import (
-	"edetector_API/config"
-	"edetector_API/api/task"
-	"edetector_API/api/member"
 	"edetector_API/api/dashboard"
+	"edetector_API/api/member"
 	"edetector_API/api/searchEvidence"
+	"edetector_API/api/task"
+	"edetector_API/config"
 	"edetector_API/internal/token"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
 	"edetector_API/pkg/redis"
 	"fmt"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -34,6 +35,11 @@ func Main() {
 	// Backend
 	router.POST("/updateTask", task.Update)
 
+	// Web Socket
+	router.GET("/searchEvidence/ws", func(c *gin.Context) {
+        searchEvidence.WebSocket(c.Writer, c.Request)
+    })
+
 	// Login
 	router.POST("/member/signup", member.Signup)
 	router.POST("/member/login", member.Login)
@@ -45,9 +51,6 @@ func Main() {
 	// Search Evidence
 	router.GET("/searchEvidence/detectDevices", searchEvidence.DetectDevices)
 	router.POST("/searchEvidence/refresh", searchEvidence.Refresh)
-    router.GET("/searchEvidence/ws", func(c *gin.Context) {
-        searchEvidence.WebSocket(c.Writer, c.Request)
-    })
 
 	// Working Server Tasks
 	taskGroup := router.Group("/task")
@@ -64,7 +67,7 @@ func Main() {
 	router.GET("/dashboard/riskProgram", dashboard.RiskProgram)
 	router.GET("/dashboard/riskComputer", dashboard.RiskComputer)
 
-	router.Run(":5050")
+	router.Run(":" + os.Args[1])
 }
 
 func API_init() {

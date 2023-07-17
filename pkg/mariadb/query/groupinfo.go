@@ -6,7 +6,7 @@ import (
 
 func LoadGroups(deviceId string) ([]string, error) {
 	query := "SELECT group_id FROM client_group WHERE client_id = ?"
-	rows, err := mariadb.DB.Query(query)
+	rows, err := mariadb.DB.Query(query, deviceId)
 	if err != nil {
 		return []string{}, err
 	}

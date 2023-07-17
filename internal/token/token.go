@@ -2,9 +2,9 @@ package token
 
 import (
 	"database/sql"
-	"edetector_API/internal/Error"
 	"edetector_API/pkg/mariadb"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -54,8 +54,7 @@ func TokenAuth() gin.HandlerFunc {
 		token := c.GetHeader("Authorization")
 		userId, err := Verify(token)
 		if err != nil {
-			Error.Handler(c, err, "Error verifying token from header")
-			c.Abort()
+			c.AbortWithStatus(http.StatusUnauthorized)
 		} else {
 			c.Set("userID", userId)
 			c.Next()
