@@ -18,7 +18,7 @@ func Update(c *gin.Context) {
 	}
 
 	// Send signal to websocket
-	channel.SignalChannel <- req.DeviceId
+	channel.SignalChannel <- []string{req.DeviceId}
 
 	// Send response
 	res := TaskResponse {

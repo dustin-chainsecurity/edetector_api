@@ -1,6 +1,7 @@
 package task
 
 import (
+	"edetector_API/internal/channel"
 	"edetector_API/internal/Error"
 	"edetector_API/pkg/mariadb/query"
 	"net/http"
@@ -23,6 +24,8 @@ func ScheduledScan(c *gin.Context) {
 			return
 		}
 	}
+
+	channel.SignalChannel <- req.Devices
 
 	res := TaskResponse {
 		IsSuccess: true,

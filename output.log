@@ -1,0 +1,4 @@
+{"level":"error","ts":"2023-07-18T11:17:57.747+0800","msg":"websocket: close 1001 (going away)","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":59}
+{"level":"error","ts":"2023-07-18T11:30:48.634+0800","msg":"websocket: close 1001 (going away)","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":59}
+{"level":"error","ts":"2023-07-18T11:46:42.731+0800","msg":"websocket: close 1001 (going away)","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":59}
+{"level":"error","ts":"2023-07-18T12:00:57.274+0800","msg":"websocket: close 1006 (abnormal closure): unexpected EOF","func":"searchEvidence.readMessages","file":"/home/angel/edetector_API/api/searchEvidence/webSocket.go","line":59}

@@ -117,7 +117,7 @@ func handleSignals(ctx context.Context, conn *websocket.Conn, cancel context.Can
 			default:
                 msg := WsResponse {
                     IsSuccess: true,
-                    DeviceId:  []string{signal},
+                    DeviceId:  signal,
                     Message:   "refresh devices required",
                 }
                 messageChannel <- msg
