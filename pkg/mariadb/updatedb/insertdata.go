@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/rand"
-	"edetector_API/api"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
 	"edetector_API/pkg/redis"
@@ -15,9 +14,7 @@ type ClientOnlineStatus struct {
 	Time   string
 }
 
-func main() {
-
-	api.API_init()
+func InsertData() {
 
 	var key, ip, deviceName, query, mac string
 	var err error
@@ -92,19 +89,12 @@ func (c *ClientOnlineStatus) Marshal() string {
 }
 
 func generateMACAddress() string {
-	// Create a byte slice of length 6 to store the MAC address
 	mac := make([]byte, 6)
-
-	// Generate 6 random bytes
 	_, err := rand.Read(mac)
 	if err != nil {
 		panic(err)
 	}
-
-	// Set the locally administered bit (the second least significant bit of the first byte)
 	mac[0] |= 2
-
-	// Format the MAC address as a string
 	macAddress := fmt.Sprintf("%02X:%02X:%02X:%02X:%02X:%02X",
 		mac[0], mac[1], mac[2], mac[3], mac[4], mac[5])
 

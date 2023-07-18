@@ -33,6 +33,7 @@ func Main() {
 	router.Use(cors.New(corsConfig))
 
 	// Backend
+	router.GET("/check", task.Check)
 	router.POST("/updateTask", task.Update)
 
 	// Web Socket

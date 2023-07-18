@@ -68,12 +68,9 @@ func Login(c *gin.Context) {
 	}
 
 	if verified {
-
-		user_info.Username = req.Username
-		
+		user_info.Username = req.Username		
 		// Generate token
 		user_info.Token = token.Generate()
-
 		// Update user token
 		query = "UPDATE user_info SET token = ?, token_time = CURRENT_TIMESTAMP WHERE id = ?"
 		_, err = mariadb.DB.Exec(query, user_info.Token, user_info.ID)

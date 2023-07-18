@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS task (
 );
 `
 
-func main() {
+func CreateTables() {
 
 	var err error
 
