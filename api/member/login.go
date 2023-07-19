@@ -1,10 +1,9 @@
 package member
 
 import (
-	"database/sql"
 	"edetector_API/internal/Error"
 	"edetector_API/internal/token"
-	"edetector_API/pkg/mariadb"
+	"edetector_API/pkg/mariadb/query"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,11 +32,13 @@ type UserInfo struct {
 	Token    string
 }
 
+var err error
+
 func Login(c *gin.Context) {
 
 	// Receive request
 	var req LoginRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err = c.ShouldBindJSON(&req); err != nil {
 		Error.Handler(c, err, "Invalid request format")
 		return
 	}
@@ -53,18 +54,14 @@ func Login(c *gin.Context) {
 		Token:    "Nil",
 	}
 
-	query := "SELECT id FROM user WHERE username = ? AND password = MD5(?)"
-	err := mariadb.DB.QueryRow(query, req.Username, req.Password).Scan(&user_info.ID)
+	user_info.ID, err = query.CheckUser(req.Username, req.Password)
 	if err != nil {
-		// Username not exist or wrong password
-		if err == sql.ErrNoRows {
-			message = "wrong username or password"
-			verified = false
-			user_info.ID = -1
-		} else {
-			Error.Handler(c, err, "Error checking user info")
-			return
-		}
+		Error.Handler(c, err, "Error checking user info")
+		return
+	}
+	if user_info.ID == -1 {
+		message = "wrong username or password"
+		verified = false		
 	}
 
 	if verified {
@@ -72,8 +69,7 @@ func Login(c *gin.Context) {
 		// Generate token
 		user_info.Token = token.Generate()
 		// Update user token
-		query = "UPDATE user_info SET token = ?, token_time = CURRENT_TIMESTAMP WHERE id = ?"
-		_, err = mariadb.DB.Exec(query, user_info.Token, user_info.ID)
+		err = query.UpdateToken(user_info.Token, user_info.ID)
 		if err != nil {
 			Error.Handler(c, err, "Error updating token")
 			return
