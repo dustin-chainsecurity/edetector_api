@@ -36,6 +36,9 @@ func Main() {
 	router.GET("/check", task.Check)
 	router.POST("/updateTask", task.Update)
 
+	// Testing
+	router.POST("/updateProgress", task.UpdateProgress)
+
 	// Web Socket
 	router.GET("/searchEvidence/ws", func(c *gin.Context) {
         searchEvidence.WebSocket(c.Writer, c.Request)

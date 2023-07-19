@@ -42,7 +42,7 @@ func DetectionMode(c *gin.Context) {
 
 		// check if the changes are needed
 		if m != process || m != network {
-			err := AddTask(deviceId, "ChangeDetectMode", fmt.Sprintf("%d|%d", m, m))
+			_, err := AddTask(deviceId, "ChangeDetectMode", fmt.Sprintf("%d|%d", m, m))
 			if err != nil {
 				Error.Handler(c, err, "Error adding ChangeDetectMode task")
 				return
