@@ -101,3 +101,17 @@ func UpdateSchedule(deviceId string, column string, schedule string) error {
 	}
 	return nil
 }
+
+func CheckDevice(deviceId string) (bool, error) {
+	var count int
+	query := "SELECT COUNT(*) FROM client WHERE client_id = ?"
+	err := mariadb.DB.QueryRow(query, deviceId).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	if count == 0 {
+		return false, nil
+	} else {
+		return true, nil
+	}
+}

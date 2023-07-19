@@ -10,8 +10,8 @@ import (
 )
 
 type DetectionModeRequest struct {
-	Mode        bool       `json:"mode"`
-	Devices    []string    `json:"deviceId"`
+	Mode    bool     `json:"mode"`
+	Devices []string `json:"deviceId"`
 }
 
 func DetectionMode(c *gin.Context) {
@@ -42,7 +42,7 @@ func DetectionMode(c *gin.Context) {
 
 		// check if the changes are needed
 		if m != process || m != network {
-			_, err := AddTask(deviceId, "ChangeDetectMode", fmt.Sprintf("%d|%d", m, m))
+			_, err := addTask(deviceId, "ChangeDetectMode", fmt.Sprintf("%d|%d", m, m))
 			if err != nil {
 				Error.Handler(c, err, "Error adding ChangeDetectMode task")
 				return
@@ -57,9 +57,9 @@ func DetectionMode(c *gin.Context) {
 		}
 	}
 
-	res := TaskResponse {
+	res := TaskResponse{
 		IsSuccess: true,
-		Message: message,
+		Message:   message,
 	}
 	c.JSON(http.StatusOK, res)
 }

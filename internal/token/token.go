@@ -2,6 +2,7 @@ package token
 
 import (
 	"database/sql"
+	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
 	"fmt"
 	"net/http"
@@ -18,22 +19,19 @@ func Generate() (string) {
 }
 
 func Verify(token string) (int, error) {
-
-	var userId = -1
+	var userId int
 	var timestamp sql.NullString
-
 	// check if valid
 	query := "SELECT id, token_time FROM user_info WHERE token = ?"
 	err := mariadb.DB.QueryRow(query, token).Scan(&userId, &timestamp)
 	if err != nil {
-		// token not exist
+		// token incorrect
 		if err == sql.ErrNoRows {
-			return -1, fmt.Errorf("token not exist")
+			return -1, nil
 		} else {
-			return -1, fmt.Errorf(err.Error())
+			return -1, err
 		}
 	}
-
 	if timestamp.Valid {
 		// check if token expired
 		layout := "2006-01-02 15:04:05"
@@ -55,6 +53,8 @@ func TokenAuth() gin.HandlerFunc {
 		token := c.GetHeader("Authorization")
 		userId, err := Verify(token)
 		if err != nil {
+			logger.Error("Error verifying token: " + err.Error())
+		} else if userId == -1 { // token incorrect
 			c.AbortWithStatus(http.StatusUnauthorized)
 		} else {
 			c.Set("userID", userId)

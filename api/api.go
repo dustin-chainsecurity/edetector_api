@@ -1,8 +1,10 @@
 package api
 
 import (
+	"context"
 	"edetector_API/api/dashboard"
 	"edetector_API/api/member"
+	"edetector_API/api/saveagent"
 	"edetector_API/api/searchEvidence"
 	"edetector_API/api/task"
 	"edetector_API/config"
@@ -12,6 +14,8 @@ import (
 	"edetector_API/pkg/redis"
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -22,6 +26,8 @@ var err error
 func Main() {
 
 	API_init()
+	ctx, cancel := context.WithCancel(context.Background())
+	Quit := make(chan os.Signal, 1)
 
 	// Routing
 	router := gin.Default()
@@ -34,6 +40,7 @@ func Main() {
 
 	// Backend
 	router.GET("/check", task.Check)
+	router.GET("/save", saveagent.SaveAgent)
 	router.POST("/updateTask", task.Update)
 
 	// Testing
@@ -41,7 +48,7 @@ func Main() {
 
 	// Web Socket
 	router.GET("/searchEvidence/ws", func(c *gin.Context) {
-        searchEvidence.WebSocket(c.Writer, c.Request)
+        searchEvidence.WebSocket(ctx, c.Writer, c.Request)
     })
 
 	// Login
@@ -72,6 +79,11 @@ func Main() {
 	router.GET("/dashboard/riskComputer", dashboard.RiskComputer)
 
 	router.Run(":" + os.Args[1])
+
+	signal.Notify(Quit, syscall.SIGINT, syscall.SIGTERM)
+	<-Quit
+	cancel()
+	fmt.Println("Web API shutdown complete.")
 }
 
 func API_init() {
