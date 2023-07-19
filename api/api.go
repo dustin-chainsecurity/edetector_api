@@ -78,12 +78,16 @@ func Main() {
 	router.GET("/dashboard/riskProgram", dashboard.RiskProgram)
 	router.GET("/dashboard/riskComputer", dashboard.RiskComputer)
 
-	router.Run(":" + os.Args[1])
-
+	// shutdown process
 	signal.Notify(Quit, syscall.SIGINT, syscall.SIGTERM)
-	<-Quit
-	cancel()
-	fmt.Println("Web API shutdown complete.")
+	go func() {
+		<-Quit
+		cancel()
+		fmt.Println("Web API shutdown complete.")
+		os.Exit(0)
+	}()
+
+	router.Run(":" + os.Args[1])
 }
 
 func API_init() {
