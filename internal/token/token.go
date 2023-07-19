@@ -20,7 +20,7 @@ func Generate() (string) {
 func Verify(token string) (int, error) {
 
 	var userId = -1
-	var timestamp string
+	var timestamp sql.NullString
 
 	// check if valid
 	query := "SELECT id, token_time FROM user_info WHERE token = ?"
@@ -34,17 +34,18 @@ func Verify(token string) (int, error) {
 		}
 	}
 
-	// check if token expired
-	layout := "2006-01-02 15:04:05"
-	parsedTimestamp, err := time.Parse(layout, timestamp)
-	if err != nil {
-		return -1, fmt.Errorf("failed to parse token timestamp: %v", err)
+	if timestamp.Valid {
+		// check if token expired
+		layout := "2006-01-02 15:04:05"
+		parsedTimestamp, err := time.Parse(layout, timestamp.String)
+		if err != nil {
+			return -1, fmt.Errorf("failed to parse token timestamp: %v", err)
+		}
+		expirationTime := parsedTimestamp.Add(ExpirationPeriod)
+		if time.Now().After(expirationTime) {
+			return -1, fmt.Errorf("token expired")
+		}
 	}
-	expirationTime := parsedTimestamp.Add(ExpirationPeriod)
-	if time.Now().After(expirationTime) {
-		return -1, fmt.Errorf("token expired")
-	}
-
 	return userId, nil
 }
 

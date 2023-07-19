@@ -11,6 +11,12 @@ type MissionRequest struct {
 	Devices     []string    `json:"deviceId"`
 }
 
+type MissionResponse struct {
+	IsSuccess   bool          `json:"isSuccess"`
+	Message     string        `json:"message"`
+	TaskID      []string      `json:"taskId"`
+}
+
 var messageMap = map[string] string {
 	"StartScan": "Ring0Process",
 	"StartCollect": "null",
@@ -27,17 +33,20 @@ func SendMission(c *gin.Context) {
 		return
 	}
 
+	tasks := []string{}
 	for _, deviceId := range req.Devices {
-		err := AddTask(deviceId, req.Action, messageMap[req.Action])
+		taskId, err := AddTask(deviceId, req.Action, messageMap[req.Action])
 		if err != nil {
 			Error.Handler(c, err, "Error adding task")
 			return
 		}
+		tasks = append(tasks, taskId)
 	}
 
-	res := TaskResponse {
+	res := MissionResponse {
 		IsSuccess: true,
 		Message: "Success",
+		TaskID: tasks,
 	}
 	c.JSON(http.StatusOK, res)
 }

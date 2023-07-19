@@ -34,7 +34,7 @@ type ScheduleRequest struct {
 	Devices   []string   `json:"deviceId"`
 }
 
-func AddTask(deviceId string, work string, msg string) error {
+func AddTask(deviceId string, work string, msg string) (string, error) {
 
 	taskId := uuid.NewString()
 
@@ -42,7 +42,7 @@ func AddTask(deviceId string, work string, msg string) error {
 	query := "INSERT INTO task (task_id, client_id, type, status, progress, timestamp) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)"
 	_, err := mariadb.DB.Exec(query, taskId, deviceId, work, 0, 0)
 	if err != nil {
-		return err
+		return taskId, err
 	}
 
 	// store into redis
@@ -54,11 +54,11 @@ func AddTask(deviceId string, work string, msg string) error {
 	}
 	pktString, err := json.Marshal(pkt)
 	if err != nil {
-		return err
+		return taskId, err
 	}
 
 	err = redis.Redis_set(taskId, string(pktString))
-	return err
+	return taskId, err
 }
 
 func processSchedule(date int, time int) string {
