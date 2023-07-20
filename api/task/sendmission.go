@@ -1,7 +1,7 @@
 package task
 
 import (
-	"edetector_API/internal/Error"
+	"edetector_API/internal/errhandler"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -30,7 +30,7 @@ func SendMission(c *gin.Context) {
 
 	var req MissionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		Error.Handler(c, err, "Invalid request format")
+		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
 
@@ -38,7 +38,7 @@ func SendMission(c *gin.Context) {
 	for _, deviceId := range req.Devices {
 		taskId, err := addTask(deviceId, req.Action, messageMap[req.Action])
 		if err != nil {
-			Error.Handler(c, err, "Error adding task")
+			errhandler.Handler(c, err, "Error adding task")
 			return
 		}
 		tasks = append(tasks, taskId)

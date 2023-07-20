@@ -1,7 +1,7 @@
 package member
 
 import (
-	"edetector_API/internal/Error"
+	"edetector_API/internal/errhandler"
 	"edetector_API/pkg/mariadb"
 	"net/http"
 
@@ -25,7 +25,7 @@ func Signup(c *gin.Context) {
 	// Receive request
 	var req SignUpRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		Error.Handler(c, err, "Invalid request format")
+		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
 
@@ -37,7 +37,7 @@ func Signup(c *gin.Context) {
 	query := "SELECT EXISTS(SELECT 1 FROM user WHERE username = ?)"
 	err := mariadb.DB.QueryRow(query, req.Username).Scan(&exist)
 	if err != nil {
-		Error.Handler(c, err, "Error checking username existence")
+		errhandler.Handler(c, err, "Error checking username existence")
 		return
 	}
 
@@ -47,7 +47,7 @@ func Signup(c *gin.Context) {
 		query = "INSERT INTO user (username, password) VALUES (?, MD5(?))"
 		_, err = mariadb.DB.Exec(query, req.Username, req.Password)
 		if err != nil {
-			Error.Handler(c, err, "Error storing user data")
+			errhandler.Handler(c, err, "Error storing user data")
 			return
 		}
 
@@ -56,7 +56,7 @@ func Signup(c *gin.Context) {
 		query := "SELECT id FROM user WHERE username = ?"
 		err := mariadb.DB.QueryRow(query, req.Username).Scan(&userId)
 		if err != nil {
-			Error.Handler(c, err, "Error retrieving user id")
+			errhandler.Handler(c, err, "Error retrieving user id")
 			return
 		}
 
@@ -64,7 +64,7 @@ func Signup(c *gin.Context) {
 		query = "INSERT INTO user_info (id, token, email) VALUES (?, ?, ?)"
 		_, err = mariadb.DB.Exec(query, userId, req.Token, req.Email)
 		if err != nil {
-			Error.Handler(c, err, "Error storing user data")
+			errhandler.Handler(c, err, "Error storing user data")
 			return
 		}
 		verified = true

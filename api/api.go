@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"edetector_API/api/dashboard"
 	"edetector_API/api/member"
 	"edetector_API/api/saveagent"
@@ -26,7 +25,6 @@ var err error
 func Main() {
 
 	API_init()
-	ctx, cancel := context.WithCancel(context.Background())
 	Quit := make(chan os.Signal, 1)
 
 	// Routing
@@ -41,15 +39,9 @@ func Main() {
 	// Backend
 	router.GET("/check", task.Check)
 	router.GET("/save", saveagent.SaveAgent)
-	router.POST("/updateTask", task.Update)
-
-	// Testing
+	router.POST("/sendMission", task.SendMission)
+	// QA
 	router.POST("/updateProgress", task.UpdateProgress)
-
-	// Web Socket
-	router.GET("/searchEvidence/ws", func(c *gin.Context) {
-        searchEvidence.WebSocket(ctx, c.Writer, c.Request)
-    })
 
 	// Login
 	router.POST("/member/signup", member.Signup)
@@ -67,9 +59,6 @@ func Main() {
 	taskGroup := router.Group("/task")
 	taskGroup.POST("/sendMission", task.SendMission)
 	taskGroup.POST("/detectionMode", task.DetectionMode)
-	taskGroup.POST("/scheduledScan", task.ScheduledScan)
-	taskGroup.POST("/scheduledCollect", task.ScheduledCollect)
-	taskGroup.POST("/scheduledDownload", task.ScheduledDownload)
 
 	// Dashboard
 	router.GET("/dashboard/serverState", dashboard.ServerState)
@@ -82,7 +71,6 @@ func Main() {
 	signal.Notify(Quit, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-Quit
-		cancel()
 		fmt.Println("Web API shutdown complete.")
 		os.Exit(0)
 	}()

@@ -1,0 +1,1 @@
+{"level":"info","ts":"2023-07-20T17:41:07.990+0800","msg":"Task c0814860-2c26-4d41-97ba-35412d811d2c handled for client 8beba472f3f44cabbbb44fd232171933","func":"taskservice.taskHandler","file":"/home/angel/edetector_API/internal/taskservice/handler.go","line":40}

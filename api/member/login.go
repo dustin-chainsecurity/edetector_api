@@ -1,7 +1,7 @@
 package member
 
 import (
-	"edetector_API/internal/Error"
+	"edetector_API/internal/errhandler"
 	"edetector_API/internal/token"
 	"edetector_API/pkg/mariadb/query"
 	"net/http"
@@ -39,7 +39,7 @@ func Login(c *gin.Context) {
 	// Receive request
 	var req LoginRequest
 	if err = c.ShouldBindJSON(&req); err != nil {
-		Error.Handler(c, err, "Invalid request format")
+		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
 
@@ -56,22 +56,22 @@ func Login(c *gin.Context) {
 
 	user_info.ID, err = query.CheckUser(req.Username, req.Password)
 	if err != nil {
-		Error.Handler(c, err, "Error checking user info")
+		errhandler.Handler(c, err, "Error checking user info")
 		return
 	}
 	if user_info.ID == -1 {
 		message = "wrong username or password"
-		verified = false		
+		verified = false
 	}
 
 	if verified {
-		user_info.Username = req.Username		
+		user_info.Username = req.Username
 		// Generate token
 		user_info.Token = token.Generate()
 		// Update user token
 		err = query.UpdateToken(user_info.Token, user_info.ID)
 		if err != nil {
-			Error.Handler(c, err, "Error updating token")
+			errhandler.Handler(c, err, "Error updating token")
 			return
 		}
 	}

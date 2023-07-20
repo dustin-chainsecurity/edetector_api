@@ -1,12 +1,13 @@
-package searchEvidence
+package websocket
 
 import (
-    "context"
+	"context"
 	"edetector_API/internal/channel"
-    "edetector_API/internal/token"
+	"edetector_API/internal/token"
 	"edetector_API/pkg/logger"
+	"fmt"
 	"net/http"
-    "sync"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -24,8 +25,9 @@ type WsResponse struct {
 }
 
 type User struct {
-    userId  int
-	conn   *websocket.Conn
+    userId   int
+	conn    *websocket.Conn
+    channel  chan WsResponse
 }
 
 var upgrader = websocket.Upgrader{
@@ -39,7 +41,7 @@ var upgrader = websocket.Upgrader{
 var users = make(map[*websocket.Conn]bool)
 var mutex sync.Mutex
 
-func WebSocket(global_ctx context.Context, w http.ResponseWriter, r *http.Request) {
+func webSocket(global_ctx context.Context, w http.ResponseWriter, r *http.Request) {
     conn, err := upgrader.Upgrade(w, r, nil)
     if err != nil {
         logger.Error(err.Error())
@@ -51,16 +53,18 @@ func WebSocket(global_ctx context.Context, w http.ResponseWriter, r *http.Reques
     users[conn] = true
     mutex.Unlock()
     client := &User{
-        conn:   conn,
+        conn: conn,
+        channel: messageChannel,
     }
+    fmt.Println("[WS]   new client from " + conn.RemoteAddr().String())
 
-    go client.readMessage(messageChannel)
-    go handleSignal(global_ctx, conn, messageChannel) // update task -> refresh
-    go heartbeat(global_ctx, conn, messageChannel)
-    go broadcast(global_ctx, conn, messageChannel)
+    go client.readMessage()
+    go handleUpdateTask(global_ctx, conn, client.channel) // update task -> refresh
+    go heartbeat(global_ctx, conn, client.channel)
+    go broadcast(global_ctx, conn, client.channel)
 }
 
-func (u *User) readMessage(ch chan WsResponse) {
+func (u *User) readMessage() {
     defer func() {
         mutex.Lock()
         delete(users, u.conn)
@@ -72,7 +76,11 @@ func (u *User) readMessage(ch chan WsResponse) {
         var req WsRequest
         err := u.conn.ReadJSON(&req)
         if err != nil {
-            logger.Error("Error receiving message from ws: " + err.Error())
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+                fmt.Println("[WS]   client from " + u.conn.RemoteAddr().String() + " disconnected")
+			} else {
+                logger.Error("Error receiving message from ws: " + err.Error())
+			}
             break
         }
         res := WsResponse {
@@ -87,10 +95,9 @@ func (u *User) readMessage(ch chan WsResponse) {
             break
         }
         if u.userId == -1 { // incorrect token
-            logger.Info("token incorrect")
             break
         }
-        ch <- res
+        u.channel <- res
     }
 }
 
@@ -105,12 +112,13 @@ func broadcast(ctx context.Context, conn *websocket.Conn, ch <-chan WsResponse) 
                 if err != nil {
                     logger.Error("Broadcast error: " + err.Error())
                 }
+                fmt.Println("[WS]   broadcast message to " + conn.RemoteAddr().String())
             }
 		}
 	}
 }
 
-func handleSignal(ctx context.Context, conn *websocket.Conn, ch chan WsResponse) {
+func handleUpdateTask(ctx context.Context, conn *websocket.Conn, ch chan WsResponse) {
     for {
         select {
         case <- ctx.Done():
@@ -125,6 +133,7 @@ func handleSignal(ctx context.Context, conn *websocket.Conn, ch chan WsResponse)
                     DeviceId:  signal,
                     Message:   "refresh devices required",
                 }
+                fmt.Println("[WS]   update device " + signal[0] + " required")
                 ch <- msg
 			}
         }
@@ -147,6 +156,7 @@ func heartbeat(ctx context.Context, conn *websocket.Conn, ch chan WsResponse) {
                     DeviceId:  []string{},
                     Message:   "connection check",
                 }
+                fmt.Println("[WS]   connection check")
                 ch <- msg
             }
         }

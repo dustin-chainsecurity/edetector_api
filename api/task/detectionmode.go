@@ -1,7 +1,7 @@
 package task
 
 import (
-	"edetector_API/internal/Error"
+	"edetector_API/internal/errhandler"
 	"edetector_API/pkg/mariadb"
 	"fmt"
 	"net/http"
@@ -19,7 +19,7 @@ func DetectionMode(c *gin.Context) {
 	var req DetectionModeRequest
 	var message = "Success"
 	if err := c.ShouldBindJSON(&req); err != nil {
-		Error.Handler(c, err, "Invalid request format")
+		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
 
@@ -36,7 +36,7 @@ func DetectionMode(c *gin.Context) {
 		query := "SELECT processreport, networkreport FROM client_setting WHERE client_id = ?"
 		err := mariadb.DB.QueryRow(query, deviceId).Scan(&process, &network)
 		if err != nil {
-			Error.Handler(c, err, "Error retrieving current client setting")
+			errhandler.Handler(c, err, "Error retrieving current client setting")
 			return
 		}
 
@@ -44,12 +44,12 @@ func DetectionMode(c *gin.Context) {
 		if m != process || m != network {
 			_, err := addTask(deviceId, "ChangeDetectMode", fmt.Sprintf("%d|%d", m, m))
 			if err != nil {
-				Error.Handler(c, err, "Error adding ChangeDetectMode task")
+				errhandler.Handler(c, err, "Error adding ChangeDetectMode task")
 				return
 			}
 			err = updateDetectMode(m, deviceId)
 			if err != nil {
-				Error.Handler(c, err, "Error updating client_setting table")
+				errhandler.Handler(c, err, "Error updating client_setting table")
 				return
 			}
 		} else {

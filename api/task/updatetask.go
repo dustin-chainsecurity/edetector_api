@@ -2,18 +2,20 @@ package task
 
 import (
 	"edetector_API/internal/channel"
-	"edetector_API/internal/Error"
+	"edetector_API/internal/errhandler"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Update(c *gin.Context) {
+func UpdateTask(c *gin.Context) {
 
 	// Receive request
-	var req struct { DeviceId  string  `json:"deviceId"` }
+	var req struct {
+		DeviceId string `json:"deviceId"`
+	}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		Error.Handler(c, err, "Invalid request format")
+		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
 
@@ -21,9 +23,9 @@ func Update(c *gin.Context) {
 	channel.SignalChannel <- []string{req.DeviceId}
 
 	// Send response
-	res := TaskResponse {
+	res := TaskResponse{
 		IsSuccess: true,
-		Message: "success",
+		Message:   "success",
 	}
 	c.JSON(http.StatusOK, res)
 }
