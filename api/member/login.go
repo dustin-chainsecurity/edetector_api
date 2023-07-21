@@ -4,6 +4,7 @@ import (
 	"edetector_API/internal/errhandler"
 	"edetector_API/internal/token"
 	"edetector_API/pkg/mariadb/query"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -42,6 +43,7 @@ func Login(c *gin.Context) {
 		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
+	fmt.Println("Request content: ", req)
 
 	var message = "login success"
 	var verified = true

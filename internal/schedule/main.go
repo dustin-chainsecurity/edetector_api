@@ -46,6 +46,6 @@ func sendTask() {
 
 func untilWholePoint() time.Duration {
 	now := time.Now()
-	next := now.Truncate(time.Hour).Add(33 * time.Minute)
+	next := now.Truncate(time.Hour).Add(time.Hour)
 	return next.Sub(now)
 }

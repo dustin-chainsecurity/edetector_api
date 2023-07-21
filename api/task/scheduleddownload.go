@@ -4,6 +4,7 @@ import (
 	"edetector_API/internal/channel"
 	"edetector_API/internal/errhandler"
 	"edetector_API/pkg/mariadb/query"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,7 @@ func ScheduledDownload(c *gin.Context) {
 		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
+	fmt.Println("Request content: ", req)
 
 	for _, deviceId := range req.Devices {
 		err := query.UpdateSchedule(deviceId, "file_schedule", processSchedule(req.Date, req.Time))

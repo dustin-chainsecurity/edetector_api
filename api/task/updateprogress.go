@@ -3,6 +3,7 @@ package task
 import (
 	"edetector_API/internal/errhandler"
 	"edetector_API/pkg/mariadb"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,6 +20,7 @@ func UpdateProgress(c *gin.Context) {
 		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
+	fmt.Println("Request content: ", req)
 
 	query := "UPDATE task SET progress = ? WHERE task_id = ?"
 	_, err := mariadb.DB.Exec(query, req.Progress, req.TaskId)

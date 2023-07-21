@@ -13,6 +13,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+var logTime string = time.Now().Format("2006-01-02 - 15:04:05")
+
 type WsRequest struct {
     Authorization string  `json:"authorization"`
     Message       string  `json:"message"`
@@ -39,7 +41,7 @@ var upgrader = websocket.Upgrader{
 }
 
 var users = make(map[*websocket.Conn]bool)
-var mutex sync.Mutex
+var mutex, broadcastMutex sync.Mutex
 
 func webSocket(global_ctx context.Context, w http.ResponseWriter, r *http.Request) {
     conn, err := upgrader.Upgrade(w, r, nil)
@@ -56,7 +58,7 @@ func webSocket(global_ctx context.Context, w http.ResponseWriter, r *http.Reques
         conn: conn,
         channel: messageChannel,
     }
-    fmt.Println("[WS]   new client from " + conn.RemoteAddr().String())
+    fmt.Println("[WS]  " + logTime + " new client from " + conn.RemoteAddr().String())
 
     go client.readMessage()
     go handleUpdateTask(global_ctx, conn, client.channel) // update task -> refresh
@@ -77,12 +79,13 @@ func (u *User) readMessage() {
         err := u.conn.ReadJSON(&req)
         if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-                fmt.Println("[WS]   client from " + u.conn.RemoteAddr().String() + " disconnected")
+                fmt.Println("[WS]  " + logTime + " client from " + u.conn.RemoteAddr().String() + " disconnected")
 			} else {
                 logger.Error("Error receiving message from ws: " + err.Error())
 			}
             break
         }
+        fmt.Println("[WS]  Request content: ", req)
         res := WsResponse {
             IsSuccess: true,
             DeviceId:  []string{},
@@ -107,13 +110,15 @@ func broadcast(ctx context.Context, conn *websocket.Conn, ch <-chan WsResponse) 
 		case <-ctx.Done():
 			return
 		case message := <-ch:
+            broadcastMutex.Lock()
             for conn := range users {
                 err := conn.WriteJSON(message)
                 if err != nil {
                     logger.Error("Broadcast error: " + err.Error())
                 }
-                fmt.Println("[WS]   broadcast message to " + conn.RemoteAddr().String())
+                fmt.Println("[WS]  " + logTime + " broadcast message to " + conn.RemoteAddr().String())
             }
+            broadcastMutex.Unlock()
 		}
 	}
 }
@@ -133,7 +138,7 @@ func handleUpdateTask(ctx context.Context, conn *websocket.Conn, ch chan WsRespo
                     DeviceId:  signal,
                     Message:   "refresh devices required",
                 }
-                fmt.Println("[WS]   update device " + signal[0] + " required")
+                fmt.Println("[WS]  " + logTime + " update device " + signal[0] + " required")
                 ch <- msg
 			}
         }
@@ -156,7 +161,7 @@ func heartbeat(ctx context.Context, conn *websocket.Conn, ch chan WsResponse) {
                     DeviceId:  []string{},
                     Message:   "connection check",
                 }
-                fmt.Println("[WS]   connection check")
+                fmt.Println("[WS]  " + logTime + " connection check")
                 ch <- msg
             }
         }

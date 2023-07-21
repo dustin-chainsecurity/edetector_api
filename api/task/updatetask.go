@@ -3,6 +3,7 @@ package task
 import (
 	"edetector_API/internal/channel"
 	"edetector_API/internal/errhandler"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,7 @@ func UpdateTask(c *gin.Context) {
 		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
+	fmt.Println("Request content: ", req)
 
 	// Send signal to websocket
 	channel.SignalChannel <- []string{req.DeviceId}

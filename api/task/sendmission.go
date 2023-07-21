@@ -2,6 +2,7 @@ package task
 
 import (
 	"edetector_API/internal/errhandler"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,6 +34,7 @@ func SendMission(c *gin.Context) {
 		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
+	fmt.Println("Request content: ", req)
 
 	tasks := []string{}
 	for _, deviceId := range req.Devices {

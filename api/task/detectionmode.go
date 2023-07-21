@@ -22,6 +22,7 @@ func DetectionMode(c *gin.Context) {
 		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
+	fmt.Println("Request content: ", req)
 
 	for _, deviceId := range req.Devices {
 
