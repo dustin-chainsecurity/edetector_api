@@ -93,15 +93,6 @@ func LoadAllDeviceInfo() ([]RawDevice, error) {
 	return devices, nil
 }
 
-func UpdateSchedule(deviceId string, column string, schedule string) error {
-	query := "UPDATE client_task_status SET " + column + " = ? WHERE client_id = ?"
-	_, err := mariadb.DB.Exec(query, schedule, deviceId)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func CheckDevice(deviceId string) (bool, error) {
 	var count int
 	query := "SELECT COUNT(*) FROM client WHERE client_id = ?"
