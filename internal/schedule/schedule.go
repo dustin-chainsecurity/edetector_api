@@ -29,17 +29,17 @@ func sendTask() {
 	scan, collect, file := processSchedule()
 	// StartScan
 	if _, ok := scan[current_time]; ok {
-		fmt.Println("send task \"StartScan\"")
+		fmt.Println("[SCHEDULED] " + time.Now().Format("2006-01-02 - 15:04:05") + " send task \"StartScan\"")
 		go request.SendMissionToApi("StartScan", scan[current_time])
 	}
 	// StartCollect
 	if _, ok := collect[index]; ok {
-		fmt.Println("send task \"StartCollect\"")
+		fmt.Println("[SCHEDULED] " + time.Now().Format("2006-01-02 - 15:04:05") + " send task \"StartCollect\"")
 		go request.SendMissionToApi("StartCollect", collect[index])
 	}
 	// StartGetDrive
 	if _, ok := file[index]; ok {
-		fmt.Println("send task \"StartGetDrive\"")
+		fmt.Println("[SCHEDULED] " + time.Now().Format("2006-01-02 - 15:04:05") + " send task \"StartGetDrive\"")
 		go request.SendMissionToApi("StartGetDrive", file[index])
 	}
 }

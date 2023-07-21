@@ -16,7 +16,7 @@ type refreshResponse struct {
 
 func Refresh(c *gin.Context) {
 
-	// Receive request
+	// receive request
 	var req struct {
 		Devices []string `json:"deviceId"`
 	}
@@ -26,6 +26,14 @@ func Refresh(c *gin.Context) {
 	}
 	fmt.Println("Request content: ", req)
 
+	// check devices
+	err := query.CheckAllDevice(req.Devices)
+	if err != nil {
+		errhandler.Handler(c, err, "Error checking deviceID")
+		return
+	}
+
+	// load device data
 	var devices = []device{}
 	for _, deviceId := range req.Devices {
 		raw_device, err := query.LoadDeviceInfo(deviceId)
@@ -41,7 +49,7 @@ func Refresh(c *gin.Context) {
 		devices = append(devices, device)
 	}
 
-	// Send response
+	// send response
 	res := refreshResponse{
 		IsSuccess: true,
 		Data:      devices,

@@ -2,7 +2,7 @@ package task
 
 import (
 	"edetector_API/internal/errhandler"
-	"edetector_API/pkg/mariadb"
+	"edetector_API/pkg/mariadb/query"
 	"fmt"
 	"net/http"
 
@@ -22,10 +22,17 @@ func UpdateProgress(c *gin.Context) {
 	}
 	fmt.Println("Request content: ", req)
 
-	query := "UPDATE task SET progress = ? WHERE task_id = ?"
-	_, err := mariadb.DB.Exec(query, req.Progress, req.TaskId)
+	// Check taskId
+	_, err := query.CheckDevice(req.TaskId)
 	if err != nil {
-		errhandler.Handler(c, err, "Error updating token")
+		errhandler.Handler(c, err, "Error checking taskID")
+		return
+	}
+
+	// Update progress
+	err = query.UpdateTaskProgress(req.TaskId, req.Progress)
+	if err != nil {
+		errhandler.Handler(c, err, "Error updating task progress")
 		return
 	}
 

@@ -2,7 +2,7 @@ package task
 
 import (
 	"edetector_API/internal/errhandler"
-	"edetector_API/pkg/mariadb"
+	"edetector_API/pkg/mariadb/query"
 	"fmt"
 	"net/http"
 
@@ -24,18 +24,23 @@ func DetectionMode(c *gin.Context) {
 	}
 	fmt.Println("Request content: ", req)
 
+	// check devices
+	err := query.CheckAllDevice(req.Devices)
+	if err != nil {
+		errhandler.Handler(c, err, "Error checking deviceID")
+		return
+	}
+
 	for _, deviceId := range req.Devices {
 
 		// fetch agent current setting
-		var process, network, m int
+		var m int
 		if req.Mode {
 			m = 1
 		} else {
 			m = 0
 		}
-
-		query := "SELECT processreport, networkreport FROM client_setting WHERE client_id = ?"
-		err := mariadb.DB.QueryRow(query, deviceId).Scan(&process, &network)
+		process, network, err := query.GetDetectMode(deviceId)
 		if err != nil {
 			errhandler.Handler(c, err, "Error retrieving current client setting")
 			return
@@ -48,7 +53,7 @@ func DetectionMode(c *gin.Context) {
 				errhandler.Handler(c, err, "Error adding ChangeDetectMode task")
 				return
 			}
-			err = updateDetectMode(m, deviceId)
+			err = query.UpdateDetectMode(m, deviceId)
 			if err != nil {
 				errhandler.Handler(c, err, "Error updating client_setting table")
 				return
@@ -63,10 +68,4 @@ func DetectionMode(c *gin.Context) {
 		Message:   message,
 	}
 	c.JSON(http.StatusOK, res)
-}
-
-func updateDetectMode(mode int, deviceId string) error {
-	query := "UPDATE client_setting SET processreport = ?, networkreport = ? WHERE client_id = ?"
-	_, err := mariadb.DB.Exec(query, mode, mode, deviceId)
-	return err
 }

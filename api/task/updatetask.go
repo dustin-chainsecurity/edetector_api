@@ -3,6 +3,7 @@ package task
 import (
 	"edetector_API/internal/channel"
 	"edetector_API/internal/errhandler"
+	"edetector_API/pkg/mariadb/query"
 	"fmt"
 	"net/http"
 
@@ -20,6 +21,13 @@ func UpdateTask(c *gin.Context) {
 		return
 	}
 	fmt.Println("Request content: ", req)
+
+	// Check deviceId
+	_, err := query.CheckDevice(req.DeviceId)
+	if err != nil {
+		errhandler.Handler(c, err, "Error checking deviceID")
+		return
+	}
 
 	// Send signal to websocket
 	channel.SignalChannel <- []string{req.DeviceId}

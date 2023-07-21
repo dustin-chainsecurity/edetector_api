@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
+	"fmt"
 	"strconv"
 )
 
@@ -19,7 +20,7 @@ func LoadTaskStatus(deviceId string, work string) (int, int, error) {
 			if err != nil {
 				return -1, 0, err
 			}
-			if count == 0 {  //* no tasks yet
+			if count == 0 { //* no tasks yet
 				return -1, 0, nil
 			} else { //* all tasks finished
 				return 3, 0, nil
@@ -31,7 +32,7 @@ func LoadTaskStatus(deviceId string, work string) (int, int, error) {
 	return status, progress, nil //* status: 0, 1, 2
 }
 
-func Load_stored_task(taskId string, clientId string, status int) [][]string {
+func LoadStoredTask(taskId string, clientId string, status int) [][]string {
 	q := "select task_id, client_id, status from task where "
 	var result [][]string
 	if clientId != "nil" {
@@ -62,9 +63,31 @@ func Load_stored_task(taskId string, clientId string, status int) [][]string {
 	return result
 }
 
-func Update_task_status(taskId string, status int) {
+func CheckTask(TaskId string) (bool, error) {
+	var count int
+	query := "SELECT COUNT(*) FROM task WHERE task_id = ?"
+	err := mariadb.DB.QueryRow(query, TaskId).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	if count == 0 {
+		return false, fmt.Errorf("task " + TaskId + " not exist")
+	} else {
+		return true, nil
+	}
+}
+
+func UpdateTaskStatus(taskId string, status int) {
 	_, err := mariadb.DB.Exec("update task set status = ? where task_id = ?", status, taskId)
 	if err != nil {
 		logger.Error("Error updating task status: " + err.Error())
 	}
+}
+
+func UpdateTaskProgress(taskId string, progress int) error {
+	_, err := mariadb.DB.Exec("update task set progress = ? where task_id = ?", progress, taskId)
+	if err != nil {
+		return err
+	}
+	return nil
 }

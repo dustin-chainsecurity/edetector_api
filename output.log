@@ -1,0 +1,17 @@
+{"level":"info","ts":"2023-07-21T14:31:39.076+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:31:39.093+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:31:39.100+0800","msg":"token anyScript incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:31:39.101+0800","msg":"token anyScript incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:32:32.348+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:34:31.444+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:34:31.444+0800","msg":"token 833403e8-e1e7-4f59-a10f-59aff7105f5d expired","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":47}
+{"level":"info","ts":"2023-07-21T14:34:31.444+0800","msg":"token 833403e8-e1e7-4f59-a10f-59aff7105f5d expired","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":47}
+{"level":"info","ts":"2023-07-21T14:34:31.454+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:35:09.528+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:35:09.541+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:37:08.849+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:37:08.855+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:39:28.439+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:39:28.447+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:42:04.399+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:42:04.462+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}

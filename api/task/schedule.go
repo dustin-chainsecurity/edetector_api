@@ -18,6 +18,13 @@ func ScheduledScan(c *gin.Context) {
 	}
 	fmt.Println("Request content: ", req)
 
+	// check devices
+	err := query.CheckAllDevice(req.Devices)
+	if err != nil {
+		errhandler.Handler(c, err, "Error checking deviceID")
+		return
+	}
+
 	for _, deviceId := range req.Devices {
 		err := query.UpdateSchedule(deviceId, "scan_schedule", req.Time, req.Mode)
 		if err != nil {
@@ -42,6 +49,13 @@ func ScheduledCollect(c *gin.Context) {
 	}
 	fmt.Println("Request content: ", req)
 
+	// check devices
+	err := query.CheckAllDevice(req.Devices)
+	if err != nil {
+		errhandler.Handler(c, err, "Error checking deviceID")
+		return
+	}
+
 	for _, deviceId := range req.Devices {
 		err := query.UpdateSchedule(deviceId, "collect_schedule", processSchedule(req.Date, req.Time), req.Mode)
 		if err != nil {
@@ -65,6 +79,13 @@ func ScheduledDownload(c *gin.Context) {
 		return
 	}
 	fmt.Println("Request content: ", req)
+
+	// check devices
+	err := query.CheckAllDevice(req.Devices)
+	if err != nil {
+		errhandler.Handler(c, err, "Error checking deviceID")
+		return
+	}
 
 	for _, deviceId := range req.Devices {
 		err := query.UpdateSchedule(deviceId, "file_schedule", processSchedule(req.Date, req.Time), req.Mode)

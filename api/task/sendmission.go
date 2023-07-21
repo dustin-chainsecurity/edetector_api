@@ -2,6 +2,7 @@ package task
 
 import (
 	"edetector_API/internal/errhandler"
+	"edetector_API/pkg/mariadb/query"
 	"fmt"
 	"net/http"
 
@@ -35,6 +36,13 @@ func SendMission(c *gin.Context) {
 		return
 	}
 	fmt.Println("Request content: ", req)
+
+	// check devices
+	err := query.CheckAllDevice(req.Devices)
+	if err != nil {
+		errhandler.Handler(c, err, "Error checking deviceID")
+		return
+	}
 
 	tasks := []string{}
 	for _, deviceId := range req.Devices {

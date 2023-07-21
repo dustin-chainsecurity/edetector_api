@@ -3,6 +3,7 @@ package query
 import (
 	"database/sql"
 	"edetector_API/pkg/mariadb"
+	"fmt"
 )
 
 type RawDevice struct {
@@ -93,6 +94,22 @@ func LoadAllDeviceInfo() ([]RawDevice, error) {
 	return devices, nil
 }
 
+func GetDetectMode(deviceId string) (int, int, error) {
+	var process, network int
+	query := "SELECT processreport, networkreport FROM client_setting WHERE client_id = ?"
+	err := mariadb.DB.QueryRow(query, deviceId).Scan(&process, &network)
+	if err != nil {
+		return 0, 0, err
+	}
+	return process, network, nil
+}
+
+func UpdateDetectMode(mode int, deviceId string) error {
+	query := "UPDATE client_setting SET processreport = ?, networkreport = ? WHERE client_id = ?"
+	_, err := mariadb.DB.Exec(query, mode, mode, deviceId)
+	return err
+}
+
 func CheckDevice(deviceId string) (bool, error) {
 	var count int
 	query := "SELECT COUNT(*) FROM client WHERE client_id = ?"
@@ -101,8 +118,18 @@ func CheckDevice(deviceId string) (bool, error) {
 		return false, err
 	}
 	if count == 0 {
-		return false, nil
+		return false, fmt.Errorf("device " + deviceId + " not exist")
 	} else {
 		return true, nil
 	}
+}
+
+func CheckAllDevice(devices []string) error {
+	for _, id := range devices {
+		_, err := CheckDevice(id)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

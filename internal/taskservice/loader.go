@@ -6,13 +6,13 @@ import (
 )
 
 type task struct {
-	taskId    string
-	clientId  string
-	status    int
+	taskId   string
+	clientId string
+	status   int
 }
 
 func loadTasks(q task) []task {
-	result := query.Load_stored_task(q.taskId, q.clientId, q.status)
+	result := query.LoadStoredTask(q.taskId, q.clientId, q.status)
 	var tasks []task
 	for _, v := range result {
 		tmp := task{}
