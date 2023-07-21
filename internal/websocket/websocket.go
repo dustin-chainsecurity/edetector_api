@@ -13,8 +13,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var logTime string = time.Now().Format("2006-01-02 - 15:04:05")
-
 type WsRequest struct {
     Authorization string  `json:"authorization"`
     Message       string  `json:"message"`
@@ -30,6 +28,8 @@ type User struct {
     userId   int
 	conn    *websocket.Conn
     channel  chan WsResponse
+    ctx      context.Context
+    cancel   context.CancelFunc
 }
 
 var upgrader = websocket.Upgrader{
@@ -50,20 +50,23 @@ func webSocket(global_ctx context.Context, w http.ResponseWriter, r *http.Reques
         return
     }
     messageChannel := make(chan WsResponse)
+    ctx, cancel := context.WithCancel(context.Background())
 
     mutex.Lock()
     users[conn] = true
     mutex.Unlock()
-    client := &User{
-        conn: conn,
+    user := &User{
+        conn:    conn,
         channel: messageChannel,
+        ctx:     ctx,
+        cancel:  cancel,
     }
-    fmt.Println("[WS]  " + logTime + " new client from " + conn.RemoteAddr().String())
+    fmt.Println("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " new client from " + conn.RemoteAddr().String())
 
-    go client.readMessage()
-    go handleUpdateTask(global_ctx, conn, client.channel) // update task -> refresh
-    go heartbeat(global_ctx, conn, client.channel)
-    go broadcast(global_ctx, conn, client.channel)
+    go user.readMessage()
+    go user.heartbeat()
+    go handleUpdateTask(global_ctx, conn, user.channel) // update task -> refresh
+    go broadcast(global_ctx, conn, user.channel)
 }
 
 func (u *User) readMessage() {
@@ -72,6 +75,7 @@ func (u *User) readMessage() {
         delete(users, u.conn)
         mutex.Unlock()
         u.conn.Close()
+        u.cancel()
     }()
 
     for {
@@ -79,18 +83,14 @@ func (u *User) readMessage() {
         err := u.conn.ReadJSON(&req)
         if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-                fmt.Println("[WS]  " + logTime + " client from " + u.conn.RemoteAddr().String() + " disconnected")
+                fmt.Println("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " client from " + u.conn.RemoteAddr().String() + " disconnected")
 			} else {
                 logger.Error("Error receiving message from ws: " + err.Error())
 			}
             break
         }
-        fmt.Println("[WS]  Request content: ", req)
-        res := WsResponse {
-            IsSuccess: true,
-            DeviceId:  []string{},
-            Message:   "authorized",
-        }
+        fmt.Println("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " Request content: ", req)
+        // verify request
         t := req.Authorization
         u.userId, err = token.Verify(t)
         if err != nil {
@@ -100,7 +100,49 @@ func (u *User) readMessage() {
         if u.userId == -1 { // incorrect token
             break
         }
-        u.channel <- res
+        // response
+        res := WsResponse {
+            IsSuccess: true,
+            DeviceId:  []string{},
+            Message:   "authorized",
+        }
+        broadcastMutex.Lock()
+        err = u.conn.WriteJSON(res)
+        if err != nil {
+            logger.Error("Write authorized message error: " + err.Error())
+            broadcastMutex.Unlock()
+            break
+        }
+        fmt.Println("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " write message to " + u.conn.RemoteAddr().String())
+        broadcastMutex.Unlock()
+    }
+}
+
+func (u *User)heartbeat() {
+    for {
+        select {
+        case <- u.ctx.Done():
+            return
+        default:
+            time.Sleep(30 * time.Second)
+            select {
+            case <- u.ctx.Done():
+                return
+            default:
+                msg := WsResponse {
+                    IsSuccess: true,
+                    DeviceId:  []string{},
+                    Message:   "connection check",
+                }
+                broadcastMutex.Lock()
+                err := u.conn.WriteJSON(msg)
+                if err != nil {
+                    logger.Error("Heartbeat error: " + err.Error())
+                }
+                fmt.Println("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " connection check to " + u.conn.RemoteAddr().String())
+                broadcastMutex.Unlock()
+            }
+        }
     }
 }
 
@@ -116,7 +158,7 @@ func broadcast(ctx context.Context, conn *websocket.Conn, ch <-chan WsResponse) 
                 if err != nil {
                     logger.Error("Broadcast error: " + err.Error())
                 }
-                fmt.Println("[WS]  " + logTime + " broadcast message to " + conn.RemoteAddr().String())
+                fmt.Println("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " broadcast message to " + conn.RemoteAddr().String())
             }
             broadcastMutex.Unlock()
 		}
@@ -138,32 +180,9 @@ func handleUpdateTask(ctx context.Context, conn *websocket.Conn, ch chan WsRespo
                     DeviceId:  signal,
                     Message:   "refresh devices required",
                 }
-                fmt.Println("[WS]  " + logTime + " update device " + signal[0] + " required")
+                fmt.Println("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " update device " + signal[0] + " required")
                 ch <- msg
 			}
-        }
-    }
-}
-
-func heartbeat(ctx context.Context, conn *websocket.Conn, ch chan WsResponse) {
-    for {
-        select {
-        case <- ctx.Done():
-            return
-        default:
-            select {
-            case <- ctx.Done():
-                return
-            default:
-                time.Sleep(30 * time.Second)
-                msg := WsResponse {
-                    IsSuccess: true,
-                    DeviceId:  []string{},
-                    Message:   "connection check",
-                }
-                fmt.Println("[WS]  " + logTime + " connection check")
-                ch <- msg
-            }
         }
     }
 }

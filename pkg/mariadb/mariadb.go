@@ -23,6 +23,6 @@ func Connect_init() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("MARIADB Connected")
+	fmt.Println("MariaDB Connected")
 	return nil
 }
