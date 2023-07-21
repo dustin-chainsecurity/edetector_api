@@ -1,6 +1,6 @@
-{"level":"info","ts":"2023-07-21T14:31:39.076+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
-{"level":"info","ts":"2023-07-21T14:31:39.093+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
-{"level":"info","ts":"2023-07-21T14:31:39.100+0800","msg":"token anyScript incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:53:49.411+0800","msg":"token df28a718-130d-4448-8133-845016409234 incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"error","ts":"2023-07-21T14:53:54.956+0800","msg":"Error receiving message from ws: websocket: close 1001 (going away)","func":"websocket.(*User).readMessage","file":"/home/angel/edetector_API/internal/websocket/websocket.go","line":88}
+":"/home/angel/edetector_API/internal/token/token.go","line":31}
 {"level":"info","ts":"2023-07-21T14:31:39.101+0800","msg":"token anyScript incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
 {"level":"info","ts":"2023-07-21T14:32:32.348+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
 {"level":"info","ts":"2023-07-21T14:34:31.444+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
@@ -15,3 +15,13 @@
 {"level":"info","ts":"2023-07-21T14:39:28.447+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
 {"level":"info","ts":"2023-07-21T14:42:04.399+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
 {"level":"info","ts":"2023-07-21T14:42:04.462+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:49:42.985+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:49:42.994+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:53:49.395+0800","msg":"token df28a718-130d-4448-8133-845016409234 incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:53:50.416+0800","msg":"token df28a718-130d-4448-8133-845016409234 incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:53:52.433+0800","msg":"token df28a718-130d-4448-8133-845016409234 incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:53:54.910+0800","msg":"token df28a718-130d-4448-8133-845016409234 incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:53:54.915+0800","msg":"token df28a718-130d-4448-8133-845016409234 incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:53:54.915+0800","msg":"token df28a718-130d-4448-8133-845016409234 incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:53:57.628+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
+{"level":"info","ts":"2023-07-21T14:53:57.634+0800","msg":"token  incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}

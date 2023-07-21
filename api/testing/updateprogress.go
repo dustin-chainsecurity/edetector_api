@@ -1,6 +1,7 @@
-package task
+package testing
 
 import (
+	"edetector_API/api/task"
 	"edetector_API/internal/errhandler"
 	"edetector_API/pkg/mariadb/query"
 	"fmt"
@@ -37,7 +38,7 @@ func UpdateProgress(c *gin.Context) {
 	}
 
 	// Send response
-	res := TaskResponse{
+	res := task.TaskResponse{
 		IsSuccess: true,
 		Message:   "success",
 	}

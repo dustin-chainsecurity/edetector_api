@@ -5,7 +5,9 @@ import (
 	"edetector_API/api/member"
 	"edetector_API/api/saveagent"
 	"edetector_API/api/searchEvidence"
+	"edetector_API/api/server"
 	"edetector_API/api/task"
+	"edetector_API/api/testing"
 	"edetector_API/config"
 	"edetector_API/internal/token"
 	"edetector_API/pkg/logger"
@@ -37,11 +39,11 @@ func Main() {
 	router.Use(cors.New(corsConfig))
 
 	// Backend
-	router.GET("/check", task.Check)
+	router.GET("/check", server.Check)
 	router.GET("/save", saveagent.SaveAgent)
 	router.POST("/sendMission", task.SendMission)
-	// QA
-	router.POST("/updateProgress", task.UpdateProgress)
+	// Testing
+	router.POST("/updateProgress", testing.UpdateProgress)
 
 	// Login
 	router.POST("/member/signup", member.Signup)
