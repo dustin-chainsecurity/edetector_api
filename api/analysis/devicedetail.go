@@ -1,4 +1,4 @@
-package searchEvidence
+package analysis
 
 import (
 	"edetector_API/internal/device"
@@ -9,12 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type detectDevicesResponse struct {
+type detectDetailResponse struct {
 	IsSuccess bool            `json:"isSuccess"`
-	Data      []device.Device `json:"data"`
+	Data      []device.Detail `json:"data"`
 }
 
-func DetectDevices(c *gin.Context) {
+func DeviceDetail(c *gin.Context) {
 
 	// Process device data
 	raw_devices, err := query.LoadAllDeviceInfo()
@@ -22,9 +22,9 @@ func DetectDevices(c *gin.Context) {
 		errhandler.Handler(c, err, "Error loading raw device data")
 	}
 
-	devices := []device.Device{}
+	devices := []device.Detail{}
 	for _, r := range raw_devices {
-		d, err := device.ProcessRawDevice(r)
+		d, err := device.ProcessDeviceDetail(r)
 		if err != nil {
 			errhandler.Handler(c, err, "Error processing device data")
 			return
@@ -33,7 +33,7 @@ func DetectDevices(c *gin.Context) {
 	}
 
 	// Create the response object
-	res := detectDevicesResponse{
+	res := detectDetailResponse{
 		IsSuccess: true,
 		Data:      devices,
 	}

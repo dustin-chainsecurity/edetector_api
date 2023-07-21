@@ -1,4 +1,4 @@
-package main
+package updatedb
 
 import (
 	"crypto/rand"
@@ -19,9 +19,9 @@ func InsertData() {
 	var key, ip, deviceName, query, mac string
 	var err error
 
-	for i := 0; i < 501; i++ {
+	for i := 1; i < 6; i++ {
 
-		key = fmt.Sprintf("agent%d", i)
+		key = fmt.Sprintf("test_agent%d", i)
 		ip = fmt.Sprintf("192.168.0.%d", i)
 		mac = generateMACAddress()
 		deviceName = fmt.Sprintf("PC-%d", i)

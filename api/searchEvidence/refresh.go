@@ -1,6 +1,7 @@
 package searchEvidence
 
 import (
+	"edetector_API/internal/device"
 	"edetector_API/internal/errhandler"
 	"edetector_API/pkg/mariadb/query"
 	"fmt"
@@ -10,8 +11,8 @@ import (
 )
 
 type refreshResponse struct {
-	IsSuccess bool     `json:"isSuccess"`
-	Data      []device `json:"data"`
+	IsSuccess bool            `json:"isSuccess"`
+	Data      []device.Device `json:"data"`
 }
 
 func Refresh(c *gin.Context) {
@@ -34,19 +35,19 @@ func Refresh(c *gin.Context) {
 	}
 
 	// load device data
-	var devices = []device{}
+	var devices = []device.Device{}
 	for _, deviceId := range req.Devices {
 		raw_device, err := query.LoadDeviceInfo(deviceId)
 		if err != nil {
 			errhandler.Handler(c, err, "Error loading raw device data")
 			return
 		}
-		device, err := processRawDevice(raw_device)
+		d, err := device.ProcessRawDevice(raw_device)
 		if err != nil {
 			errhandler.Handler(c, err, "Error processing device data")
 			return
 		}
-		devices = append(devices, device)
+		devices = append(devices, d)
 	}
 
 	// send response

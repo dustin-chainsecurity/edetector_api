@@ -1,4 +1,4 @@
-package main
+package updatedb
 
 import (
 	"edetector_API/pkg/mariadb"

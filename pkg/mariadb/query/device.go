@@ -9,6 +9,7 @@ import (
 type RawDevice struct {
 	DeviceID           string
 	InnerIP            string
+	Mac                string
 	Network            int
 	Process            int
 	DeviceName         string
@@ -24,7 +25,7 @@ type RawDevice struct {
 func LoadDeviceInfo(deviceId string) (RawDevice, error) {
 	var d RawDevice
 	query := `
-	SELECT C.client_id, C.ip, S.networkreport, S.processreport, I.computername, 
+	SELECT C.client_id, C.ip, C.mac, S.networkreport, S.processreport, I.computername, 
 		T.scan_schedule, T.scan_finish_time, T.collect_schedule, T.collect_finish_time, 
 		T.file_schedule, T.file_finish_time, T.image_finish_time
 	FROM client AS C
@@ -36,6 +37,7 @@ func LoadDeviceInfo(deviceId string) (RawDevice, error) {
 	err := mariadb.DB.QueryRow(query, deviceId).Scan(
 		&d.DeviceID,
 		&d.InnerIP,
+		&d.Mac,
 		&d.Network,
 		&d.Process,
 		&d.DeviceName,
@@ -56,7 +58,7 @@ func LoadDeviceInfo(deviceId string) (RawDevice, error) {
 func LoadAllDeviceInfo() ([]RawDevice, error) {
 	var devices []RawDevice
 	query := `
-	SELECT C.client_id, C.ip, S.networkreport, S.processreport, I.computername, 
+	SELECT C.client_id, C.ip, C.mac, S.networkreport, S.processreport, I.computername, 
 		T.scan_schedule, T.scan_finish_time, T.collect_schedule, T.collect_finish_time, 
 		T.file_schedule, T.file_finish_time, T.image_finish_time
 	FROM client AS C
@@ -75,6 +77,7 @@ func LoadAllDeviceInfo() ([]RawDevice, error) {
 		err := rows.Scan(
 			&d.DeviceID,
 			&d.InnerIP,
+			&d.Mac,
 			&d.Network,
 			&d.Process,
 			&d.DeviceName,

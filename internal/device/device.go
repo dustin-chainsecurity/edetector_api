@@ -1,4 +1,4 @@
-package searchEvidence
+package device
 
 import (
 	"database/sql"
@@ -22,7 +22,7 @@ type processing struct {
 	FinishTime  int    `json:"finishTime"`
 }
 
-type device struct {
+type Device struct {
 	DeviceID           string         `json:"deviceId"`
 	Connection         bool           `json:"connection"`
 	InnerIP            string         `json:"innerIP"`
@@ -38,10 +38,32 @@ type device struct {
 	ImageFinishTime    processing     `json:"imageFinishTime"`
 }
 
+type Detail struct {
+	DeviceID           string         `json:"id"`
+	InnerIP            string         `json:"ip"`
+	Mac                string         `json:"macAddress"`
+	DeviceName         string         `json:"name"`
+	Groups             []string       `json:"group"`
+}
 
-func processRawDevice(r mq.RawDevice) (device, error) {
+func ProcessDeviceDetail(r mq.RawDevice) (Detail, error) {
+	var d Detail
+	var err error
+	d.DeviceID = r.DeviceID
+	d.InnerIP = r.InnerIP
+	d.Mac = r.Mac
+	d.DeviceName = r.DeviceName
+	// group
+	d.Groups, err = mq.LoadGroups(d.DeviceID)
+	if err != nil {
+		return d, err
+	}
+	return d, nil
+}
 
-	var d device
+func ProcessRawDevice(r mq.RawDevice) (Device, error) {
+
+	var d Device
 	var err error
 	d.DeviceID = r.DeviceID
 	d.InnerIP = r.InnerIP

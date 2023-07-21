@@ -29,16 +29,18 @@ func LoadStoredSchedule() [][]sql.NullString {
 }
 
 func UpdateSchedule(deviceId string, column string, schedule string, mode bool) error {
-	query := "UPDATE client_task_status SET " + column + " = "
 	if mode {
-		query += schedule  
+		query := "UPDATE client_task_status SET " + column + " = ? WHERE client_id = ?"
+		_, err := mariadb.DB.Exec(query, schedule, deviceId)
+		if err != nil {
+			return err
+		}
 	} else {
-		query += "NULL"
-	}
-	query += " WHERE client_id = ?"
-	_, err := mariadb.DB.Exec(query, deviceId)
-	if err != nil {
-		return err
+		query := "UPDATE client_task_status SET " + column + " = NULL WHERE client_id = ?"
+		_, err := mariadb.DB.Exec(query, deviceId)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"edetector_API/api/analysis"
 	"edetector_API/api/dashboard"
 	"edetector_API/api/member"
 	"edetector_API/api/saveagent"
@@ -56,6 +57,9 @@ func Main() {
 	// Search Evidence
 	router.GET("/searchEvidence/detectDevices", searchEvidence.DetectDevices)
 	router.POST("/searchEvidence/refresh", searchEvidence.Refresh)
+
+	// Analysis Page
+	router.GET("/analysisPage/allDeviceDetail", analysis.DeviceDetail)
 
 	// Working Server Tasks
 	taskGroup := router.Group("/task")
