@@ -153,7 +153,7 @@ func processFinishTime(deviceId string, work string, finishtime sql.NullString) 
 		return output, nil
 	case 2:                                    //* working
 		output.IsFinish = false
-		output.Progress = progress //! TO BE ADDED: progress function
+		output.Progress = progress
 		return output, nil
 	case 3:                                    //* all tasks finished
 		if finishtime.Valid {
