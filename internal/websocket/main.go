@@ -6,6 +6,7 @@ import (
 	"edetector_API/api/task"
 	"edetector_API/internal/token"
 	"fmt"
+	"io"
 	"os"
 	"os/signal"
 	"syscall"
@@ -19,8 +20,12 @@ func Main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	Quit := make(chan os.Signal, 1)
 
-	// routing
+	// Gin Settings
 	gin.SetMode(gin.ReleaseMode)
+	f, _ := os.Create("cmd/websocket/gin.log")
+	gin.DefaultWriter = io.MultiWriter(f)
+
+	// routing
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true

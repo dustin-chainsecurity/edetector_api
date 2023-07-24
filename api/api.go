@@ -15,6 +15,7 @@ import (
 	"edetector_API/pkg/mariadb"
 	"edetector_API/pkg/redis"
 	"fmt"
+	"io"
 	"os"
 	"os/signal"
 	"syscall"
@@ -28,10 +29,13 @@ var err error
 func Main() {
 
 	API_init()
-	Quit := make(chan os.Signal, 1)
+
+	// Gin Settings
+	gin.SetMode(gin.ReleaseMode)
+	f, _ := os.Create("cmd/api/gin.log")
+	gin.DefaultWriter = io.MultiWriter(f)
 
 	// Routing
-	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
@@ -75,6 +79,7 @@ func Main() {
 	router.GET("/dashboard/riskComputer", dashboard.RiskComputer)
 
 	// shutdown process
+	Quit := make(chan os.Signal, 1)
 	signal.Notify(Quit, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-Quit
@@ -86,25 +91,19 @@ func Main() {
 }
 
 func API_init() {
-
-	//
-
 	// Load configuration
 	if config.LoadConfig() == nil {
 		fmt.Println("Error loading config file")
 		return
 	}
-
 	// Init Logger
 	logger.InitLogger(config.Viper.GetString("WORKER_LOG_FILE"))
 	fmt.Println("Logger enabled, log file: ", config.Viper.GetString("WORKER_LOG_FILE"))
-
 	// Connect to Redis
 	if db := redis.Redis_init(); db == nil {
 		logger.Error("Error connecting to redis")
 		return
 	}
-
 	// Connect to MariaDB
 	if err = mariadb.Connect_init(); err != nil {
 		logger.Error("Error connecting to mariadb: " + err.Error())
