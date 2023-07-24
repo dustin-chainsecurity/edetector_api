@@ -7,7 +7,7 @@ import (
 
 func main() {
 	api.API_init()
-	// CreateTables()
-	// CreateEvents()
-	updatedb.InsertData()
+	updatedb.CreateTables()
+	// updatedb.CreateEvents()
+	// updatedb.InsertData()
 }

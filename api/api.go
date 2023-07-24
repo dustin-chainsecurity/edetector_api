@@ -31,6 +31,7 @@ func Main() {
 	Quit := make(chan os.Signal, 1)
 
 	// Routing
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
@@ -85,6 +86,8 @@ func Main() {
 }
 
 func API_init() {
+
+	//
 
 	// Load configuration
 	if config.LoadConfig() == nil {

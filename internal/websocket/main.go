@@ -20,6 +20,7 @@ func Main() {
 	Quit := make(chan os.Signal, 1)
 
 	// routing
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true

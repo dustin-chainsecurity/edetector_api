@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS user_info (
 	token VARCHAR(200) NOT NULL,
 	token_time TIMESTAMP,
 	email VARCHAR(45) NOT NULL,
-	FOREIGN KEY (id) REFERENCES user(id)
+	FOREIGN KEY (id) REFERENCES user(id) ON DELETE CASCADE
 );
 `
 
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS client_group (
 	client_id varchar(45) NOT NULL,
 	group_id INT NOT NULL,
 	PRIMARY KEY (client_id, group_id),
-	FOREIGN KEY (client_id) REFERENCES client(client_id),
+	FOREIGN KEY (client_id) REFERENCES client(client_id) ON DELETE CASCADE,
 	FOREIGN KEY (group_id) REFERENCES group_info(group_id)
 );
 `
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS client_task_status (
 	file_schedule varchar(45),
 	file_finish_time TIMESTAMP,
 	image_finish_time TIMESTAMP,
-	FOREIGN KEY (client_id) REFERENCES client(client_id)
+	FOREIGN KEY (client_id) REFERENCES client(client_id) ON DELETE CASCADE
 );
 `
 
@@ -93,7 +93,7 @@ func CreateTables() {
 	defer mariadb.DB.Close()
 
 	// Create table
-	if err = createTable(TaskSQL); err != nil {
+	if err = createTable(ClientGroupSQL); err != nil {
 		fmt.Println("Failed to create table: " + err.Error())
 		return
 	}

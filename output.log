@@ -1,3 +1,0 @@
-{"level":"error","ts":"2023-07-21T16:25:00.111+0800","msg":"Error checking deviceID: device agent1 not exist","func":"errhandler.Handler","file":"/home/angel/edetector_API/internal/errhandler/errhandler.go","line":12}
-{"level":"error","ts":"2023-07-21T16:25:27.387+0800","msg":"Error checking deviceID: device agent1 not exist","func":"errhandler.Handler","file":"/home/angel/edetector_API{"level":"error","ts":"2023-07-21T16:26:00.066+{"level":"info","ts":"2023-07-21T16:28:11.063+0800","msg":"token hey incorrect","func":"token.Verify","file":"/home/angel/edetector_API/internal/token/token.go","line":31}
-ne":12}
