@@ -1,2 +1,0 @@
-[GIN] 2023/07/24 - 14:59:50 | 200 |    4.901127ms | 192.168.200.158 | POST     "/member/loginWithToken"
-[GIN] 2023/07/24 - 15:00:02 | 200 |    1.895144ms | 192.168.200.158 | POST     "/member/loginWithToken"

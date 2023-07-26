@@ -3,6 +3,7 @@ package schedule
 import (
 	"context"
 	"edetector_API/internal/request"
+	"edetector_API/pkg/logger"
 	"fmt"
 	"strconv"
 	"time"
@@ -13,7 +14,7 @@ func ScheduleTask(ctx context.Context) {
 	for {
 		select {
 			case <-ctx.Done():
-				fmt.Println("Schedule service is shutting down...")
+				logger.Info("Schedule service is shutting down...")
 				return
 			default:
 				sendTask()
@@ -29,17 +30,17 @@ func sendTask() {
 	scan, collect, file := processSchedule()
 	// StartScan
 	if _, ok := scan[current_time]; ok {
-		fmt.Println("[SCHEDULED] " + time.Now().Format("2006-01-02 - 15:04:05") + " send task \"StartScan\"")
+		logger.Info("[SCHEDULED] " + time.Now().Format("2006-01-02 - 15:04:05") + " send task \"StartScan\"")
 		go request.SendMissionToApi("StartScan", scan[current_time])
 	}
 	// StartCollect
 	if _, ok := collect[index]; ok {
-		fmt.Println("[SCHEDULED] " + time.Now().Format("2006-01-02 - 15:04:05") + " send task \"StartCollect\"")
+		logger.Info("[SCHEDULED] " + time.Now().Format("2006-01-02 - 15:04:05") + " send task \"StartCollect\"")
 		go request.SendMissionToApi("StartCollect", collect[index])
 	}
 	// StartGetDrive
 	if _, ok := file[index]; ok {
-		fmt.Println("[SCHEDULED] " + time.Now().Format("2006-01-02 - 15:04:05") + " send task \"StartGetDrive\"")
+		logger.Info("[SCHEDULED] " + time.Now().Format("2006-01-02 - 15:04:05") + " send task \"StartGetDrive\"")
 		go request.SendMissionToApi("StartGetDrive", file[index])
 	}
 }

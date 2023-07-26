@@ -2,10 +2,12 @@ package request
 
 import (
 	"bytes"
+	"edetector_API/config"
 	"edetector_API/pkg/logger"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 type taskRequest struct {
@@ -25,14 +27,17 @@ func SendToServer(id string) {
 	request := taskRequest {
 		TaskID: id,
 	}
-	SendRequest(request, "http://192.168.200.163:5000/sendTask")
+	ip := config.Viper.GetString("SERVER_IP")
+	port := config.Viper.GetInt("SERVER_PORT")
+	path := fmt.Sprintf("http://%s:%d/sendTask", ip, port)
+	SendRequest(request, path)
 }
 
 func SendUpdateTaskToApi(id string) {
 	request := updateRequest {
 		DeviceID: id,
 	}
-	SendRequest(request, "http://192.168.200.161:5050/updateTask")
+	SendRequest(request, "http://127.0.0.1:5050/updateTask")
 }
 
 func SendMissionToApi(work string, devices []string) {
@@ -40,7 +45,7 @@ func SendMissionToApi(work string, devices []string) {
 		Action:  work,
 		Devices: devices,
 	}
-	SendRequest(request, "http://192.168.200.161:5000/sendMission")
+	SendRequest(request, "http://127.0.0.1:5000/sendMission")
 }
 
 func SendRequest(request interface{}, path string) {
@@ -67,7 +72,7 @@ func SendRequest(request interface{}, path string) {
 	defer response.Body.Close()
 	// Check the response status code
 	if response.StatusCode != http.StatusOK {
-		fmt.Println("Request failed with status code:", response.StatusCode)
+		logger.Error("Request failed with status code:" + strconv.Itoa(response.StatusCode))
 		return
 	}
 }

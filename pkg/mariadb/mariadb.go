@@ -3,6 +3,7 @@ package mariadb
 import (
 	"database/sql"
 	"edetector_API/config"
+	"edetector_API/pkg/logger"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -23,6 +24,6 @@ func Connect_init() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("MariaDB Connected")
+	logger.Info("MariaDB Connected")
 	return nil
 }

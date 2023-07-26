@@ -3,7 +3,8 @@ package redis
 import (
 	"context"
 	"edetector_API/config"
-	"fmt"
+	"edetector_API/pkg/logger"
+
 	"github.com/redis/go-redis/v9"
 )
 
@@ -17,10 +18,10 @@ func Redis_init() *redis.Client {
 	})
 	_, err := RedisClient.Ping(context.Background()).Result()
 	if err != nil {
-		fmt.Println("Error connecting to redis")
+		logger.Info("Error connecting to redis")
 		return nil
 	}
-	fmt.Println("Redis Connected")
+	logger.Info("Redis Connected")
 	return RedisClient
 }
 

@@ -3,6 +3,7 @@ package searchEvidence
 import (
 	"edetector_API/internal/device"
 	"edetector_API/internal/errhandler"
+	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb/query"
 	"fmt"
 	"net/http"
@@ -25,7 +26,7 @@ func Refresh(c *gin.Context) {
 		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
-	fmt.Println("Request content: ", req)
+	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 
 	// check devices
 	err := query.CheckAllDevice(req.Devices)

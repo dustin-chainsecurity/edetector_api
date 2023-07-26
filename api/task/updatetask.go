@@ -3,6 +3,7 @@ package task
 import (
 	"edetector_API/internal/channel"
 	"edetector_API/internal/errhandler"
+	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb/query"
 	"fmt"
 	"net/http"
@@ -20,7 +21,7 @@ func UpdateTask(c *gin.Context) {
 		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
-	fmt.Println("Request content: ", req)
+	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 
 	// Check deviceId
 	_, err := query.CheckDevice(req.DeviceId)

@@ -2,6 +2,7 @@ package member
 
 import (
 	"edetector_API/internal/errhandler"
+	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
 	"fmt"
 	"net/http"
@@ -29,7 +30,7 @@ func Signup(c *gin.Context) {
 		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
-	fmt.Println("Request content: ", req)
+	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 
 	// Check if username already exist
 	var message string

@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"edetector_API/pkg/logger"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,7 +29,7 @@ func SaveAgent(c *gin.Context) {
 	// Marshal payload into JSON
 	payload, err := json.Marshal(request)
 	if err != nil {
-		fmt.Println("Error marshaling JSON:", err)
+		logger.Error("Error marshaling JSON:" + err.Error())
 		return
 	}
 
@@ -52,7 +52,7 @@ func SaveAgent(c *gin.Context) {
 
 	// Check the response status code
 	if response.StatusCode != http.StatusOK {
-		fmt.Println("Request failed with status code:", response.StatusCode)
+		logger.Error("Request failed with status code:" + strconv.Itoa(response.StatusCode))
 		return
 	}
 
@@ -71,7 +71,7 @@ func SaveAgent(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("Agent saved successfully!")
+	logger.Info("Agent saved successfully!")
 	res := struct {
 		IsSuccess bool `json:"isSuccess"`
 		Message string `json:"message"`

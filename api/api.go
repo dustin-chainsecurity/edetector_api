@@ -28,11 +28,11 @@ var err error
 
 func Main() {
 
-	API_init()
+	API_init("API_LOG_FILE")
 
 	// Gin Settings
 	gin.SetMode(gin.ReleaseMode)
-	f, _ := os.Create("cmd/api/gin.log")
+	f, _ := os.Create(config.Viper.GetString("API_GIN_LOG"))
 	gin.DefaultWriter = io.MultiWriter(f)
 
 	// Routing
@@ -83,22 +83,22 @@ func Main() {
 	signal.Notify(Quit, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-Quit
-		fmt.Println("Web API shutdown complete.")
+		logger.Log.Info("Shutting down API server...")
 		os.Exit(0)
 	}()
 
 	router.Run(":" + os.Args[1])
 }
 
-func API_init() {
+func API_init(LOG_PATH string) {
 	// Load configuration
 	if config.LoadConfig() == nil {
 		fmt.Println("Error loading config file")
 		return
 	}
 	// Init Logger
-	logger.InitLogger(config.Viper.GetString("WORKER_LOG_FILE"))
-	fmt.Println("Logger enabled, log file: ", config.Viper.GetString("WORKER_LOG_FILE"))
+	logger.InitLogger(config.Viper.GetString(LOG_PATH))
+	logger.Log.Info("Logger enabled, log file: " + config.Viper.GetString(LOG_PATH))
 	// Connect to Redis
 	if db := redis.Redis_init(); db == nil {
 		logger.Error("Error connecting to redis")

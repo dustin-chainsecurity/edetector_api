@@ -61,7 +61,7 @@ func webSocket(global_ctx context.Context, w http.ResponseWriter, r *http.Reques
         ctx:     ctx,
         cancel:  cancel,
     }
-    fmt.Println("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " new client from " + conn.RemoteAddr().String())
+    logger.Info("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " new client from " + conn.RemoteAddr().String())
 
     go user.readMessage()
     go user.heartbeat()
@@ -83,13 +83,13 @@ func (u *User) readMessage() {
         err := u.conn.ReadJSON(&req)
         if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-                fmt.Println("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " client from " + u.conn.RemoteAddr().String() + " disconnected")
+                logger.Info("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " client from " + u.conn.RemoteAddr().String() + " disconnected")
 			} else {
                 logger.Error("Error receiving message from ws: " + err.Error())
 			}
             break
         }
-        fmt.Println("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " Request content: ", req)
+        logger.Info("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " Request content: " + fmt.Sprintf("%+v", req))
         // verify request
         t := req.Authorization
         u.userId, err = token.Verify(t)
@@ -113,7 +113,7 @@ func (u *User) readMessage() {
             broadcastMutex.Unlock()
             break
         }
-        fmt.Println("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " write message to " + u.conn.RemoteAddr().String())
+        logger.Info("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " write message to " + u.conn.RemoteAddr().String())
         broadcastMutex.Unlock()
     }
 }
@@ -139,7 +139,7 @@ func (u *User)heartbeat() {
                 if err != nil {
                     logger.Error("Heartbeat error: " + err.Error())
                 }
-                fmt.Println("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " connection check to " + u.conn.RemoteAddr().String())
+                logger.Info("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " connection check to " + u.conn.RemoteAddr().String())
                 broadcastMutex.Unlock()
             }
         }
@@ -158,7 +158,7 @@ func broadcast(ctx context.Context, conn *websocket.Conn, ch <-chan WsResponse) 
                 if err != nil {
                     logger.Error("Broadcast error: " + err.Error())
                 }
-                fmt.Println("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " broadcast message to " + conn.RemoteAddr().String())
+                logger.Info("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " broadcast message to " + conn.RemoteAddr().String())
             }
             broadcastMutex.Unlock()
 		}
@@ -180,7 +180,7 @@ func handleUpdateTask(ctx context.Context, conn *websocket.Conn, ch chan WsRespo
                     DeviceId:  signal,
                     Message:   "refresh devices required",
                 }
-                fmt.Println("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " update device " + signal[0] + " required")
+                logger.Info("[WS]  " + time.Now().Format("2006-01-02 - 15:04:05") + " update device " + signal[0] + " required")
                 ch <- msg
 			}
         }

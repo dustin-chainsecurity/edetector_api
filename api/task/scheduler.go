@@ -3,6 +3,7 @@ package task
 import (
 	"edetector_API/internal/channel"
 	"edetector_API/internal/errhandler"
+	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb/query"
 	"fmt"
 	"net/http"
@@ -16,7 +17,7 @@ func ScheduledScan(c *gin.Context) {
 		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
-	fmt.Println("Request content: ", req)
+	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 
 	// check devices
 	err := query.CheckAllDevice(req.Devices)
@@ -47,7 +48,7 @@ func ScheduledCollect(c *gin.Context) {
 		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
-	fmt.Println("Request content: ", req)
+	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 
 	// check devices
 	err := query.CheckAllDevice(req.Devices)
@@ -78,7 +79,7 @@ func ScheduledDownload(c *gin.Context) {
 		errhandler.Handler(c, err, "Invalid request format")
 		return
 	}
-	fmt.Println("Request content: ", req)
+	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 
 	// check devices
 	err := query.CheckAllDevice(req.Devices)

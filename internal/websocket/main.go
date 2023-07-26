@@ -4,8 +4,9 @@ import (
 	"context"
 	"edetector_API/api"
 	"edetector_API/api/task"
+	"edetector_API/config"
 	"edetector_API/internal/token"
-	"fmt"
+	"edetector_API/pkg/logger"
 	"io"
 	"os"
 	"os/signal"
@@ -16,13 +17,13 @@ import (
 )
 
 func Main() {
-	api.API_init()
+	api.API_init("WS_LOG_FILE")
 	ctx, cancel := context.WithCancel(context.Background())
 	Quit := make(chan os.Signal, 1)
 
 	// Gin Settings
 	gin.SetMode(gin.ReleaseMode)
-	f, _ := os.Create("cmd/websocket/gin.log")
+	f, _ := os.Create(config.Viper.GetString("WS_GIN_LOG"))
 	gin.DefaultWriter = io.MultiWriter(f)
 
 	// routing
@@ -52,7 +53,7 @@ func Main() {
 	go func() {
 		<-Quit
 		cancel()
-		fmt.Println("Websocket shutdown complete.")
+		logger.Info("Shutting down websocket server...")
 		os.Exit(0)
 	}()
 

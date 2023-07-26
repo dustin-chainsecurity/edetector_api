@@ -27,7 +27,6 @@ func Verify(token string) (int, error) {
 	if err != nil {
 		// token incorrect
 		if err == sql.ErrNoRows {
-			fmt.Println("token " + token + " incorrect")
 			logger.Info("token " + token + " incorrect")
 			return -1, nil
 		} else {
@@ -43,7 +42,6 @@ func Verify(token string) (int, error) {
 		}
 		expirationTime := parsedTimestamp.Add(ExpirationPeriod)
 		if time.Now().After(expirationTime) {
-			fmt.Println("token " + token + " expired")
 			logger.Info("token " + token + " expired")
 			return -1, nil
 		}

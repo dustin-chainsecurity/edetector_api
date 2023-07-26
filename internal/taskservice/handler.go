@@ -6,7 +6,6 @@ import (
 	"edetector_API/pkg/logger"
 	mq "edetector_API/pkg/mariadb/query"
 	rq "edetector_API/pkg/redis/query"
-	"fmt"
 )
 
 var taskchans = make(map[string]chan string)
@@ -33,10 +32,9 @@ func taskHandler(ctx context.Context, ch chan string, client string) {
 	for {
 		select {
 		case <-ctx.Done():
-			fmt.Println("Task handler for " + client + " is shutting down...")
+			logger.Info("Task handler for " + client + " is shutting down...")
 			return
 		case taskId := <-ch:
-			fmt.Println("Task " + taskId + " handled for client " + client)
 			logger.Info("Task " + taskId + " handled for client " + client)
 			mq.UpdateTaskStatus(taskId, 2)
 			request.SendToServer(taskId)

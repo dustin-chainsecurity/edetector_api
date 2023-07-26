@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	api.API_init()
+	api.API_init("TEST_LOG_FILE")
 	updatedb.CreateTables()
 	// updatedb.CreateEvents()
 	// updatedb.InsertData()
