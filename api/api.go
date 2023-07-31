@@ -3,6 +3,7 @@ package api
 import (
 	"edetector_API/api/analysis"
 	"edetector_API/api/dashboard"
+	"edetector_API/api/group"
 	"edetector_API/api/member"
 	"edetector_API/api/saveagent"
 	"edetector_API/api/searchEvidence"
@@ -78,7 +79,14 @@ func Main() {
 	router.GET("/dashboard/riskProgram", dashboard.RiskProgram)
 	router.GET("/dashboard/riskComputer", dashboard.RiskComputer)
 
-	// shutdown process
+	// Group
+	router.GET("/group", group.GetInfo)
+	router.POST("/group", group.Add)
+	router.DELETE("/group", group.Remove)
+	router.POST("member/group", group.Join)
+	router.DELETE("member/group", group.Leave)
+
+	// Shutdown Process
 	Quit := make(chan os.Signal, 1)
 	signal.Notify(Quit, syscall.SIGINT, syscall.SIGTERM)
 	go func() {

@@ -1,13 +1,25 @@
 package group
 
 import (
-
+	"github.com/gin-gonic/gin"
 )
 
-func Join() {
+func GetInfo(c *gin.Context) {
 
 }
 
-func Leave() {
+func Join(c *gin.Context) {
+
+}
+
+func Leave(c *gin.Context) {
 	
+}
+
+func Add(c *gin.Context) {
+
+}
+
+func Remove(c *gin.Context) {
+
 }
