@@ -5,7 +5,12 @@ import (
 )
 
 func LoadGroups(deviceId string) ([]string, error) {
-	query := "SELECT group_id FROM client_group WHERE client_id = ?"
+	query := `
+		SELECT group_info.group_name
+		FROM client_group
+		JOIN group_info ON group_info.group_id = client_group.group_id
+		WHERE client_id = ?;
+	`
 	rows, err := mariadb.DB.Query(query, deviceId)
 	if err != nil {
 		return []string{}, err
@@ -14,12 +19,12 @@ func LoadGroups(deviceId string) ([]string, error) {
 	
 	groups := []string{}
 	for rows.Next() {
-		var groupId string
-		err := rows.Scan(&groupId)
+		var groupName string
+		err := rows.Scan(&groupName)
 		if err != nil {
 			return []string{}, err
         }
-		groups = append(groups, groupId)
+		groups = append(groups, groupName)
 	}
 	return groups, nil
 }
