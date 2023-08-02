@@ -2,8 +2,7 @@ package api
 
 import (
 	"edetector_API/api/analysis"
-	"edetector_API/api/dashboard"
-	"edetector_API/api/group"
+	"edetector_API/api/clear"
 	"edetector_API/api/member"
 	"edetector_API/api/saveagent"
 	"edetector_API/api/searchEvidence"
@@ -49,6 +48,11 @@ func Main() {
 	router.GET("/check", server.Check)
 	router.GET("/save", saveagent.SaveAgent)
 	router.POST("/sendMission", task.SendMission)
+	router.DELETE("/rabbit", clear.ClearRabbit)
+	router.DELETE("/redis", clear.ClearRedis)
+	router.DELETE("/maria", clear.ClearMaria)
+	router.DELETE("/elastic", clear.ClearElastic)
+
 	// Testing
 	router.POST("/updateProgress", testing.UpdateProgress)
 
@@ -71,20 +75,6 @@ func Main() {
 	taskGroup := router.Group("/task")
 	taskGroup.POST("/sendMission", task.SendMission)
 	taskGroup.POST("/detectionMode", task.DetectionMode)
-
-	// Dashboard
-	router.GET("/dashboard/serverState", dashboard.ServerState)
-	router.GET("/dashboard/agentState", dashboard.AgentState)
-	router.GET("/dashboard/ccConnectCount", dashboard.ConnectCount)
-	router.GET("/dashboard/riskProgram", dashboard.RiskProgram)
-	router.GET("/dashboard/riskComputer", dashboard.RiskComputer)
-
-	// Group
-	router.GET("/group", group.GetInfo)
-	router.POST("/group", group.Add)
-	router.DELETE("/group", group.Remove)
-	router.POST("member/group", group.Join)
-	router.DELETE("member/group", group.Leave)
 
 	// Shutdown Process
 	Quit := make(chan os.Signal, 1)
