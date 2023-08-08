@@ -37,7 +37,10 @@ func SendUpdateTaskToApi(id string) {
 	request := updateRequest {
 		DeviceID: id,
 	}
-	SendRequest(request, "http://127.0.0.1:5050/updateTask")
+	ip := config.Viper.GetString("WS_HOST")
+	port := config.Viper.GetString("WS_PORT")
+	path := fmt.Sprintf("http://%s:%s/updateTask", ip, port)
+	SendRequest(request, path)
 }
 
 func SendMissionToApi(work string, devices []string) {
@@ -45,7 +48,10 @@ func SendMissionToApi(work string, devices []string) {
 		Action:  work,
 		Devices: devices,
 	}
-	SendRequest(request, "http://127.0.0.1:5000/sendMission")
+	ip := config.Viper.GetString("API_HOST")
+	port := config.Viper.GetString("API_PORT")
+	path := fmt.Sprintf("http://%s:%s/sendMission", ip, port)
+	SendRequest(request, path)
 }
 
 func SendRequest(request interface{}, path string) {
