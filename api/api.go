@@ -3,6 +3,7 @@ package api
 import (
 	"edetector_API/api/analysis"
 	"edetector_API/api/clear"
+	"edetector_API/api/group"
 	"edetector_API/api/member"
 	"edetector_API/api/saveagent"
 	"edetector_API/api/searchEvidence"
@@ -75,6 +76,13 @@ func Main() {
 	taskGroup := router.Group("/task")
 	taskGroup.POST("/sendMission", task.SendMission)
 	taskGroup.POST("/detectionMode", task.DetectionMode)
+
+	// Group
+	router.POST("/group", group.Add)
+	router.DELETE("/group", group.Remove)
+	router.GET("/group", group.GetInfo)
+	router.POST("/group/member", group.Join)
+	router.DELETE("/group/member", group.Leave)
 
 	// Shutdown Process
 	Quit := make(chan os.Signal, 1)
