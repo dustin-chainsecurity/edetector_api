@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
 )
 
@@ -14,12 +13,14 @@ func LoadConfig() *viper.Viper {
 	// vp.SetConfigType("env")
 	// vp.AddConfigPath("config")
 	vp.AutomaticEnv()
-	if err := vp.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", vp.ConfigFileUsed())
-		Viper = vp
-		return vp
-	} else {
-		fmt.Println("Error loading config file:", err)
-		return nil
-	}
+	Viper = vp
+	return vp
+	// if err := vp.ReadInConfig(); err == nil {
+	// 	fmt.Println("Using config file:", vp.ConfigFileUsed())
+	// 	Viper = vp
+	// 	return vp
+	// } else {
+	// 	fmt.Println("Error loading config file:", err)
+	// 	return nil
+	// }
 }
