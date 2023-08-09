@@ -79,10 +79,12 @@ func Main() {
 
 	// Group
 	router.POST("/group", group.Add)
+	router.PUT("/group", group.Update)
 	router.DELETE("/group", group.Remove)
 	router.GET("/group", group.GetInfo)
-	router.POST("/group/member", group.Join)
-	router.DELETE("/group/member", group.Leave)
+	router.GET("/group/all", group.GetList)
+	router.POST("/group/device", group.Join)
+	router.DELETE("/group/device", group.Leave)
 
 	// Shutdown Process
 	Quit := make(chan os.Signal, 1)

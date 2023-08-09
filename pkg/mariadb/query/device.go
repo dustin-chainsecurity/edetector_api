@@ -114,17 +114,17 @@ func UpdateDetectMode(mode int, deviceId string) error {
 }
 
 func CheckDevice(deviceId string) (bool, error) {
-	var count int
-	query := "SELECT COUNT(*) FROM client WHERE client_id = ?"
-	err := mariadb.DB.QueryRow(query, deviceId).Scan(&count)
+	query := `
+		SELECT EXISTS(SELECT client_id FROM client WHERE client_id = ?);
+	`
+	var exist bool
+	err := mariadb.DB.QueryRow(query, deviceId).Scan(&exist)
 	if err != nil {
 		return false, err
-	}
-	if count == 0 {
+	} else if !exist {
 		return false, fmt.Errorf("device " + deviceId + " not exist")
-	} else {
-		return true, nil
 	}
+	return exist, nil
 }
 
 func CheckAllDevice(devices []string) error {
