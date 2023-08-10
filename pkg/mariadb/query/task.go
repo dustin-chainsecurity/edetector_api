@@ -63,6 +63,16 @@ func LoadStoredTask(taskId string, clientId string, status int) [][]string {
 	return result
 }
 
+func CheckProcessingTask(deviceId string, work string) (bool, error) {
+	var exist bool
+	query := "SELECT EXISTS(SELECT task_id FROM task WHERE client_id = ? AND type = ? AND status != 3 AND status != 4)"
+	err := mariadb.DB.QueryRow(query, deviceId, work).Scan(&exist)
+	if err != nil {
+		return false, err
+	}
+	return exist, nil
+}
+
 func CheckTask(TaskId string) (bool, error) {
 	var count int
 	query := "SELECT COUNT(*) FROM task WHERE task_id = ?"

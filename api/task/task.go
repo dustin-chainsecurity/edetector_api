@@ -36,22 +36,19 @@ type ScheduleRequest struct {
 }
 
 func addTask(deviceId string, work string, msg string) (string, error) {
-
-	// check deviceId
-	exist, err := query.CheckDevice(deviceId)
-	if err != nil {
+	// check processing tasks
+	if exist, err := query.CheckProcessingTask(deviceId, work); err != nil {
 		return "", err
-	}
-	if !exist {
-		return "", fmt.Errorf("deviceId not exist")
+	} else if exist {
+		return "", fmt.Errorf("already processing the same task: %s for device: %s", work, deviceId)
 	}
 	// generate taskid
 	taskId := uuid.NewString()
 	// store into mariaDB
 	query := "INSERT INTO task (task_id, client_id, type, status, progress, timestamp) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)"
-	_, err = mariadb.DB.Exec(query, taskId, deviceId, work, 0, 0)
+	_, err := mariadb.DB.Exec(query, taskId, deviceId, work, 0, 0)
 	if err != nil {
-		return taskId, err
+		return "", err
 	}
 	// store into redis
 	pkt := TaskPacket{
@@ -62,7 +59,7 @@ func addTask(deviceId string, work string, msg string) (string, error) {
 	}
 	pktString, err := json.Marshal(pkt)
 	if err != nil {
-		return taskId, err
+		return "", err
 	}
 	err = redis.Redis_set(taskId, string(pktString))
 	return taskId, err
