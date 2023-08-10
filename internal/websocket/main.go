@@ -7,6 +7,7 @@ import (
 	"edetector_API/config"
 	"edetector_API/internal/token"
 	"edetector_API/pkg/logger"
+	"edetector_API/pkg/mariadb/query"
 	"io"
 	"os"
 	"os/signal"
@@ -47,6 +48,9 @@ func Main() {
 	taskGroup.POST("/scheduledScan", task.ScheduledScan)
 	taskGroup.POST("/scheduledCollect", task.ScheduledCollect)
 	taskGroup.POST("/scheduledDownload", task.ScheduledDownload)
+
+	// Maintaining Connection with MariaDB
+	go query.CheckConnection(ctx)
 
 	// shutdown process
 	signal.Notify(Quit, syscall.SIGINT, syscall.SIGTERM)
