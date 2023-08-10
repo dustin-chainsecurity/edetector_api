@@ -33,7 +33,7 @@ func LoadTaskStatus(deviceId string, work string) (int, int, error) {
 }
 
 func LoadStoredTask(taskId string, clientId string, status int) [][]string {
-	q := "select task_id, client_id, status from task where "
+	q := "SELECT task_id, client_id, status FROM task WHERE "
 	var result [][]string
 	if clientId != "nil" {
 		q = q + "client_id = " + clientId
@@ -78,14 +78,16 @@ func CheckTask(TaskId string) (bool, error) {
 }
 
 func UpdateTaskStatus(taskId string, status int) {
-	_, err := mariadb.DB.Exec("update task set status = ? where task_id = ?", status, taskId)
+	logger.Info("Updating task status: " + taskId + " to " + strconv.Itoa(status))
+	_, err := mariadb.DB.Exec("UPDATE task SET status = ? WHERE task_id = ?", status, taskId)
 	if err != nil {
 		logger.Error("Error updating task status: " + err.Error())
 	}
+	logger.Info("Finished updating task status: " + taskId + " to " + strconv.Itoa(status))
 }
 
 func UpdateTaskProgress(taskId string, progress int) error {
-	_, err := mariadb.DB.Exec("update task set progress = ? where task_id = ?", progress, taskId)
+	_, err := mariadb.DB.Exec("UPDATE task SET progress = ? WHERE task_id = ?", progress, taskId)
 	if err != nil {
 		return err
 	}

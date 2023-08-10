@@ -11,8 +11,8 @@ import (
 var taskchans = make(map[string]chan string)
 
 func findTask(ctx context.Context) {
-	unhandle_tasks := loadUnhandleTasks()
-	for _, task := range unhandle_tasks {
+	unhandled_tasks := loadUnhandledTasks()
+	for _, task := range unhandled_tasks {
 		status, err := rq.LoadOnlineStatus(task.clientId)
 		if err != nil {
 			logger.Error(err.Error())
@@ -22,8 +22,8 @@ func findTask(ctx context.Context) {
 				taskchans[task.clientId] = make(chan string, 1024)
 				go taskHandler(ctx, taskchans[task.clientId], task.clientId)
 			}
-			taskchans[task.clientId] <- task.taskId
 			mq.UpdateTaskStatus(task.taskId, 1)
+			taskchans[task.clientId] <- task.taskId
 		}
 	}
 }
