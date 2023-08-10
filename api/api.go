@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"edetector_API/api/analysis"
 	"edetector_API/api/clear"
 	"edetector_API/api/group"
@@ -14,6 +15,7 @@ import (
 	"edetector_API/internal/token"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
+	"edetector_API/pkg/mariadb/query"
 	"edetector_API/pkg/redis"
 	"fmt"
 	"io"
@@ -30,6 +32,9 @@ var err error
 func Main() {
 
 	API_init("API_LOG_FILE")
+	Quit := make(chan os.Signal, 1)
+	ctx, cancel := context.WithCancel(context.Background())
+	logger.Info("Web API service enabled...")
 
 	// Gin Settings
 	gin.SetMode(gin.ReleaseMode)
@@ -58,12 +63,12 @@ func Main() {
 	router.POST("/updateProgress", testing.UpdateProgress)
 
 	// Login
-	router.POST("/member/signup", member.Signup)
 	router.POST("/member/login", member.Login)
 	router.POST("/member/loginWithToken", member.LoginWithToken)
 
 	// Use Token Authentication
 	router.Use(token.TokenAuth())
+	router.POST("/member/signup", member.Signup)
 
 	// Search Evidence
 	router.GET("/searchEvidence/detectDevices", searchEvidence.DetectDevices)
@@ -86,12 +91,15 @@ func Main() {
 	router.POST("/group/device", group.Join)
 	router.DELETE("/group/device", group.Leave)
 
+	// Maintaining Connection with MariaDB
+	go query.CheckConnection(ctx)
+
 	// Shutdown Process
-	Quit := make(chan os.Signal, 1)
 	signal.Notify(Quit, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-Quit
-		logger.Log.Info("Shutting down API server...")
+		cancel()
+		logger.Info("Shutting down API server...")
 		os.Exit(0)
 	}()
 
