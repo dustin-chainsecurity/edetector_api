@@ -24,7 +24,7 @@ func loadTasks(q task) []task {
 	return tasks
 }
 
-func loadUnhandleTasks() []task {
+func loadUnhandledTasks() []task {
 	var q task
 	q.taskId = "nil"
 	q.clientId = "nil"
