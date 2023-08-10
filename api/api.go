@@ -61,6 +61,7 @@ func Main() {
 
 	// Testing
 	router.POST("/updateProgress", testing.UpdateProgress)
+	router.POST("/addDevice", testing.AddDevice)
 
 	// Login
 	router.POST("/member/login", member.Login)

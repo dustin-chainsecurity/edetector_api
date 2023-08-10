@@ -1,8 +1,12 @@
 package query
 
 import (
+	"crypto/rand"
 	"database/sql"
+	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
+	"edetector_API/pkg/redis"
+	"encoding/json"
 	"fmt"
 )
 
@@ -20,6 +24,11 @@ type RawDevice struct {
 	FileSchedule       sql.NullString
 	FileFinishTime     sql.NullString
 	ImageFinishTime    sql.NullString
+}
+
+type ClientOnlineStatus struct {
+	Status int
+	Time   string
 }
 
 func LoadDeviceInfo(deviceId string) (RawDevice, error) {
@@ -135,4 +144,68 @@ func CheckAllDevice(devices []string) error {
 		}
 	}
 	return nil
+}
+
+func AddDevice(id string, name string, ip string) error {
+	// check if device exist
+	if exist, err := CheckDevice(id); err != nil {
+		return err
+	} else if exist {
+		return fmt.Errorf("device " + id + " already exist")
+	}
+	query := `
+		INSERT INTO client (client_id, ip, mac) VALUES (?, ?, ?);
+	`
+	_, err := mariadb.DB.Exec(query, id, ip, generateMACAddress())
+	if err != nil {
+		return err
+	}
+	query = `
+		INSERT INTO client_setting (client_id, networkreport, processreport) VALUES (?, 0, 0);
+	`
+	_, err = mariadb.DB.Exec(query, id)
+	if err != nil {
+		return err
+	}
+	query = `
+		INSERT INTO client_info (client_id, sysinfo, osinfo, computername, username, fileversion, boottime) VALUES (?, ?, ?, ?, ?, ?, ?)
+	`
+	_, err = mariadb.DB.Exec(query, id, "x64", "Windows 10 Home", name, "SYSTEM", "3.4.2.0,1988,1989", "20230706110846")
+	if err != nil {
+		return err
+	}
+	query = `
+		INSERT INTO client_task_status (client_id) VALUES (?);
+	`
+	_, err = mariadb.DB.Exec(query, id)
+	if err != nil {
+		return err
+	}
+	onlineStatusInfo := ClientOnlineStatus {
+		Status: 0,
+		Time:   "20230706110846",
+	}
+	redis.Redis_set(id, onlineStatusInfo.Marshal())	
+	return nil
+}
+
+func (c *ClientOnlineStatus) Marshal() string {
+	json, err := json.Marshal(c)
+	if err != nil {
+		logger.Error("Error in json marshal" + err.Error())
+	}
+	return string(json)
+}
+
+func generateMACAddress() string {
+	mac := make([]byte, 6)
+	_, err := rand.Read(mac)
+	if err != nil {
+		panic(err)
+	}
+	mac[0] |= 2
+	macAddress := fmt.Sprintf("%02X:%02X:%02X:%02X:%02X:%02X",
+		mac[0], mac[1], mac[2], mac[3], mac[4], mac[5])
+
+	return macAddress
 }

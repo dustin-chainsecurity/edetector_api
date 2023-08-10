@@ -50,20 +50,6 @@ func InsertData() {
 			return
 		}
 
-		// client_group
-		query = "INSERT INTO client_group (client_id, group_id) VALUES (?, ?)"
-		_, err = mariadb.DB.Exec(query, key, 1)
-		if err != nil {
-			logger.Error("Error storing client data: " + err.Error())
-			return
-		}
-		query = "INSERT INTO client_group (client_id, group_id) VALUES (?, ?)"
-		_, err = mariadb.DB.Exec(query, key, 2)
-		if err != nil {
-			logger.Error("Error storing client data: " + err.Error())
-			return
-		}
-
 		// client_task_status
 		query = "INSERT INTO client_task_status (client_id) VALUES (?)"
 		_, err = mariadb.DB.Exec(query, key)
