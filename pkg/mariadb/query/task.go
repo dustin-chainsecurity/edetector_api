@@ -78,12 +78,10 @@ func CheckTask(TaskId string) (bool, error) {
 }
 
 func UpdateTaskStatus(taskId string, status int) {
-	logger.Info("Updating task status: " + taskId + " to " + strconv.Itoa(status))
 	_, err := mariadb.DB.Exec("UPDATE task SET status = ? WHERE task_id = ?", status, taskId)
 	if err != nil {
 		logger.Error("Error updating task status: " + err.Error())
 	}
-	logger.Info("Finished updating task status: " + taskId + " to " + strconv.Itoa(status))
 }
 
 func UpdateTaskProgress(taskId string, progress int) error {
