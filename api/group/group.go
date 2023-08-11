@@ -88,7 +88,7 @@ func Update(c *gin.Context) {
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
-	id, err := strconv.Atoi(c.Query("id"))
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		errhandler.Handler(c, err, "Error retrieving groupID")
 		return
@@ -120,7 +120,7 @@ func Update(c *gin.Context) {
 }
 
 func Remove(c *gin.Context) {
-	id, err := strconv.Atoi(c.Query("id"))
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		errhandler.Handler(c, err, "Error retrieving groupID")
 		return
@@ -153,7 +153,7 @@ func GetList(c *gin.Context) {
 }
 
 func GetInfo(c *gin.Context) {
-	id, err := strconv.Atoi(c.Query("id"))
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		errhandler.Handler(c, err, "Error retrieving groupID")
 		return
