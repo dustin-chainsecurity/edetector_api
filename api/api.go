@@ -54,6 +54,7 @@ func Main() {
 	router.GET("/check", server.Check)
 	router.GET("/save", saveagent.SaveAgent)
 	router.POST("/sendMission", task.SendMission)
+	router.GET("/test", testing.Test)
 	router.DELETE("/rabbit", clear.ClearRabbit)
 	router.DELETE("/redis", clear.ClearRedis)
 	router.DELETE("/maria", clear.ClearMaria)

@@ -2,9 +2,9 @@ package task
 
 import (
 	"edetector_API/internal/channel"
+	"edetector_API/internal/device"
 	"edetector_API/internal/errhandler"
 	"edetector_API/pkg/logger"
-	"edetector_API/pkg/mariadb/query"
 	"fmt"
 	"net/http"
 
@@ -24,9 +24,8 @@ func UpdateTask(c *gin.Context) {
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 
 	// Check deviceId
-	_, err := query.CheckDevice(req.DeviceId)
-	if err != nil {
-		errhandler.Handler(c, err, "Error checking deviceID")
+	if err := device.CheckID(req.DeviceId); err != nil {
+		errhandler.Handler(c, err, "Invalid device ID")
 		return
 	}
 

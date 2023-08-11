@@ -1,6 +1,7 @@
 package group
 
 import (
+	"edetector_API/internal/device"
 	"edetector_API/internal/errhandler"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb/query"
@@ -93,8 +94,8 @@ func Update(c *gin.Context) {
 		return
 	}
 	// check if the group exists
-	if _, err := query.CheckGroupID(id); err != nil {
-		errhandler.Handler(c, err, "Error checking groupID")
+	if err := checkID(id); err != nil {
+		errhandler.Handler(c, err, "Invalid group ID")
 		return
 	}
 	// check if the group name exists
@@ -125,8 +126,8 @@ func Remove(c *gin.Context) {
 		return
 	}
 	// check if the group exists
-	if _, err := query.CheckGroupID(id); err != nil {
-		errhandler.Handler(c, err, "Error checking groupID")
+	if err := checkID(id); err != nil {
+		errhandler.Handler(c, err, "Invalid group ID")
 		return
 	}
 	err = query.RemoveGroup(id)
@@ -158,8 +159,8 @@ func GetInfo(c *gin.Context) {
 		return
 	}
 	// check if the group exists
-	if _, err := query.CheckGroupID(id); err != nil {
-		errhandler.Handler(c, err, "Error checking groupID")
+	if err := checkID(id); err != nil {
+		errhandler.Handler(c, err, "Invalid group ID")
 		return
 	}
 	info, err := query.LoadGroupInfo(id)
@@ -187,15 +188,14 @@ func Join(c *gin.Context) {
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 	// check if the all group exists
-	err := query.CheckAllGroupID(req.Groups)
+	err := checkAllID(req.Groups)
 	if err != nil {
-		errhandler.Handler(c, err, "Error checking groupID")
+		errhandler.Handler(c, err, "Invalid group ID")
 		return
 	}
-	// check if the all device exists
-	err = query.CheckAllDevice(req.Devices)
-	if err != nil {
-		errhandler.Handler(c, err, "Error checking deviceID")
+	// check devices
+	if err := device.CheckAllID(req.Devices); err != nil {
+		errhandler.Handler(c, err, "Invalid device ID")
 		return
 	}
 	err = query.AddGroupDevices(req.Groups, req.Devices)
@@ -217,15 +217,14 @@ func Leave(c *gin.Context) {
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 	// check if the all group exists
-	err := query.CheckAllGroupID(req.Groups)
+	err := checkAllID(req.Groups)
 	if err != nil {
-		errhandler.Handler(c, err, "Error checking groupID")
+		errhandler.Handler(c, err, "Invalid group ID")
 		return
 	}
-	// check if the all device exists
-	err = query.CheckAllDevice(req.Devices)
-	if err != nil {
-		errhandler.Handler(c, err, "Error checking deviceID")
+	// check devices
+	if err := device.CheckAllID(req.Devices); err != nil {
+		errhandler.Handler(c, err, "Invalid device ID")
 		return
 	}
 	err = query.RemoveGroupDevices(req.Groups, req.Devices)
@@ -236,4 +235,22 @@ func Leave(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"isSuccess": true,
 	})
+}
+
+func checkID(id int) error {
+	if exist, err := query.CheckGroupID(id); err != nil {
+		return err
+	} else if !exist {
+		return fmt.Errorf("groupID "+strconv.Itoa(id)+" does not exist")
+	}
+	return nil
+}
+
+func checkAllID(groups []int) error {
+	for _, id := range groups {
+		if err := checkID(id); err != nil {
+			return err
+		}
+	}
+	return nil
 }

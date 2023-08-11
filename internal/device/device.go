@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"	
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type dateForm struct {
@@ -189,4 +189,22 @@ func processFinishTime(deviceId string, work string, finishtime sql.NullString) 
 		}
 	}
 	return output, nil
+}
+
+func CheckID(id string) error {
+	if exist, err := mq.CheckDevice(id); err != nil {
+		return err
+	} else if !exist {
+		return fmt.Errorf("deviceID " + id + " does not exist")
+	}
+	return nil
+}
+
+func CheckAllID(devices []string) error {
+	for _, id := range devices {
+		if err := CheckID(id); err != nil {
+			return err
+		}
+	}
+	return nil
 }
