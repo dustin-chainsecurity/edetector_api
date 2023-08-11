@@ -78,7 +78,7 @@ func Main() {
 	router.GET("/analysisPage/allDeviceDetail", analysis.DeviceDetail)
 	router.POST("/analysisPage/template", analysis.AddTemplate)
 	router.GET("/analysisPage/template", analysis.GetTemplateList)
-	router.GET("/analysisPage/template", analysis.GetTemplate)
+	router.GET("/analysisPage/template/:id", analysis.GetTemplate)
 	router.PUT("/analysisPage/template/:id", analysis.UpdateTemplate)
 	router.DELETE("/analysisPage/template/:id", analysis.DeleteTemplate)
 
@@ -89,10 +89,10 @@ func Main() {
 
 	// Group
 	router.POST("/group", group.Add)
+	router.GET("/group", group.GetList)
+	router.GET("/group/:id", group.GetInfo)
 	router.PUT("/group/:id", group.Update)
 	router.DELETE("/group/:id", group.Remove)
-	router.GET("/group/:id", group.GetInfo)
-	router.GET("/group", group.GetList)
 	router.POST("/group/device", group.Join)
 	router.DELETE("/group/device", group.Leave)
 

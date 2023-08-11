@@ -2,27 +2,87 @@ package main
 
 import (
 	"edetector_API/internal/template"
-	"edetector_API/pkg/mariadb/query"
 	"fmt"
 )
 
 func main() {
-	// test process raw template code
-	raw := query.RawTemplate{
-		HistoryAndBookmark: "0100110100111",
-		CookieAndCache: "1011001",
-		ConnectionHistory: "011",
-		ProcessHistory: "11110100110011",
-		VanishingHistory: "0011",
-		RecentOpening: "01011",
-		USBHistory: "011",
-		EmailHistory: "01",
+	// test process template to raw template
+	t := template.Template{
+		Name:        "test",
+		Work:        "test",
+		KeywordType: "test",
+		Keyword:     "test",
+		HistoryAndBookmark: template.HistoryAndBookmarkStruct{
+			ChromeBrowsingHistory:  true,
+			ChromeLoginInfo:        true,
+			ChromeBookmarks:        true,
+			ChromeDownloadHistory:  true,
+			ChromeKeywordSearch:    true,
+			EdgeBrowsingHistory:    true,
+			EdgeLoginInfo:          true,
+			EdgeBookmarks:          true,
+			IEBrowsingHistory:      true,
+			IELoginInfo:            true,
+			FirefoxBrowsingHistory: true,
+			FirefoxLoginInfo:       true,
+			FirefoxBookmarks:       true,
+		},
+		CookieAndCache: template.CookieAndCacheStruct{
+			ChromeCache:    true,
+			ChromeCookies:  true,
+			EdgeCache:      true,
+			EdgeCookies:    true,
+			IECache:        true,
+			FirefoxCache:   true,
+			FirefoxCookies: true,
+		},
+		ConnectionHistory: template.ConnectionHistoryStruct{
+			NetworkInfo:     true,
+			NetworkResource: true,
+			WirelessInfo:    true,
+		},
+		ProcessHistory: template.ProcessHistoryStruct{
+			InstalledSoftware:       true,
+			DetailedSystemService:   true,
+			RemoteDesktopInfo:       true,
+			SystemInfo:              true,
+			Prefetch:                true,
+			ScheduledTask:           true,
+			NetworkTraffic:          true,
+			DNSInfo:                 true,
+			GeneralSystemService:    true,
+			BootupProgram:           true,
+			Jumplist:                true,
+			MUICache:                true,
+			MachineCodeHistory:      true,
+			ProgramReadWriteHistory: true,
+		},
+		VanishingHistory: template.VanishingHistoryStruct{
+			Process:        true,
+			OpenedFile:     true,
+			ConnectionInfo: true,
+			ARPCache:       true,
+		},
+		RecentOpening: template.RecentOpeningStruct{
+			RelatedShortcut: true,
+			UserInfo:        true,
+			WindowsActivity: true,
+			OpenedPath:      true,
+			OpenedFile:      true,
+		},
+		USBHistory: template.USBHistoryStruct{
+			USBInfo:         true,
+			SystemLogFile:   false,
+			SecurityLogFile: true,
+		},
+		EmailHistory: template.EmailHistoryStruct{
+			EmailPath: false,
+			EmailList: true,
+		},
 	}
-	template, err := template.ProcessRawTemplate(raw)
+	raw, err := template.ToRaw(t)
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	fmt.Println(template)
-
+	fmt.Println(raw)
 }
