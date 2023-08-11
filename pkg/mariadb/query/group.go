@@ -3,7 +3,6 @@ package query
 import (
 	"edetector_API/pkg/mariadb"
 	"fmt"
-	"strconv"
 )
 
 type GroupInfo struct {
@@ -201,8 +200,6 @@ func CheckGroupID(groupID int) (bool, error) {
 	err := mariadb.DB.QueryRow(query, groupID).Scan(&exist)
 	if err != nil {
 		return false, err
-	} else if !exist {
-		return false, fmt.Errorf("group id " + strconv.Itoa(groupID) + " not exist")
 	}
 	return exist, nil
 }
@@ -229,16 +226,6 @@ func CheckGroupNameForUpdate(groupID int, groupName string) (error) {
 		return err
 	} else if exist {
 		return fmt.Errorf("group name " + groupName + " already exists")
-	}
-	return nil
-}
-
-func CheckAllGroupID(groups []int) error {
-	for _, id := range groups {
-		_, err := CheckGroupID(id)
-		if err != nil {
-			return err
-		}
 	}
 	return nil
 }

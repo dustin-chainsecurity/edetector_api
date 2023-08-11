@@ -130,20 +130,8 @@ func CheckDevice(deviceId string) (bool, error) {
 	err := mariadb.DB.QueryRow(query, deviceId).Scan(&exist)
 	if err != nil {
 		return false, err
-	} else if !exist {
-		return false, fmt.Errorf("device " + deviceId + " not exist")
 	}
 	return exist, nil
-}
-
-func CheckAllDevice(devices []string) error {
-	for _, id := range devices {
-		_, err := CheckDevice(id)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func AddDevice(id string, name string, ip string) error {
