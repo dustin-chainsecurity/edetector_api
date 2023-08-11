@@ -8,7 +8,6 @@ import (
 	"edetector_API/api/member"
 	"edetector_API/api/saveagent"
 	"edetector_API/api/searchEvidence"
-	"edetector_API/api/server"
 	"edetector_API/api/task"
 	"edetector_API/api/testing"
 	"edetector_API/config"
@@ -51,7 +50,6 @@ func Main() {
 	router.Use(cors.New(corsConfig))
 
 	// Backend
-	router.GET("/check", server.Check)
 	router.GET("/save", saveagent.SaveAgent)
 	router.POST("/sendMission", task.SendMission)
 	router.GET("/test", testing.Test)
@@ -78,6 +76,10 @@ func Main() {
 
 	// Analysis Page
 	router.GET("/analysisPage/allDeviceDetail", analysis.DeviceDetail)
+	router.POST("/analysisPage/template", analysis.AddTemplate)
+	router.GET("/analysisPage/template", analysis.GetTemplate)
+	router.PUT("/analysisPage/template", analysis.UpdateTemplate)
+	router.DELETE("/analysisPage/template", analysis.DeleteTemplate)
 
 	// Working Server Tasks
 	taskGroup := router.Group("/task")
@@ -86,10 +88,10 @@ func Main() {
 
 	// Group
 	router.POST("/group", group.Add)
-	router.PUT("/group", group.Update)
-	router.DELETE("/group", group.Remove)
-	router.GET("/group", group.GetInfo)
-	router.GET("/group/all", group.GetList)
+	router.PUT("/group/:id", group.Update)
+	router.DELETE("/group/:id", group.Remove)
+	router.GET("/group/:id", group.GetInfo)
+	router.GET("/group", group.GetList)
 	router.POST("/group/device", group.Join)
 	router.DELETE("/group/device", group.Leave)
 
