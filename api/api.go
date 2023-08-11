@@ -77,9 +77,10 @@ func Main() {
 	// Analysis Page
 	router.GET("/analysisPage/allDeviceDetail", analysis.DeviceDetail)
 	router.POST("/analysisPage/template", analysis.AddTemplate)
+	router.GET("/analysisPage/template", analysis.GetTemplateList)
 	router.GET("/analysisPage/template", analysis.GetTemplate)
-	router.PUT("/analysisPage/template", analysis.UpdateTemplate)
-	router.DELETE("/analysisPage/template", analysis.DeleteTemplate)
+	router.PUT("/analysisPage/template/:id", analysis.UpdateTemplate)
+	router.DELETE("/analysisPage/template/:id", analysis.DeleteTemplate)
 
 	// Working Server Tasks
 	taskGroup := router.Group("/task")

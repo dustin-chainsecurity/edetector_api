@@ -5,7 +5,7 @@ import (
 )
 
 func Test(c *gin.Context) {
-	id := c.Query("id")
+	id := c.Param("id")
 	if id == "1" {
 		c.JSON(400, gin.H{
 			"message": "nil",

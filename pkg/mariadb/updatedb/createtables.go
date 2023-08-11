@@ -76,6 +76,25 @@ CREATE TABLE IF NOT EXISTS task (
 );
 `
 
+var TemplateSQL = `
+CREATE TABLE IF NOT EXISTS analysis_template (
+	template_id varchar(45) NOT NULL,
+	template_name varchar(45) NOT NULL,
+	work varchar(45) NOT NULL,
+	keyword_type varchar(45),
+	keyword varchar(255),
+	history_and_bookmark varchar(45) NOT NULL,
+	cookie_and_cache varchar(45) NOT NULL,
+	connection_history varchar(45) NOT NULL,
+	process_history varchar(45) NOT NULL,
+	vanishing_history varchar(45) NOT NULL,
+	recent_opening varchar(45) NOT NULL,
+	usb_history varchar(45) NOT NULL,
+	email_history varchar(45) NOT NULL,
+	PRIMARY KEY (template_id)
+);
+`
+
 func CreateTables() {
 
 	var err error
@@ -93,7 +112,7 @@ func CreateTables() {
 	defer mariadb.DB.Close()
 
 	// Create table
-	if err = createTable(ClientGroupSQL); err != nil {
+	if err = createTable(TemplateSQL); err != nil {
 		fmt.Println("Failed to create table: " + err.Error())
 		return
 	}
