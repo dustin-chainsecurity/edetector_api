@@ -141,15 +141,15 @@ func ToTemplate(raw query.RawTemplate) (Template, error) {
 }
 
 func processCategory(category string, template *Template, raw query.RawTemplate) (err error) {
-	categoryValues, _ := CategoryMap[category]
-	field, _ := Field[category]                                        // history_and_bookmark -> HistoryAndBookmark
-	parentField := reflect.ValueOf(template).Elem().FieldByName(field) // template.HistoryAndBookmark
+	categoryValues := CategoryMap[category]
+	field := Field[category]  // history_and_bookmark -> HistoryAndBookmark
+	parentField := reflect.ValueOf(template).Elem().FieldByName(field)  // template.HistoryAndBookmark
 	if !parentField.IsValid() || !parentField.CanSet() {
 		return fmt.Errorf("invalid field name %s", field)
 	}
-	rawSlice := reflect.ValueOf(&raw).Elem().FieldByName(field).String() // raw.HistoryAndBookmark
+	rawSlice := reflect.ValueOf(&raw).Elem().FieldByName(field).String()  // raw.HistoryAndBookmark
 	for i, key := range categoryValues {
-		embeddedField := parentField.FieldByName(key) // template.HistoryAndBookmark.ChromeBrowsingHistory
+		embeddedField := parentField.FieldByName(key)  // template.HistoryAndBookmark.ChromeBrowsingHistory
 		if embeddedField.IsValid() && embeddedField.CanSet() {
 			embeddedField.SetBool(rawSlice[i] == '1')
 		} else {
@@ -175,8 +175,8 @@ func ToRaw(template Template) (query.RawTemplate, error) {
 }
 
 func processCategoryReverse(category string, template Template, raw *query.RawTemplate) (err error) {
-	categoryValues, _ := CategoryMap[category]
-	field, _ := Field[category] // history_and_bookmark -> HistoryAndBookmark
+	categoryValues := CategoryMap[category]
+	field := Field[category] // history_and_bookmark -> HistoryAndBookmark
 	parentField := reflect.ValueOf(template).FieldByName(field)
 	fmt.Println(parentField) // template.HistoryAndBookmark
 	if !parentField.IsValid() {
