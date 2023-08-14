@@ -62,7 +62,3 @@ func addTask(deviceId string, work string, msg string) (string, error) {
 	err = redis.Redis_set(taskId, string(pktString))
 	return taskId, err
 }
-
-func processSchedule(date int, time int) string {
-	return fmt.Sprintf("%d|%d", date, time)
-}

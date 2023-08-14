@@ -9,6 +9,7 @@ import (
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb/query"
 	"io"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -49,17 +50,29 @@ func Main() {
 	taskGroup.POST("/scheduledCollect", task.ScheduledCollect)
 	taskGroup.POST("/scheduledDownload", task.ScheduledDownload)
 
+	// Start websocket service
+	srv := &http.Server{
+		Addr:    ":" + os.Args[1],
+		Handler: router,
+	}
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Error("Error starting websocket server: " + err.Error())
+			os.Exit(1)
+		}
+	}()
+
 	// Maintaining Connection with MariaDB
 	go query.CheckConnection(ctx)
 
 	// shutdown process
 	signal.Notify(Quit, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		<-Quit
-		cancel()
-		logger.Info("Shutting down websocket server...")
-		os.Exit(0)
-	}()
-
-	router.Run(":" + os.Args[1])
+	<-Quit
+	logger.Info("Shutting down Websocket server...")
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		logger.Error("Error shutting down Websocket server: " + err.Error())
+		os.Exit(1)
+	}
+	logger.Info("Websocket server exited")
 }

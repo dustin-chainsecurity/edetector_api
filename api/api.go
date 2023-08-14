@@ -18,6 +18,7 @@ import (
 	"edetector_API/pkg/redis"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -29,11 +30,9 @@ import (
 var err error
 
 func Main() {
-
 	API_init("API_LOG_FILE")
-	Quit := make(chan os.Signal, 1)
 	ctx, cancel := context.WithCancel(context.Background())
-	logger.Info("Web API service enabled...")
+	Quit := make(chan os.Signal, 1)
 
 	// Gin Settings
 	gin.SetMode(gin.ReleaseMode)
@@ -96,19 +95,31 @@ func Main() {
 	router.POST("/group/device", group.Join)
 	router.DELETE("/group/device", group.Leave)
 
+	// Start API service
+	srv := &http.Server{
+		Addr:    ":" + os.Args[1],
+		Handler: router,
+	}
+	go func () {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Error("Error starting API server: " + err.Error())
+			os.Exit(1)
+		}
+	}()
+
 	// Maintaining Connection with MariaDB
 	go query.CheckConnection(ctx)
 
-	// Shutdown Process
+	// Graceful Shutdown
 	signal.Notify(Quit, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		<-Quit
-		cancel()
-		logger.Info("Shutting down API server...")
-		os.Exit(0)
-	}()
-
-	router.Run(":" + os.Args[1])
+	<-Quit
+	logger.Info("Shutting down API server...")
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		logger.Error("Error shutting down API server: " + err.Error())
+		os.Exit(1)
+	}
+	logger.Info("API server exited")
 }
 
 func API_init(LOG_PATH string) {

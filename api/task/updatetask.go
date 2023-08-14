@@ -12,7 +12,6 @@ import (
 )
 
 func UpdateTask(c *gin.Context) {
-
 	// Receive request
 	var req struct {
 		DeviceId string `json:"deviceId"`
@@ -22,16 +21,13 @@ func UpdateTask(c *gin.Context) {
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
-
 	// Check deviceId
 	if err := device.CheckID(req.DeviceId); err != nil {
 		errhandler.Handler(c, err, "Invalid device ID")
 		return
 	}
-
 	// Send signal to websocket
 	channel.SignalChannel <- []string{req.DeviceId}
-
 	// Send response
 	res := TaskResponse{
 		IsSuccess: true,
