@@ -29,6 +29,27 @@ import (
 
 var err error
 
+func API_init(LOG_PATH string) {
+	// Load configuration
+	if config.LoadConfig() == nil {
+		fmt.Println("Error loading config file")
+		return
+	}
+	// Init Logger
+	logger.InitLogger(config.Viper.GetString(LOG_PATH))
+	logger.Log.Info("Logger enabled, log file: " + config.Viper.GetString(LOG_PATH))
+	// Connect to Redis
+	if db := redis.Redis_init(); db == nil {
+		logger.Error("Error connecting to redis")
+		return
+	}
+	// Connect to MariaDB
+	if err = mariadb.Connect_init(); err != nil {
+		logger.Error("Error connecting to mariadb: " + err.Error())
+		return
+	}
+}
+
 func Main() {
 	API_init("API_LOG_FILE")
 	ctx, cancel := context.WithCancel(context.Background())
@@ -122,25 +143,4 @@ func Main() {
 	mariadb.DB.Close()
 	redis.Redis_close()
 	logger.Info("API server exited")
-}
-
-func API_init(LOG_PATH string) {
-	// Load configuration
-	if config.LoadConfig() == nil {
-		fmt.Println("Error loading config file")
-		return
-	}
-	// Init Logger
-	logger.InitLogger(config.Viper.GetString(LOG_PATH))
-	logger.Log.Info("Logger enabled, log file: " + config.Viper.GetString(LOG_PATH))
-	// Connect to Redis
-	if db := redis.Redis_init(); db == nil {
-		logger.Error("Error connecting to redis")
-		return
-	}
-	// Connect to MariaDB
-	if err = mariadb.Connect_init(); err != nil {
-		logger.Error("Error connecting to mariadb: " + err.Error())
-		return
-	}
 }

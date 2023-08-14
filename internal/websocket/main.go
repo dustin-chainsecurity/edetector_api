@@ -2,7 +2,6 @@ package websocket
 
 import (
 	"context"
-	"edetector_API/api"
 	"edetector_API/api/task"
 	"edetector_API/config"
 	"edetector_API/internal/token"
@@ -10,6 +9,7 @@ import (
 	"edetector_API/pkg/mariadb"
 	"edetector_API/pkg/mariadb/query"
 	"edetector_API/pkg/redis"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -20,8 +20,31 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var err error
+
+func websocket_init(LOG_PATH string) {
+	// Load configuration
+	if config.LoadConfig() == nil {
+		fmt.Println("Error loading config file")
+		return
+	}
+	// Init Logger
+	logger.InitLogger(config.Viper.GetString(LOG_PATH))
+	logger.Log.Info("Logger enabled, log file: " + config.Viper.GetString(LOG_PATH))
+	// Connect to Redis
+	if db := redis.Redis_init(); db == nil {
+		logger.Error("Error connecting to redis")
+		return
+	}
+	// Connect to MariaDB
+	if err = mariadb.Connect_init(); err != nil {
+		logger.Error("Error connecting to mariadb: " + err.Error())
+		return
+	}
+}
+
 func Main() {
-	api.API_init("WS_LOG_FILE")
+	websocket_init("WS_LOG_FILE")
 	ctx, cancel := context.WithCancel(context.Background())
 	Quit := make(chan os.Signal, 1)
 
