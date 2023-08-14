@@ -5,6 +5,8 @@ import (
 	"edetector_API/api"
 	"edetector_API/internal/schedule"
 	"edetector_API/pkg/logger"
+	"edetector_API/pkg/mariadb"
+	"edetector_API/pkg/redis"
 	"os"
 	"os/signal"
 	"syscall"
@@ -21,6 +23,8 @@ func Start() {
 	signal.Notify(Quit, syscall.SIGINT, syscall.SIGTERM)
 	<-Quit
 	cancel()
+	mariadb.DB.Close()
+	redis.Redis_close()
 	logger.Info("Task service shutdown")
 }
 

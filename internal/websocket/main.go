@@ -7,7 +7,9 @@ import (
 	"edetector_API/config"
 	"edetector_API/internal/token"
 	"edetector_API/pkg/logger"
+	"edetector_API/pkg/mariadb"
 	"edetector_API/pkg/mariadb/query"
+	"edetector_API/pkg/redis"
 	"io"
 	"net/http"
 	"os"
@@ -74,5 +76,7 @@ func Main() {
 		logger.Error("Error shutting down Websocket server: " + err.Error())
 		os.Exit(1)
 	}
+	mariadb.DB.Close()
+	redis.Redis_close()
 	logger.Info("Websocket server exited")
 }

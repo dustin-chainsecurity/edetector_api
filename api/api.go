@@ -119,6 +119,8 @@ func Main() {
 		logger.Error("Error shutting down API server: " + err.Error())
 		os.Exit(1)
 	}
+	mariadb.DB.Close()
+	redis.Redis_close()
 	logger.Info("API server exited")
 }
 
