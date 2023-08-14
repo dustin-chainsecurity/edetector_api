@@ -2,6 +2,7 @@ package query
 
 import (
 	"edetector_API/pkg/mariadb"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -62,7 +63,7 @@ func LoadAllRawTemplate() ([]RawTemplate, error) {
 }
 
 type RawTemplate struct {
-	ID                 int
+	ID                 string
 	Name               string 
 	Work               string
 	KeywordType        string
@@ -79,6 +80,8 @@ type RawTemplate struct {
 
 func AddTemplate(raw RawTemplate) (string, error) {
 	template_id := uuid.NewString()
+	template_id = strings.ReplaceAll(template_id, "-", "")
+
 	query := `
 		INSERT INTO analysis_template (template_id, template_name, work,keyword_type,keyword,history_and_bookmark,cookie_and_cache,connection_history,process_history,vanishing_history,recent_opening,usb_history,email_history) 
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

@@ -123,6 +123,7 @@ func GetTemplate(c *gin.Context) {
 	raw, err := query.LoadRawTemplate(id)
 	if err != nil {
 		errhandler.Handler(c, err, "Error loading raw template data")
+		return
 	}
 	// Process the raw template data
 	template, err := template.ToTemplate(raw)
@@ -141,6 +142,7 @@ func GetTemplateList(c *gin.Context) {
 	raws, err := query.LoadAllRawTemplate()
 	if err != nil {
 		errhandler.Handler(c, err, "Error loading raw template data")
+		return
 	}
 	// Process the raw template data
 	templates := []template.Template{}

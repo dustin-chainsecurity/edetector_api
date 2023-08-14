@@ -178,15 +178,12 @@ func processCategoryReverse(category string, template Template, raw *query.RawTe
 	categoryValues := CategoryMap[category]
 	field := Field[category] // history_and_bookmark -> HistoryAndBookmark
 	parentField := reflect.ValueOf(template).FieldByName(field)
-	fmt.Println(parentField) // template.HistoryAndBookmark
 	if !parentField.IsValid() {
 		return fmt.Errorf("invalid field name %s", field)
 	}
 	rawSlice := reflect.ValueOf(raw).Elem().FieldByName(field) // raw.HistoryAndBookmark
-	fmt.Println(rawSlice)
 	for _, key := range categoryValues {
 		embeddedField := parentField.FieldByName(key) // template.HistoryAndBookmark.ChromeBrowsingHistory
-		fmt.Println(embeddedField)
 		if embeddedField.IsValid() {
 			if embeddedField.Bool() {
 				rawSlice.SetString(rawSlice.String() + "1")
