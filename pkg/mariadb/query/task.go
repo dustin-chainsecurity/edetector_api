@@ -8,6 +8,15 @@ import (
 	"strconv"
 )
 
+func AddTask(taskId string, clientId string, work string) error {
+	query := "INSERT INTO task (task_id, client_id, type, status, progress, timestamp) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)"
+	_, err := mariadb.DB.Exec(query, taskId, clientId, work, 0, 0)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func LoadTaskStatus(deviceId string, work string) (int, int, error) {
 	var status, progress int
 	query := "SELECT status, progress FROM task WHERE client_id = ? AND type = ? AND status != 3"

@@ -1,7 +1,6 @@
 package task
 
 import (
-	"edetector_API/pkg/mariadb"
 	"edetector_API/pkg/mariadb/query"
 	"edetector_API/pkg/redis"
 	"encoding/json"
@@ -45,8 +44,7 @@ func addTask(deviceId string, work string, msg string) (string, error) {
 	// generate taskid
 	taskId := uuid.NewString()
 	// store into mariaDB
-	query := "INSERT INTO task (task_id, client_id, type, status, progress, timestamp) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)"
-	_, err := mariadb.DB.Exec(query, taskId, deviceId, work, 0, 0)
+	err := query.AddTask(taskId, deviceId, work)
 	if err != nil {
 		return "", err
 	}
