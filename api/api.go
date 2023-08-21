@@ -68,53 +68,66 @@ func Main() {
 	corsConfig.AllowHeaders = []string{"Content-Type", "Accept", "Content-Length", "Authorization", "Origin", "X-Requested-With"}
 	router.RedirectFixedPath = true
 	router.Use(cors.New(corsConfig))
-
+	router.StaticFS("/server_file",http.Dir("./api/server_files"))
 	// Backend
 	router.GET("/save", saveagent.SaveAgent)
 	router.POST("/sendMission", task.SendMission)
 	router.GET("/test", testing.Test)
-	router.DELETE("/rabbit", clear.ClearRabbit)
-	router.DELETE("/redis", clear.ClearRedis)
-	router.DELETE("/maria", clear.ClearMaria)
-	router.DELETE("/elastic", clear.ClearElastic)
 
+	// admin group
+	adminGroup := router.Group("/admin")
+	adminGroup.Use(token.TokenAdminAuth())
+	adminGroup.DELETE("/rabbit", clear.ClearRabbit)
+	adminGroup.DELETE("/redis", clear.ClearRedis)
+	adminGroup.DELETE("/maria", clear.ClearMaria)
+	adminGroup.DELETE("/elastic", clear.ClearElastic)
+	adminGroup.POST("/signup", member.Signup)
 	// Testing
 	router.POST("/updateProgress", testing.UpdateProgress)
 	router.POST("/addDevice", testing.AddDevice)
 
 	// Login
-	router.POST("/member/login", member.Login)
-	router.POST("/member/loginWithToken", member.LoginWithToken)
-
+	router.POST("/login", member.Login)
+	router.POST("/loginWithToken", member.LoginWithToken)
+	
 	// Use Token Authentication
-	router.Use(token.TokenAuth())
-	router.POST("/member/signup", member.Signup)
+	// router.Use(token.TokenAuth())
+	memberGroup := router.Group("/member")
+	memberGroup.Use(token.TokenAuth())
+	
 
 	// Search Evidence
-	router.GET("/searchEvidence/detectDevices", searchEvidence.DetectDevices)
-	router.POST("/searchEvidence/refresh", searchEvidence.Refresh)
+	searchEvidenceGroup := router.Group("/searchEvidence")
+	searchEvidenceGroup.Use(token.TokenAuth())
+	searchEvidenceGroup.GET("/detectDevices", searchEvidence.DetectDevices)
+	searchEvidenceGroup.POST("/refresh", searchEvidence.Refresh)
 
 	// Analysis Page
-	router.GET("/analysisPage/allDeviceDetail", analysis.DeviceDetail)
-	router.POST("/analysisPage/template", analysis.AddTemplate)
-	router.GET("/analysisPage/template", analysis.GetTemplateList)
-	router.GET("/analysisPage/template/:id", analysis.GetTemplate)
-	router.PUT("/analysisPage/template/:id", analysis.UpdateTemplate)
-	router.DELETE("/analysisPage/template/:id", analysis.DeleteTemplate)
+	analysisGroup := router.Group("/analysisPage")
+	analysisGroup.Use(token.TokenAuth())
+	analysisGroup.GET("/allDeviceDetail", analysis.DeviceDetail)
+	analysisGroup.POST("/template", analysis.AddTemplate)
+	analysisGroup.GET("/template", analysis.GetTemplateList)
+	analysisGroup.GET("/template/:id", analysis.GetTemplate)
+	analysisGroup.PUT("/template/:id", analysis.UpdateTemplate)
+	analysisGroup.DELETE("/template/:id", analysis.DeleteTemplate)
 
 	// Working Server Tasks
 	taskGroup := router.Group("/task")
+	taskGroup.Use(token.TokenAuth())
 	taskGroup.POST("/sendMission", task.SendMission)
 	taskGroup.POST("/detectionMode", task.DetectionMode)
-
+	//File download
+	
 	// Group
-	router.POST("/group", group.Add)
-	router.GET("/group", group.GetList)
-	router.GET("/group/:id", group.GetInfo)
-	router.PUT("/group/:id", group.Update)
-	router.DELETE("/group/:id", group.Remove)
-	router.POST("/group/device", group.Join)
-	router.DELETE("/group/device", group.Leave)
+	groupGroup := router.Group("/group")
+	groupGroup.POST("/", group.Add)
+	groupGroup.GET("/", group.GetList)
+	groupGroup.GET("/:id", group.GetInfo)
+	groupGroup.PUT("/:id", group.Update)
+	groupGroup.DELETE("/:id", group.Remove)
+	groupGroup.POST("/device", group.Join)
+	groupGroup.DELETE("/device", group.Leave)
 
 	// Start API service
 	srv := &http.Server{

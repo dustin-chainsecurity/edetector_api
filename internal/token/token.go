@@ -18,6 +18,11 @@ func Generate() (string) {
 	return uuid.NewString()
 }
 
+func VerifyAdmin(token string) (int, error) {
+	return 0, nil
+	//ToDo
+}
+
 func Verify(token string) (int, error) {
 	var userId int
 	var timestamp sql.NullString
@@ -54,6 +59,22 @@ func TokenAuth() gin.HandlerFunc {
 		// Read the token from the header
 		token := c.GetHeader("Authorization")
 		userId, err := Verify(token)
+		if err != nil {
+			logger.Error("Error verifying token: " + err.Error())
+		} else if userId == -1 { // token incorrect
+			c.AbortWithStatus(http.StatusUnauthorized)
+		} else {
+			c.Set("userID", userId)
+			c.Next()
+		}
+	}
+}
+
+func TokenAdminAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Read the token from the header
+		token := c.GetHeader("Authorization")
+		userId, err := VerifyAdmin(token)
 		if err != nil {
 			logger.Error("Error verifying token: " + err.Error())
 		} else if userId == -1 { // token incorrect
