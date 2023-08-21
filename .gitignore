@@ -1,2 +1,4 @@
 *.log
 app.env
+server_files
+*.exe
