@@ -8,6 +8,7 @@ import (
 	"edetector_API/api/member"
 	"edetector_API/api/saveagent"
 	"edetector_API/api/searchEvidence"
+	"edetector_API/api/setting"
 	"edetector_API/api/task"
 	"edetector_API/api/testing"
 	"edetector_API/config"
@@ -68,13 +69,18 @@ func Main() {
 	corsConfig.AllowHeaders = []string{"Content-Type", "Accept", "Content-Length", "Authorization", "Origin", "X-Requested-With"}
 	router.RedirectFixedPath = true
 	router.Use(cors.New(corsConfig))
+
+	// Download Executables
 	router.StaticFS("/server_file",http.Dir("./api/server_files"))
+
 	// Backend
 	router.GET("/save", saveagent.SaveAgent)
 	router.POST("/sendMission", task.SendMission)
 	router.GET("/test", testing.Test)
+	router.POST("/updateProgress", testing.UpdateProgress)
+	router.POST("/addDevice", testing.AddDevice)
 
-	// admin group
+	// Admin Group
 	adminGroup := router.Group("/admin")
 	adminGroup.Use(token.TokenAdminAuth())
 	adminGroup.DELETE("/rabbit", clear.ClearRabbit)
@@ -82,21 +88,16 @@ func Main() {
 	adminGroup.DELETE("/maria", clear.ClearMaria)
 	adminGroup.DELETE("/elastic", clear.ClearElastic)
 	adminGroup.POST("/signup", member.Signup)
-	// Testing
-	router.POST("/updateProgress", testing.UpdateProgress)
-	router.POST("/addDevice", testing.AddDevice)
 
 	// Login
 	router.POST("/login", member.Login)
 	router.POST("/loginWithToken", member.LoginWithToken)
-	
-	// Use Token Authentication
-	// router.Use(token.TokenAuth())
+
+	// Member Group
 	memberGroup := router.Group("/member")
 	memberGroup.Use(token.TokenAuth())
-	
 
-	// Search Evidence
+	// Search Evidence Page
 	searchEvidenceGroup := router.Group("/searchEvidence")
 	searchEvidenceGroup.Use(token.TokenAuth())
 	searchEvidenceGroup.GET("/detectDevices", searchEvidence.DetectDevices)
@@ -117,7 +118,6 @@ func Main() {
 	taskGroup.Use(token.TokenAuth())
 	taskGroup.POST("/sendMission", task.SendMission)
 	taskGroup.POST("/detectionMode", task.DetectionMode)
-	//File download
 	
 	// Group
 	groupGroup := router.Group("/group")
@@ -128,6 +128,12 @@ func Main() {
 	groupGroup.DELETE("/:id", group.Remove)
 	groupGroup.POST("/device", group.Join)
 	groupGroup.DELETE("/device", group.Leave)
+
+	// Setting Group
+	settingGroup := router.Group("/setting")
+	settingGroup.Use(token.TokenAuth())
+	settingGroup.GET("/:field", setting.GetSettingField)
+	settingGroup.POST("/:field", setting.UpdateSettingField)
 
 	// Start API service
 	srv := &http.Server{
