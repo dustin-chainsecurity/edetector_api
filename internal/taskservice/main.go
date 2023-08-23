@@ -16,14 +16,14 @@ import (
 
 var err error
 
-func taskservice_init(LOG_PATH string) {
+func taskservice_init(LOG_PATH string, HOSTNAME string, APP string) {
 	// Load configuration
 	if config.LoadConfig() == nil {
 		fmt.Println("Error loading config file")
 		return
 	}
 	// Init Logger
-	logger.InitLogger(config.Viper.GetString(LOG_PATH))
+	logger.InitLogger(config.Viper.GetString(LOG_PATH), HOSTNAME, APP)
 	logger.Log.Info("Logger enabled, log file: " + config.Viper.GetString(LOG_PATH))
 	// Connect to Redis
 	if db := redis.Redis_init(); db == nil {
@@ -38,7 +38,7 @@ func taskservice_init(LOG_PATH string) {
 }
 
 func Start() {
-	taskservice_init("TASK_LOG_FILE")
+	taskservice_init("TASK_LOG_FILE", "taskservice", "TASKSERVICE")
 	Quit := make(chan os.Signal, 1)
 	ctx, cancel := context.WithCancel(context.Background())
 	logger.Info("Task service enabled...")
