@@ -69,11 +69,11 @@ type agent struct {
 }
 
 type mission struct {
-	FileAnalysis         bool `json:"fileAnalysis"`
-	FileAnalysisMainDisk bool `json:"fileAnalysisMainDisk"`
-	MemoryScan           bool `json:"memoryScan"`
-	Collection           bool `json:"collection"`
-	GenerateImage        bool `json:"generateImage"`
+	FileAnalysis         bool   `json:"fileAnalysis"`
+	FileAnalysisMainDisk string `json:"fileAnalysisMainDisk"`
+	MemoryScan           bool   `json:"memoryScan"`
+	Collection           bool   `json:"collection"`
+	GenerateImage        bool   `json:"generateImage"`
 }
 
 type generateAgent struct {
