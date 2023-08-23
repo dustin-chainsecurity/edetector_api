@@ -37,7 +37,7 @@
     "agent": {
         "mission": {
             "fileAnalysis": true,
-            "fileAnalysisMainDisk": true,
+            "fileAnalysisMainDisk": "C:",
             "memoryScan": true,
             "collection": true,
             "generateImage": true
