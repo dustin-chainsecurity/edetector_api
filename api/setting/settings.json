@@ -51,10 +51,10 @@
         "cpuPriority": ""
     },
     "interface": {
-        "cefLog": true,
-        "riskLevel": "example",
+        "cefLog": false,
+        "riskLevel": "level3",
         "ip": "192.168.0.2",
-        "port": 514,
-        "signatureID": "example"
+        "port": 123,
+        "signatureID": "Lorem"
     }
 }

@@ -22,14 +22,14 @@ import (
 
 var err error
 
-func websocket_init(LOG_PATH string) {
+func websocket_init(LOG_PATH string, HOSTNAME string, APP string) {
 	// Load configuration
 	if config.LoadConfig() == nil {
 		fmt.Println("Error loading config file")
 		return
 	}
 	// Init Logger
-	logger.InitLogger(config.Viper.GetString(LOG_PATH))
+	logger.InitLogger(config.Viper.GetString(LOG_PATH), HOSTNAME, APP)
 	logger.Log.Info("Logger enabled, log file: " + config.Viper.GetString(LOG_PATH))
 	// Connect to Redis
 	if db := redis.Redis_init(); db == nil {
@@ -44,7 +44,7 @@ func websocket_init(LOG_PATH string) {
 }
 
 func Main() {
-	websocket_init("WS_LOG_FILE")
+	websocket_init("WS_LOG_FILE", "websocket", "WEBSOCKET")
 	ctx, cancel := context.WithCancel(context.Background())
 	Quit := make(chan os.Signal, 1)
 

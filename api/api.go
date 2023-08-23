@@ -30,14 +30,14 @@ import (
 
 var err error
 
-func API_init(LOG_PATH string) {
+func API_init(LOG_PATH string, HOSTNAME string, APP string) {
 	// Load configuration
 	if config.LoadConfig() == nil {
 		fmt.Println("Error loading config file")
 		return
 	}
 	// Init Logger
-	logger.InitLogger(config.Viper.GetString(LOG_PATH))
+	logger.InitLogger(config.Viper.GetString(LOG_PATH), HOSTNAME, APP)
 	logger.Log.Info("Logger enabled, log file: " + config.Viper.GetString(LOG_PATH))
 	// Connect to Redis
 	if db := redis.Redis_init(); db == nil {
@@ -52,7 +52,7 @@ func API_init(LOG_PATH string) {
 }
 
 func Main() {
-	API_init("API_LOG_FILE")
+	API_init("API_LOG_FILE", "api", "API")
 	ctx, cancel := context.WithCancel(context.Background())
 	Quit := make(chan os.Signal, 1)
 

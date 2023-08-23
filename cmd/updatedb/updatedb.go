@@ -11,14 +11,14 @@ import (
 
 var err error
 
-func updatedb_init(LOG_PATH string) {
+func updatedb_init(LOG_PATH string, HOSTNAME string, APP string) {
 	// Load configuration
 	if config.LoadConfig() == nil {
 		fmt.Println("Error loading config file")
 		return
 	}
 	// Init Logger
-	logger.InitLogger(config.Viper.GetString(LOG_PATH))
+	logger.InitLogger(config.Viper.GetString(LOG_PATH), HOSTNAME, APP)
 	logger.Log.Info("Logger enabled, log file: " + config.Viper.GetString(LOG_PATH))
 	// Connect to Redis
 	if db := redis.Redis_init(); db == nil {
@@ -33,7 +33,7 @@ func updatedb_init(LOG_PATH string) {
 }
 
 func main() {
-	updatedb_init("TEST_LOG_FILE")
+	updatedb_init("TEST_LOG_FILE", "TEST_HOSTNAME", "TEST_APP")
 	updatedb.CreateTables()
 	// updatedb.CreateEvents()
 	// updatedb.InsertData()
