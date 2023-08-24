@@ -2,3 +2,4 @@
 app.env
 server_files
 *.exe
+settings.json
