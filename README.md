@@ -15,7 +15,7 @@ This service schedules and allocates tasks for the working server in order to sm
 Brief description of the layout :
 
 * `README.md` contains detailed description of the repository.
-* `docs`contains detailed documentations for the services.
+* `doc`contains detailed documentations for the services.
 * `config` contains environment variables to be used in the repository.
 * `cmd` contains main packages (entrypoints), each subdirectory of `cmd` is a main package.
 * `pkg` holds common packages that can be shared among different repositories.
