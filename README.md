@@ -2,13 +2,13 @@
 This repository contains three microservices : 
 
 - **Web API Service**<br />
-This service acts as a bridge that enables seamless communication, data transfer and interaction between the user-facing frontend and the robust backend server. See [] for more details.
+This service acts as a bridge that enables seamless communication, data transfer and interaction between the user-facing frontend and the robust backend server. <br />See [] for more details.
 
 - **Websocket Service**<br />
-This service is designed to enable the working server to inform the frontend to refresh device details if the worker tasks' status has changed, providing real-time user experience. See [] for more details.
+This service is designed to enable the working server to inform the frontend to refresh device details if the worker tasks' status has changed, providing real-time user experience. <br />See [] for more details.
 
 - **Task Service**<br />
-This service schedules and allocates tasks for the working server in order to smoothen the overall working process. See [] for more details.
+This service schedules and allocates tasks for the working server in order to smoothen the overall working process. <br />See [] for more details.
 
 ## Directory Layout
 
