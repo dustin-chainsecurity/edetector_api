@@ -18,10 +18,10 @@ You can view service logs from the console, `./cmd/api/*.log`, and `/var/log/sys
 <br/>
 
 Request
-```
-Body: {
-    "username": string,
-    "password": string
+```json
+"Body": {
+    "username": "example",
+    "password": "example"
 }
 ```
 Response
@@ -30,8 +30,8 @@ Response
     "success": true,
     "message": "success",
     "user": {
-        "username": "test",
-        "token": "test"
+        "username": "example",
+        "token": "token"
     }
 }
 ```
@@ -42,19 +42,19 @@ Response
 <br/>
 
 Request
-```console
-Body: {
-    "token": string
+```json
+"Body": {
+    "token": "token"
 }
 ```
 Response
-```
-Body: {
-    "success": boolean,
-    "message": string,
+```json
+"Body": {
+    "success": true,
+    "message": "success",
     "user": {
-        "username": string,
-        "token": string
+        "username": "example",
+        "token": "token"
     }
 }
 ```
@@ -67,51 +67,51 @@ Body: {
 <br/>
 
 Request
-```console
-Header: {"Authorization": "token"}
+```json
+"Header": {"Authorization": "token"}
 ```
 Response
 ```json
 {
-    "isSuccess": boolean,
+    "isSuccess": true,
     "data": [
         {
-            "deviceId": string,
-            "connection": boolean,
-            "innerIP": string,
-            "deviceName": string,
-            "groups": [],
-            "detectionMode": boolean,
-            "scanSchedule": []string,
+            "deviceId": "example",
+            "connection": true,
+            "innerIP": "example",
+            "deviceName": "example",
+            "groups": ["example"],
+            "detectionMode": true,
+            "scanSchedule": ["example"],
             "scanFinishTime": {
-                "isFinish": boolean,
-                "progress": int,
-                "finishTime": int
+                "isFinish": true,
+                "progress": 0,
+                "finishTime": 0
             },
             "collectSchedule": {
-                "date": string,
-                "time": string
+                "date": "example",
+                "time": "example"
             },
             "collectFinishTime": {
-                "isFinish": boolean,
-                "progress": int,
-                "finishTime": int
+                "isFinish": true,
+                "progress": 0,
+                "finishTime": 0
             },
             "fileDownloadDate": {
-                "date": string,
-                "time": string
+                "date": "example",
+                "time": "example"
             },
             "fileFinishTime": {
-                "isFinish": boolean,
-                "progress": int,
-                "finishTime": int
+                "isFinish": true,
+                "progress": 0,
+                "finishTime": 0
             },
             "imageFinishTime": {
-                "isFinish": boolean,
-                "progress": int,
-                "finishTime": int
+                "isFinish": true,
+                "progress": 0,
+                "finishTime": 0
             }
-        }, ...
+        }
     ]
 }
 ```
