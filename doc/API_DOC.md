@@ -18,20 +18,20 @@ You can view service logs from the console, `./cmd/api/*.log`, and `/var/log/sys
 <br/>
 
 Request
-```console
+```
 Body: {
     "username": string,
     "password": string
 }
 ```
 Response
-```console
-Body: {
-    "success": boolean,
-    "message": string,
+```json
+"Body": {
+    "success": true,
+    "message": "success",
     "user": {
-        "username": string,
-        "token": string
+        "username": "test",
+        "token": "test"
     }
 }
 ```
@@ -42,13 +42,13 @@ Body: {
 <br/>
 
 Request
-```json
+```console
 Body: {
     "token": string
 }
 ```
 Response
-```json
+```
 Body: {
     "success": boolean,
     "message": string,
