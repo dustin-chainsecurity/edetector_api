@@ -122,8 +122,8 @@ func Main() {
 	
 	// Group
 	groupGroup := router.Group("/group")
-	groupGroup.POST("/", group.Add)
-	groupGroup.GET("/", group.GetList)
+	groupGroup.POST("", group.Add)
+	groupGroup.GET("", group.GetList)
 	groupGroup.GET("/:id", group.GetInfo)
 	groupGroup.PUT("/:id", group.Update)
 	groupGroup.DELETE("/:id", group.Remove)
