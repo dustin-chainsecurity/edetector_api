@@ -69,6 +69,7 @@ func Main() {
 	corsConfig.AllowHeaders = []string{"Content-Type", "Accept", "Content-Length", "Authorization", "Origin", "X-Requested-With"}
 	router.RedirectFixedPath = true
 	router.Use(cors.New(corsConfig))
+	router.Use(logger.GinLog())
 
 	// Download Executables
 	router.StaticFS("/server_file",http.Dir("./api/server_files"))
