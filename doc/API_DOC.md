@@ -9,6 +9,22 @@ go run cmd/api/api.go 5000
 ### Monitor Logs
 You can view service logs from the console, `./cmd/api/*.log`, and `/var/log/syslog`
 
+# Version
+### v0.0.1 (2023.08.21)
+Functioning APIs :
+- Backend-Related : SaveAgent, AddDevice, UpdateProgress, Test
+- Member-Related : Login, LoginWithToken, Signup
+- Search Evidence Page
+- Analysis Page
+- Group Settings
+
+### v1.0.0 (2023.08.24)
+Enhancements :
+- Added settings-related APIs
+- Integrated zap logger with syslog
+
+---
+
 # REST API
 
 ## Member
