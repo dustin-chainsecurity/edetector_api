@@ -9,4 +9,17 @@ go run cmd/websocket/websocket.go 5050
 ### Monitor Logs
 You can view service logs from the console, `./cmd/websocket/*.log`, and `/var/log/syslog`
 
-## API List
+# Version
+### v1.0.0 (2023.08.21)
+Functions :
+- Informs frontend to refresh page when task status have been updated
+- Scheduling task APIs
+- Update Task API for backend usage
+
+### v1.0.1 (2023.08.24)
+Enhancements :
+- Integrated zap logger with syslog
+
+---
+
+## REST API
