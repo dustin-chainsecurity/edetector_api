@@ -16,7 +16,6 @@ Functions :
 
 ### v1.0.1 (2023.08.24)
 Enhancements :
-- Added settings-related APIs
 - Integrated zap logger with syslog
 
 ---
