@@ -72,7 +72,7 @@ func Main() {
 	router.Use(logger.GinLog())
 
 	// Download Executables
-	router.StaticFS("/server_file",http.Dir("./api/server_files"))
+	router.StaticFS("/server_file", http.Dir("./api/server_files"))
 
 	// Backend
 	router.GET("/save", saveagent.SaveAgent)
@@ -122,8 +122,11 @@ func Main() {
 	
 	// Group
 	groupGroup := router.Group("/group")
-	groupGroup.POST("/", group.Add)
-	groupGroup.GET("/", group.GetList)
+	groupGroup.Use(token.TokenAuth())
+	groupGroup.POST("", group.Add)
+	groupGroup.GET("", group.GetList)
+	groupGroup.POST("/add", group.Add)
+	groupGroup.GET("/all", group.GetList)
 	groupGroup.GET("/:id", group.GetInfo)
 	groupGroup.PUT("/:id", group.Update)
 	groupGroup.DELETE("/:id", group.Remove)
@@ -163,4 +166,17 @@ func Main() {
 	mariadb.DB.Close()
 	redis.Redis_close()
 	logger.Info("API server exited")
+}
+
+func CORS() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        c.Header("Access-Control-Allow-Origin", "*")
+        c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+        c.Header("Access-Control-Allow-Methods", "POST, HEAD, PATCH, OPTIONS, GET, PUT")
+        if c.Request.Method == "OPTIONS" {
+            c.AbortWithStatus(204)
+            return
+        }
+        c.Next()
+    }
 }

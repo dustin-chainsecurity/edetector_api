@@ -58,6 +58,10 @@ func TokenAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Read the token from the header
 		token := c.GetHeader("Authorization")
+		if token == "" {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
 		userId, err := Verify(token)
 		if err != nil {
 			logger.Error("Error verifying token: " + err.Error())
