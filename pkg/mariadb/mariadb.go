@@ -5,6 +5,7 @@ import (
 	"edetector_API/config"
 	"edetector_API/pkg/logger"
 	"fmt"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -24,6 +25,7 @@ func Connect_init() error {
 	if err != nil {
 		return err
 	}
+	DB.SetConnMaxLifetime(time.Minute * 5)
 	logger.Info("MariaDB Connected")
 	return nil
 }
