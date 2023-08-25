@@ -3,7 +3,7 @@ This service schedules and allocates tasks for the working server in order to sm
 
 ### Run Service
 ```console
-go run cmd/taskservice/taskservice.go <forward port>
+go run cmd/taskservice/taskservice.go
 ```
 ### Monitor Logs
 You can view service logs from the console, `./cmd/taskservice/*.log`, and `/var/log/syslog`
