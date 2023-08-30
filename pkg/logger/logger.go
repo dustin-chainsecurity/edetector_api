@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/imperfectgo/zap-syslog"
 	"github.com/imperfectgo/zap-syslog/syslog"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -19,8 +20,13 @@ var Log *zap.Logger
 
 func InitLogger(path string, hostname string, app string) {
 	// file logger
-	file, _ := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
-	fileWriteSyncer := zapcore.AddSync(file)
+	// _, _ = os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	fileWriteSyncer := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   path,
+		MaxSize:    500, // MB
+		MaxBackups: 3,
+		MaxAge:     28,   // days
+	})
 	productionCfg := zap.NewProductionEncoderConfig()
 	productionCfg.EncodeTime = zapcore.ISO8601TimeEncoder
 	fileEncoder := zapcore.NewJSONEncoder(productionCfg)
