@@ -37,8 +37,9 @@ func taskservice_init(LOG_PATH string, HOSTNAME string, APP string) {
 	}
 }
 
-func Start() {
+func Start(version string) {
 	taskservice_init("TASK_LOG_FILE", "taskservice", "TASKSERVICE")
+	logger.Info("Task service started, version: " + version)
 	Quit := make(chan os.Signal, 1)
 	ctx, cancel := context.WithCancel(context.Background())
 	logger.Info("Task service enabled...")

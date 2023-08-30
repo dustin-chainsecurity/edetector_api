@@ -4,6 +4,8 @@ import (
 	"edetector_API/api"
 )
 
+var version string
+
 func main() {
-	api.Main()
+	api.Main(version)
 }

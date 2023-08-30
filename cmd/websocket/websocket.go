@@ -4,6 +4,8 @@ import (
 	"edetector_API/internal/websocket"
 )
 
+var version string
+
 func main() {
-	websocket.Main()
+	websocket.Main(version)
 }
