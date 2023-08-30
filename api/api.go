@@ -12,7 +12,7 @@ import (
 	"edetector_API/api/task"
 	"edetector_API/api/testing"
 	"edetector_API/config"
-	"edetector_API/internal/fflag"
+	"edetector_API/pkg/fflag"
 	"edetector_API/internal/token"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"

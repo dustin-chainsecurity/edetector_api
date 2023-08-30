@@ -2,7 +2,7 @@ package setting
 
 import (
 	"edetector_API/config"
-	"edetector_API/internal/errhandler"
+	"edetector_API/pkg/errhandler"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -20,15 +20,15 @@ type SettingData struct {
 }
 
 type serverAndEmail struct {
-	WorkerPort      int      `json:"workerPort"`
-	DetectPort      int      `json:"detectPort"`
-	DetectDefault   bool     `json:"detectDefault"`
-	UpdatePort      int      `json:"updatePort"`
-	Email           string   `json:"email"`
-	Password        string   `json:"password"`
-	IP              string   `json:"ip"`
-	Port            int      `json:"port"`
-	Encryption      string   `json:"encryption"`
+	WorkerPort    int    `json:"workerPort"`
+	DetectPort    int    `json:"detectPort"`
+	DetectDefault bool   `json:"detectDefault"`
+	UpdatePort    int    `json:"updatePort"`
+	Email         string `json:"email"`
+	Password      string `json:"password"`
+	IP            string `json:"ip"`
+	Port          int    `json:"port"`
+	Encryption    string `json:"encryption"`
 }
 
 type function struct {

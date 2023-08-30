@@ -2,7 +2,7 @@ package testing
 
 import (
 	"edetector_API/api/task"
-	"edetector_API/internal/errhandler"
+	"edetector_API/pkg/errhandler"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb/query"
 	"fmt"

@@ -2,7 +2,7 @@ package analysis
 
 import (
 	"edetector_API/internal/device"
-	"edetector_API/internal/errhandler"
+	"edetector_API/pkg/errhandler"
 	"edetector_API/pkg/mariadb/query"
 	"net/http"
 

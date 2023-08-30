@@ -1,7 +1,7 @@
 package testing
 
 import (
-	"edetector_API/internal/errhandler"
+	"edetector_API/pkg/errhandler"
 	"edetector_API/pkg/mariadb/query"
 	"net/http"
 
@@ -15,7 +15,7 @@ type deviceInfo struct {
 }
 
 type addDeviceRequest struct {
-	Devices   []deviceInfo  `json:"devices"`
+	Devices []deviceInfo `json:"devices"`
 }
 
 func AddDevice(c *gin.Context) {

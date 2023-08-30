@@ -3,7 +3,7 @@ package task
 import (
 	"edetector_API/internal/channel"
 	"edetector_API/internal/device"
-	"edetector_API/internal/errhandler"
+	"edetector_API/pkg/errhandler"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb/query"
 	"fmt"
@@ -101,7 +101,6 @@ func ScheduledDownload(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, res)
 }
-
 
 func processSchedule(date int, time int) string {
 	return fmt.Sprintf("%d|%d", date, time)
