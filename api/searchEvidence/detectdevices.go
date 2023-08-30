@@ -3,10 +3,12 @@ package searchEvidence
 import (
 	"edetector_API/internal/device"
 	"edetector_API/internal/errhandler"
+	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb/query"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type detectDevicesResponse struct {
@@ -37,6 +39,7 @@ func DetectDevices(c *gin.Context) {
 		IsSuccess: true,
 		Data:      devices,
 	}
+	logger.Debug("DetectDevices response: ", zap.Any("res", res))
 
 	c.JSON(http.StatusOK, res)
 }

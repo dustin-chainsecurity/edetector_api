@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type refreshResponse struct {
@@ -55,5 +56,6 @@ func Refresh(c *gin.Context) {
 		IsSuccess: true,
 		Data:      devices,
 	}
+	logger.Debug("Refresh response: ", zap.Any("res", res))
 	c.JSON(http.StatusOK, res)
 }
