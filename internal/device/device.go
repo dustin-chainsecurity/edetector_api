@@ -2,9 +2,11 @@ package device
 
 import (
 	"database/sql"
+	"edetector_API/pkg/logger"
 	mq "edetector_API/pkg/mariadb/query"
 	rq "edetector_API/pkg/redis/query"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -176,6 +178,7 @@ func processFinishTime(deviceId string, work string, finishtime sql.NullString) 
 	case 2:                                    //* working
 		output.IsFinish = false
 		output.Progress = progress
+		logger.Debug("device " + deviceId + " working on " + work + ", progress: " + strconv.Itoa(progress))
 		return output, nil
 	case 3:                                    //* all tasks finished
 		if finishtime.Valid {
