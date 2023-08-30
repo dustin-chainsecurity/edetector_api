@@ -2,7 +2,7 @@ package group
 
 import (
 	"edetector_API/internal/device"
-	"edetector_API/internal/errhandler"
+	"edetector_API/pkg/errhandler"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb/query"
 	"fmt"
@@ -35,8 +35,8 @@ type groupInfoResponse struct {
 }
 
 type updateDevicesRequest struct {
-	Groups  []int      `json:"groups"`
-	Devices []string   `json:"devices"`
+	Groups  []int    `json:"groups"`
+	Devices []string `json:"devices"`
 }
 
 type group struct {
@@ -60,7 +60,7 @@ func Add(c *gin.Context) {
 		errhandler.Handler(c, err, "Error checking group name existence")
 		return
 	} else if exist {
-		errhandler.Handler(c, fmt.Errorf("group name " + req.Name + " already exists"), "Error checking group name")
+		errhandler.Handler(c, fmt.Errorf("group name "+req.Name+" already exists"), "Error checking group name")
 		return
 	}
 
@@ -241,7 +241,7 @@ func checkID(id int) error {
 	if exist, err := query.CheckGroupID(id); err != nil {
 		return err
 	} else if !exist {
-		return fmt.Errorf("groupID "+strconv.Itoa(id)+" does not exist")
+		return fmt.Errorf("groupID " + strconv.Itoa(id) + " does not exist")
 	}
 	return nil
 }

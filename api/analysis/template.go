@@ -1,8 +1,8 @@
 package analysis
 
 import (
-	"edetector_API/internal/errhandler"
 	"edetector_API/internal/template"
+	"edetector_API/pkg/errhandler"
 	"edetector_API/pkg/mariadb/query"
 	"fmt"
 	"net/http"
@@ -22,7 +22,7 @@ func AddTemplate(c *gin.Context) {
 		errhandler.Handler(c, err, "Error checking template name")
 		return
 	} else if exist {
-		errhandler.Handler(c, fmt.Errorf("template name " + req.Name + " already exists"), "Error checking template name")
+		errhandler.Handler(c, fmt.Errorf("template name "+req.Name+" already exists"), "Error checking template name")
 		return
 	}
 	// Process the template data
@@ -51,7 +51,7 @@ func DeleteTemplate(c *gin.Context) {
 		errhandler.Handler(c, err, "Error checking template id")
 		return
 	} else if !exist {
-		errhandler.Handler(c, fmt.Errorf("template id" + id + " does not exist"), "Error checking template id")
+		errhandler.Handler(c, fmt.Errorf("template id"+id+" does not exist"), "Error checking template id")
 		return
 	}
 	err := query.DeleteTemplate(id)
@@ -73,7 +73,7 @@ func UpdateTemplate(c *gin.Context) {
 		errhandler.Handler(c, err, "Error checking template id")
 		return
 	} else if !exist {
-		errhandler.Handler(c, fmt.Errorf("template id" + id + " does not exist"), "Error checking template id")
+		errhandler.Handler(c, fmt.Errorf("template id"+id+" does not exist"), "Error checking template id")
 		return
 	}
 	// Get the template data from the request
@@ -87,7 +87,7 @@ func UpdateTemplate(c *gin.Context) {
 		errhandler.Handler(c, err, "Error checking template name")
 		return
 	} else if exist {
-		errhandler.Handler(c, fmt.Errorf("template name " + req.Name + " already exists"), "Error checking template name")
+		errhandler.Handler(c, fmt.Errorf("template name "+req.Name+" already exists"), "Error checking template name")
 		return
 	}
 	// Process the template data
@@ -116,7 +116,7 @@ func GetTemplate(c *gin.Context) {
 		errhandler.Handler(c, err, "Error checking template id")
 		return
 	} else if !exist {
-		errhandler.Handler(c, fmt.Errorf("template id" + id + " does not exist"), "Error checking template id")
+		errhandler.Handler(c, fmt.Errorf("template id"+id+" does not exist"), "Error checking template id")
 		return
 	}
 	// Load the raw template data
