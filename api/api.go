@@ -12,6 +12,7 @@ import (
 	"edetector_API/api/task"
 	"edetector_API/api/testing"
 	"edetector_API/config"
+	"edetector_API/internal/fflag"
 	"edetector_API/internal/token"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
@@ -31,14 +32,22 @@ import (
 var err error
 
 func API_init(LOG_PATH string, HOSTNAME string, APP string) {
+	// Load feature flag
+	fflag.Get_fflag()
+	if fflag.FFLAG == nil {
+		logger.Error("Error loading feature flag")
+		return
+	}	
 	// Load configuration
 	if config.LoadConfig() == nil {
 		fmt.Println("Error loading config file")
 		return
 	}
 	// Init Logger
-	logger.InitLogger(config.Viper.GetString(LOG_PATH), HOSTNAME, APP)
-	logger.Log.Info("Logger enabled, log file: " + config.Viper.GetString(LOG_PATH))
+	if enable, err := fflag.FFLAG.FeatureEnabled("logger"); enable && err == nil {
+		logger.InitLogger(config.Viper.GetString(LOG_PATH), HOSTNAME, APP)
+		logger.Log.Info("Logger enabled, log file: " + config.Viper.GetString(LOG_PATH))
+	}
 	// Connect to Redis
 	if db := redis.Redis_init(); db == nil {
 		logger.Error("Error connecting to redis")
