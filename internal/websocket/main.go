@@ -43,8 +43,9 @@ func websocket_init(LOG_PATH string, HOSTNAME string, APP string) {
 	}
 }
 
-func Main() {
+func Main(version string) {
 	websocket_init("WS_LOG_FILE", "websocket", "WEBSOCKET")
+	logger.Info("Websocket server started, version: " + version)
 	ctx, cancel := context.WithCancel(context.Background())
 	Quit := make(chan os.Signal, 1)
 

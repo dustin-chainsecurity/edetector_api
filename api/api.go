@@ -51,8 +51,9 @@ func API_init(LOG_PATH string, HOSTNAME string, APP string) {
 	}
 }
 
-func Main() {
+func Main(version string) {
 	API_init("API_LOG_FILE", "api", "API")
+	logger.Info("API server started, version: " + version)
 	ctx, cancel := context.WithCancel(context.Background())
 	Quit := make(chan os.Signal, 1)
 
