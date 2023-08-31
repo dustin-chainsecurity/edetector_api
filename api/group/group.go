@@ -39,15 +39,6 @@ type updateDevicesRequest struct {
 	Devices []string `json:"devices"`
 }
 
-type group struct {
-	ID          int      `json:"id"`
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	RangeBegin  string   `json:"rangeBegin"`
-	RangeEnd    string   `json:"rangeEnd"`
-	Devices     []string `json:"devices"`
-}
-
 func Add(c *gin.Context) {
 	req := updateGroupRequest{}
 	if err := c.ShouldBindJSON(&req); err != nil {
