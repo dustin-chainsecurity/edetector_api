@@ -56,6 +56,12 @@ func Add(c *gin.Context) {
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 
+	// check if name is null
+	if req.Name == "" || req.Name == "未分類群組" {
+		errhandler.Handler(c, fmt.Errorf("invalid group name"), "Error checking group name")
+		return
+	}
+
 	if exist, err := query.CheckGroupName(req.Name); err != nil {
 		errhandler.Handler(c, err, "Error checking group name existence")
 		return
