@@ -19,26 +19,16 @@ func AddTask(taskId string, clientId string, work string) error {
 
 func LoadTaskStatus(deviceId string, work string) (int, int, error) {
 	var status, progress int
-	query := "SELECT status, progress FROM task WHERE client_id = ? AND type = ? AND status != 3"
+	query := "SELECT status, progress FROM task WHERE client_id = ? AND type = ? ORDER BY timestamp DESC LIMIT 1"
 	err := mariadb.DB.QueryRow(query, deviceId, work).Scan(&status, &progress)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			var count int
-			query = "SELECT COUNT(*) FROM task WHERE client_id = ? AND type = ? AND status = 3"
-			err = mariadb.DB.QueryRow(query, deviceId, work).Scan(&count)
-			if err != nil {
-				return -1, 0, err
-			}
-			if count == 0 {                 //* no task yet
-				return -1, 0, nil
-			} else {                        //* task finished
-				return 3, 0, nil
-			}
+		if err == sql.ErrNoRows {          //* no tasks yet
+			return -1, 0, nil
 		} else {
 			return -1, 0, err
 		}
 	}
-	return status, progress, nil            //* status: 0, 1, 2
+	return status, progress, nil            //* other status
 }
 
 func LoadStoredTask(taskId string, clientId string, status int) [][]string {
