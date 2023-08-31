@@ -196,7 +196,8 @@ func processFinishTime(deviceId string, work string, finishtime sql.NullString) 
 				return output, fmt.Errorf("error parsing finishtime timestamp")
 			}
 		} else {
-			return output, fmt.Errorf(work + " for " + deviceId + " finished or terminated but NULL finish time")
+			return output, nil
+			//! TBC: return output, fmt.Errorf(work + " for " + deviceId + " finished or terminated but NULL finish time")
 		}
 	case 5:                                    //* error
 		output.Status = 5
@@ -208,7 +209,7 @@ func processFinishTime(deviceId string, work string, finishtime sql.NullString) 
 			}
 		} else {
 			return output, nil
-			// return output, fmt.Errorf(work + " for " + deviceId + " failed but NULL finish time")
+			//! TBC: return output, fmt.Errorf(work + " for " + deviceId + " failed but NULL finish time")
 		}
 	}
 	return output, nil
