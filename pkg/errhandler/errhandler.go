@@ -8,6 +8,9 @@ import (
 )
 
 func Handler(c *gin.Context, err error, msg string) {
-	c.JSON(http.StatusBadRequest, gin.H{msg: err.Error()})
+	c.JSON(http.StatusOK, gin.H{
+		"isSuccess": false,
+		"message":   msg + ": " + err.Error(),
+	})
 	logger.Error(msg + ": " + err.Error())
 }

@@ -2,6 +2,7 @@ package token
 
 import (
 	"database/sql"
+	"edetector_API/pkg/errhandler"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
 	"fmt"
@@ -59,14 +60,19 @@ func TokenAuth() gin.HandlerFunc {
 		// Read the token from the header
 		token := c.GetHeader("Authorization")
 		if token == "" {
-			c.AbortWithStatus(http.StatusUnauthorized)
+			errhandler.Handler(c, fmt.Errorf("token not provided"), "Error verifying token")
+			c.Abort()
 			return
 		}
 		userId, err := Verify(token)
 		if err != nil {
-			logger.Error("Error verifying token: " + err.Error())
+			errhandler.Handler(c, err, "Error verifying token")
+			c.Abort()
+			return
 		} else if userId == -1 { // token incorrect
-			c.AbortWithStatus(http.StatusUnauthorized)
+			errhandler.Handler(c, fmt.Errorf("token incorrect"), "Error verifying token")
+			c.Abort()
+			return
 		} else {
 			c.Set("userID", userId)
 			c.Next()
