@@ -10,7 +10,7 @@ go run cmd/api/api.go 5000
 You can view service logs from the console, `./cmd/api/*.log`, and `/var/log/syslog`
 
 # Version
-### v0.0.1 (2023.08.21)
+### v1.0.0 (2023.08.21)
 Functioning APIs :
 - Backend-Related : SaveAgent, AddDevice, UpdateProgress, Test
 - Member-Related : Login, LoginWithToken, Signup
@@ -18,10 +18,22 @@ Functioning APIs :
 - Analysis Page
 - Group Settings
 
-### v1.0.0 (2023.08.24)
+### v1.0.1 (2023.08.24)
 Enhancements :
 - Added settings-related APIs
 - Integrated zap logger with syslog
+
+### v1.0.2 (2023.08.30)
+Enhancements :
+- Added feature flag
+- Added log rotate
+
+### v1.0.3 (2023.08.31)
+Fixes :
+- Changed API return status and body messages when error occurs
+- Added null string check for group names and template names
+Enhancements :
+- Able to handle more task status (terminated and failure cases)
 
 ---
 
