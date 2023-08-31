@@ -17,6 +17,11 @@ func AddTemplate(c *gin.Context) {
 		errhandler.Handler(c, err, "Error binding template data")
 		return
 	}
+	// Check if the name is null
+	if req.Name == "" {
+		errhandler.Handler(c, fmt.Errorf("template name cannot be empty"), "Error checking template name")
+		return
+	}
 	// Check if the name exists
 	if exist, err := query.CheckTemplateName(req.Name); err != nil {
 		errhandler.Handler(c, err, "Error checking template name")
