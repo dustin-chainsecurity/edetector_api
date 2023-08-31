@@ -17,10 +17,19 @@ type dateForm struct {
 }
 
 type processing struct {
-	IsFinish    bool   `json:"isFinish"`
+	Status      int    `json:"status"`
 	Progress    int    `json:"progress"`
 	FinishTime  int    `json:"finishTime"`
+	Message     string `json:"message"`
 }
+
+// status
+// 0: not started
+// 1: pending
+// 2: working
+// 3: finished
+// 4: terminated
+// 5: error
 
 type Device struct {
 	DeviceID           string         `json:"deviceId"`
@@ -158,26 +167,40 @@ func parseTimestamp(timestamp string) (int, error) {
 func processFinishTime(deviceId string, work string, finishtime sql.NullString) (processing, error) {
 
 	output := processing {
-		IsFinish: true,
-		Progress: 0,
+		Status:     0,
+		Progress:   0,
 		FinishTime: 0,
+		Message:    "nil",
 	}
 
 	status, progress, err := mq.LoadTaskStatus(deviceId, work)
 	if err != nil {
 		return output, err
 	}
+
 	switch status {
 	case -1:                                   //* no tasks yet
 		return output, nil
-	case 0, 1:                                 //* tasks not started
-		output.IsFinish = false
+	case 0, 1:                                 //* task not started
+		output.Status = 1
 		return output, nil
 	case 2:                                    //* working
-		output.IsFinish = false
+		output.Status = 2
 		output.Progress = progress
 		return output, nil
-	case 3:                                    //* all tasks finished
+	case 3, 4:                                 //* task finished or terminated
+		output.Status = status
+		if finishtime.Valid {
+			output.FinishTime, err = parseTimestamp(finishtime.String)
+			if err != nil {
+				return output, fmt.Errorf("error parsing finishtime timestamp")
+			}
+		} else {
+			return output, fmt.Errorf(work + " for " + deviceId + " finished or terminated but NULL finish time")
+		}
+	case 5:                                    //* error
+		output.Status = 5
+		output.Message = "error occurred, task failed"
 		if finishtime.Valid {
 			output.FinishTime, err = parseTimestamp(finishtime.String)
 			if err != nil {
@@ -185,7 +208,7 @@ func processFinishTime(deviceId string, work string, finishtime sql.NullString) 
 			}
 		} else {
 			return output, nil
-			//! TO BE CHANGED: return output, fmt.Errorf(work + " for " + deviceId + " finished but NULL finish time")
+			// return output, fmt.Errorf(work + " for " + deviceId + " failed but NULL finish time")
 		}
 	}
 	return output, nil
