@@ -29,16 +29,16 @@ func LoadTaskStatus(deviceId string, work string) (int, int, error) {
 			if err != nil {
 				return -1, 0, err
 			}
-			if count == 0 { //* no tasks yet
+			if count == 0 {                 //* no task yet
 				return -1, 0, nil
-			} else { //* all tasks finished
+			} else {                        //* task finished
 				return 3, 0, nil
 			}
 		} else {
 			return -1, 0, err
 		}
 	}
-	return status, progress, nil //* status: 0, 1, 2
+	return status, progress, nil            //* status: 0, 1, 2
 }
 
 func LoadStoredTask(taskId string, clientId string, status int) [][]string {
