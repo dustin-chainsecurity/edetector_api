@@ -62,6 +62,7 @@ func Main(version string) {
 	corsConfig.AllowHeaders = []string{"Content-Type", "Accept", "Content-Length", "Authorization", "Origin", "X-Requested-With"}
 	router.RedirectFixedPath = true
 	router.Use(cors.New(corsConfig))
+	router.Use(logger.GinLog())
 
 	// websocket
 	router.POST("/updateTask", task.UpdateTask)

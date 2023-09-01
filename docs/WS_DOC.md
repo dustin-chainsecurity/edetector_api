@@ -20,6 +20,12 @@ Functions :
 Enhancements :
 - Integrated zap logger with syslog
 
+### v1.0.2 (2023.09.01)
+Enhancements :
+- Integrated gin logger with zap logger
+Fixes:
+- Changed API return status and body messages when error occurs
+
 ---
 
 ## REST API
