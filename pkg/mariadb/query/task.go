@@ -64,8 +64,18 @@ func LoadStoredTask(taskId string, clientId string, status int) [][]string {
 
 func CheckProcessingTask(deviceId string, work string) (bool, error) {
 	var exist bool
-	query := "SELECT EXISTS(SELECT task_id FROM task WHERE client_id = ? AND type = ? AND status != 3 AND status != 4)"
+	query := "SELECT EXISTS(SELECT task_id FROM task WHERE client_id = ? AND type = ? AND status IN (0, 1, 2))"
 	err := mariadb.DB.QueryRow(query, deviceId, work).Scan(&exist)
+	if err != nil {
+		return false, err
+	}
+	return exist, nil
+}
+
+func CheckTerminateStatus(deviceId string) (bool, error) {
+	var exist bool
+	query := "SELECT EXISTS(SELECT task_id FROM task WHERE client_id = ? AND type = 'Terminate' AND status IN (0, 1, 2))"
+	err := mariadb.DB.QueryRow(query, deviceId).Scan(&exist)
 	if err != nil {
 		return false, err
 	}
