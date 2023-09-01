@@ -35,6 +35,11 @@ Fixes :
 Enhancements :
 - Able to handle more task status (terminated and failure cases)
 
+### v1.0.4 (2023.09.01)
+Fixes :
+- Checked terminating status before adding tasks
+
+
 ---
 
 # REST API

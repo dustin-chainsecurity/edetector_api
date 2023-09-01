@@ -41,6 +41,12 @@ func addTask(deviceId string, work string, msg string) (string, error) {
 	} else if exist {
 		return "", fmt.Errorf("already processing the same task: %s for device: %s", work, deviceId)
 	}
+	// check terminate status
+	if exist, err := query.CheckTerminateStatus(deviceId); err != nil {
+		return "", err
+	} else if exist {
+		return "", fmt.Errorf("device: %s is still terminating", deviceId)
+	}
 	// generate taskid
 	taskId := uuid.NewString()
 	// store into mariaDB
