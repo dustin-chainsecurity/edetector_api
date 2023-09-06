@@ -21,13 +21,13 @@ type addDeviceRequest struct {
 func AddDevice(c *gin.Context) {
 	var req addDeviceRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errhandler.Handler(c, err, "Error binding JSON")
+		errhandler.Info(c, err, "Error binding JSON")
 		return
 	}
 	for _, d := range req.Devices {
 		err := query.AddDevice(d.DeviceID, d.DeviceName, d.IP)
 		if err != nil {
-			errhandler.Handler(c, err, "Error adding device")
+			errhandler.Error(c, err, "Error adding device")
 			return
 		}
 	}

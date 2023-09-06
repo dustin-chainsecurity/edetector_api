@@ -23,14 +23,14 @@ func Refresh(c *gin.Context) {
 		Devices []string `json:"deviceId"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errhandler.Handler(c, err, "Invalid request format")
+		errhandler.Info(c, err, "Invalid request format")
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 
 	// check devices
 	if err := device.CheckAllID(req.Devices); err != nil {
-		errhandler.Handler(c, err, "Invalid device ID")
+		errhandler.Error(c, err, "Invalid device ID")
 		return
 	}
 
@@ -39,12 +39,12 @@ func Refresh(c *gin.Context) {
 	for _, deviceId := range req.Devices {
 		raw_device, err := query.LoadDeviceInfo(deviceId)
 		if err != nil {
-			errhandler.Handler(c, err, "Error loading raw device data")
+			errhandler.Error(c, err, "Error loading raw device data")
 			return
 		}
 		d, err := device.ProcessRawDevice(raw_device)
 		if err != nil {
-			errhandler.Handler(c, err, "Error processing device data")
+			errhandler.Error(c, err, "Error processing device data")
 			return
 		}
 		devices = append(devices, d)

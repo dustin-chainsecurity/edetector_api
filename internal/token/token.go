@@ -1,12 +1,9 @@
 package token
 
 import (
-	"database/sql"
 	"edetector_API/pkg/errhandler"
-	"edetector_API/pkg/logger"
-	"edetector_API/pkg/mariadb"
+	"edetector_API/pkg/mariadb/query"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -15,7 +12,7 @@ import (
 
 var ExpirationPeriod = time.Hour * 24
 
-func Generate() (string) {
+func Generate() string {
 	return uuid.NewString()
 }
 
@@ -25,34 +22,8 @@ func VerifyAdmin(token string) (int, error) {
 }
 
 func Verify(token string) (int, error) {
-	var userId int
-	var timestamp sql.NullString
-	// check if valid
-	query := "SELECT id, token_time FROM user_info WHERE token = ?"
-	err := mariadb.DB.QueryRow(query, token).Scan(&userId, &timestamp)
-	if err != nil {
-		// token incorrect
-		if err == sql.ErrNoRows {
-			logger.Info("token " + token + " incorrect")
-			return -1, nil
-		} else {
-			return -1, err
-		}
-	}
-	if timestamp.Valid {
-		// check if token expired
-		layout := "2006-01-02 15:04:05"
-		parsedTimestamp, err := time.Parse(layout, timestamp.String)
-		if err != nil {
-			return -1, fmt.Errorf("failed to parse token timestamp: %v", err)
-		}
-		expirationTime := parsedTimestamp.Add(ExpirationPeriod)
-		if time.Now().After(expirationTime) {
-			logger.Info("token " + token + " expired")
-			return -1, nil
-		}
-	}
-	return userId, nil
+	userID, err := query.CheckToken(token, ExpirationPeriod)
+	return userID, err
 }
 
 func TokenAuth() gin.HandlerFunc {
@@ -60,17 +31,17 @@ func TokenAuth() gin.HandlerFunc {
 		// Read the token from the header
 		token := c.GetHeader("Authorization")
 		if token == "" {
-			errhandler.Handler(c, fmt.Errorf("token not provided"), "Error verifying token")
+			errhandler.Unauthorized(c, fmt.Errorf("token not provided"), "Error verifying token")
 			c.Abort()
 			return
 		}
 		userId, err := Verify(token)
 		if err != nil {
-			errhandler.Handler(c, err, "Error verifying token")
+			errhandler.Error(c, err, "Error verifying token")
 			c.Abort()
 			return
 		} else if userId == -1 { // token incorrect
-			errhandler.Handler(c, fmt.Errorf("token incorrect"), "Error verifying token")
+			errhandler.Unauthorized(c, fmt.Errorf("token incorrect"), "Error verifying token")
 			c.Abort()
 			return
 		} else {
@@ -86,9 +57,13 @@ func TokenAdminAuth() gin.HandlerFunc {
 		token := c.GetHeader("Authorization")
 		userId, err := VerifyAdmin(token)
 		if err != nil {
-			logger.Error("Error verifying token: " + err.Error())
+			errhandler.Error(c, err, "Error verifying token")
+			c.Abort()
+			return
 		} else if userId == -1 { // token incorrect
-			c.AbortWithStatus(http.StatusUnauthorized)
+			errhandler.Unauthorized(c, fmt.Errorf("token incorrect"), "Error verifying token")
+			c.Abort()
+			return
 		} else {
 			c.Set("userID", userId)
 			c.Next()

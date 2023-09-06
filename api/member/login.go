@@ -41,7 +41,7 @@ func Login(c *gin.Context) {
 	// Receive request
 	var req LoginRequest
 	if err = c.ShouldBindJSON(&req); err != nil {
-		errhandler.Handler(c, err, "Invalid request format")
+		errhandler.Info(c, err, "Invalid request format")
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
@@ -57,9 +57,9 @@ func Login(c *gin.Context) {
 		Token:    "Nil",
 	}
 
-	user_info.ID, err = query.CheckUser(req.Username, req.Password)
+	user_info.ID, err = query.CheckPassword(req.Username, req.Password)
 	if err != nil {
-		errhandler.Handler(c, err, "Error checking user info")
+		errhandler.Error(c, err, "Error checking user info")
 		return
 	}
 	if user_info.ID == -1 {
@@ -74,7 +74,7 @@ func Login(c *gin.Context) {
 		// Update user token
 		err = query.UpdateToken(user_info.Token, user_info.ID)
 		if err != nil {
-			errhandler.Handler(c, err, "Error updating token")
+			errhandler.Error(c, err, "Error updating token")
 			return
 		}
 	}

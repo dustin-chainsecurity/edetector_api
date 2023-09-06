@@ -15,21 +15,21 @@ import (
 func ScheduledScan(c *gin.Context) {
 	var req ScheduleScanRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errhandler.Handler(c, err, "Invalid request format")
+		errhandler.Info(c, err, "Invalid request format")
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 
 	// check devices
 	if err := device.CheckAllID(req.Devices); err != nil {
-		errhandler.Handler(c, err, "Invalid device ID")
+		errhandler.Error(c, err, "Invalid device ID")
 		return
 	}
 
 	for _, deviceId := range req.Devices {
 		err := query.UpdateSchedule(deviceId, "scan_schedule", req.Time, req.Mode)
 		if err != nil {
-			errhandler.Handler(c, err, "Error handling scan schedule")
+			errhandler.Error(c, err, "Error handling scan schedule")
 			return
 		}
 	}
@@ -45,21 +45,21 @@ func ScheduledScan(c *gin.Context) {
 func ScheduledCollect(c *gin.Context) {
 	var req ScheduleRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errhandler.Handler(c, err, "Invalid request format")
+		errhandler.Info(c, err, "Invalid request format")
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 
 	// check devices
 	if err := device.CheckAllID(req.Devices); err != nil {
-		errhandler.Handler(c, err, "Invalid device ID")
+		errhandler.Error(c, err, "Invalid device ID")
 		return
 	}
 
 	for _, deviceId := range req.Devices {
 		err := query.UpdateSchedule(deviceId, "collect_schedule", processSchedule(req.Date, req.Time), req.Mode)
 		if err != nil {
-			errhandler.Handler(c, err, "Error handling collect schedule")
+			errhandler.Error(c, err, "Error handling collect schedule")
 			return
 		}
 	}
@@ -75,21 +75,21 @@ func ScheduledCollect(c *gin.Context) {
 func ScheduledDownload(c *gin.Context) {
 	var req ScheduleRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errhandler.Handler(c, err, "Invalid request format")
+		errhandler.Info(c, err, "Invalid request format")
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 
 	// check devices
 	if err := device.CheckAllID(req.Devices); err != nil {
-		errhandler.Handler(c, err, "Invalid device ID")
+		errhandler.Error(c, err, "Invalid device ID")
 		return
 	}
 
 	for _, deviceId := range req.Devices {
 		err := query.UpdateSchedule(deviceId, "file_schedule", processSchedule(req.Date, req.Time), req.Mode)
 		if err != nil {
-			errhandler.Handler(c, err, "Error handling file schedule")
+			errhandler.Error(c, err, "Error handling file schedule")
 			return
 		}
 	}

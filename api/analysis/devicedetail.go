@@ -19,14 +19,14 @@ func DeviceDetail(c *gin.Context) {
 	// Process device data
 	raw_devices, err := query.LoadAllDeviceInfo()
 	if err != nil {
-		errhandler.Handler(c, err, "Error loading raw device data")
+		errhandler.Error(c, err, "Error loading raw device data")
 	}
 
 	devices := []device.Detail{}
 	for _, r := range raw_devices {
 		d, err := device.ProcessDeviceDetail(r)
 		if err != nil {
-			errhandler.Handler(c, err, "Error processing device data")
+			errhandler.Error(c, err, "Error processing device data")
 			return
 		}
 		devices = append(devices, d)

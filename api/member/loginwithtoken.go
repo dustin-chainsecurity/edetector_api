@@ -4,7 +4,7 @@ import (
 	"edetector_API/internal/token"
 	"edetector_API/pkg/errhandler"
 	"edetector_API/pkg/logger"
-	"edetector_API/pkg/mariadb"
+	"edetector_API/pkg/mariadb/query"
 	"fmt"
 	"net/http"
 
@@ -18,7 +18,7 @@ func LoginWithToken(c *gin.Context) {
 		Token string `json:"token"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errhandler.Handler(c, err, "Invalid request format")
+		errhandler.Info(c, err, "Invalid request format")
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
@@ -27,7 +27,7 @@ func LoginWithToken(c *gin.Context) {
 	var verified bool
 	userId, err := token.Verify(req.Token)
 	if err != nil {
-		errhandler.Handler(c, err, "Error verifying token")
+		errhandler.Error(c, err, "Error verifying token")
 		return
 	}
 	var message, username, token string
@@ -41,10 +41,9 @@ func LoginWithToken(c *gin.Context) {
 		message = "token verified"
 		token = req.Token
 		// Get username
-		query := "SELECT username FROM user WHERE id = ?"
-		err := mariadb.DB.QueryRow(query, userId).Scan(&username)
+		username, err = query.GetUsername(userId)
 		if err != nil {
-			errhandler.Handler(c, err, "Error retrieving username")
+			errhandler.Error(c, err, "Error retrieving username")
 			return
 		}
 	}
