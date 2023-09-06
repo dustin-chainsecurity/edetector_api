@@ -17,13 +17,13 @@ func UpdateTask(c *gin.Context) {
 		DeviceId string `json:"deviceId"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errhandler.Handler(c, err, "Invalid request format")
+		errhandler.Info(c, err, "Invalid request format")
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 	// Check deviceId
 	if err := device.CheckID(req.DeviceId); err != nil {
-		errhandler.Handler(c, err, "Invalid device ID")
+		errhandler.Error(c, err, "Invalid device ID")
 		return
 	}
 	// Send signal to websocket

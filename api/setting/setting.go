@@ -113,13 +113,13 @@ func GetSettingField(c *gin.Context) {
 	fieldName := c.Param("field")
 	setting, err := GetSetting()
 	if err != nil {
-		errhandler.Handler(c, err, "Error loading setting data")
+		errhandler.Error(c, err, "Error loading setting data")
 		return
 	}
 	r := reflect.ValueOf(setting)
 	field := r.FieldByName(fieldName)
 	if !field.IsValid() {
-		errhandler.Handler(c, fmt.Errorf("setting field not found"), "Error checking field")
+		errhandler.Error(c, fmt.Errorf("setting field not found"), "Error checking field")
 		return
 	}
 	c.JSON(200, gin.H{
@@ -144,23 +144,23 @@ func UpdateSettingField(c *gin.Context) {
 	fieldName := c.Param("field")
 	setting, err := GetSetting()
 	if err != nil {
-		errhandler.Handler(c, err, "Error loading setting data")
+		errhandler.Error(c, err, "Error loading setting data")
 		return
 	}
 	r := reflect.ValueOf(&setting)
 	field := r.Elem().FieldByName(fieldName)
 	if !field.IsValid() {
-		errhandler.Handler(c, fmt.Errorf("setting field not found"), "Error checking field")
+		errhandler.Error(c, fmt.Errorf("setting field not found"), "Error checking field")
 		return
 	}
 	req := reflect.New(field.Type()).Interface()
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errhandler.Handler(c, err, "Invalid request format")
+		errhandler.Info(c, err, "Invalid request format")
 		return
 	}
 	field.Set(reflect.ValueOf(req).Elem())
 	if err := UpdateSetting(setting); err != nil {
-		errhandler.Handler(c, err, "Error updating setting data")
+		errhandler.Error(c, err, "Error updating setting data")
 		return
 	}
 	c.JSON(200, gin.H{

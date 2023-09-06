@@ -42,22 +42,22 @@ type updateDevicesRequest struct {
 func Add(c *gin.Context) {
 	req := updateGroupRequest{}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errhandler.Handler(c, err, "Invalid request format")
+		errhandler.Info(c, err, "Invalid request format")
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 
 	// check if name is null
 	if req.Name == "" || req.Name == "未分類群組" {
-		errhandler.Handler(c, fmt.Errorf("invalid group name"), "Error checking group name")
+		errhandler.Info(c, fmt.Errorf("invalid group name"), "Error checking group name")
 		return
 	}
 
 	if exist, err := query.CheckGroupName(req.Name); err != nil {
-		errhandler.Handler(c, err, "Error checking group name existence")
+		errhandler.Error(c, err, "Error checking group name existence")
 		return
 	} else if exist {
-		errhandler.Handler(c, fmt.Errorf("group name "+req.Name+" already exists"), "Error checking group name")
+		errhandler.Info(c, fmt.Errorf("group name " + req.Name + " already exists"), "Error checking group name")
 		return
 	}
 
@@ -68,7 +68,7 @@ func Add(c *gin.Context) {
 		RangeEnd:    req.RangeEnd,
 	})
 	if err != nil {
-		errhandler.Handler(c, err, "Error adding group")
+		errhandler.Error(c, err, "Error adding group")
 		return
 	}
 	res := addGroupResponse{
@@ -81,23 +81,29 @@ func Add(c *gin.Context) {
 func Update(c *gin.Context) {
 	req := updateGroupRequest{}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errhandler.Handler(c, err, "Invalid request format")
+		errhandler.Info(c, err, "Invalid request format")
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		errhandler.Handler(c, err, "Error retrieving groupID")
+		errhandler.Error(c, err, "Error retrieving groupID")
 		return
 	}
 	// check if the group exists
-	if err := checkID(id); err != nil {
-		errhandler.Handler(c, err, "Invalid group ID")
+	exist, err := query.CheckGroupID(id)
+	if err != nil {
+		errhandler.Error(c, err, "Error checking group ID")
 		return
+	} else if !exist {
+		errhandler.Error(c, fmt.Errorf("groupID " + strconv.Itoa(id) + " does not exist"), "Invalid group ID")
 	}
 	// check if the group name exists
-	if err := query.CheckGroupNameForUpdate(id, req.Name); err != nil {
-		errhandler.Handler(c, err, "Error checking group name")
+	if exist, err := query.CheckGroupNameForUpdate(id, req.Name); err != nil {
+		errhandler.Error(c, err, "Error checking group name")
+		return
+	} else if exist {
+		errhandler.Info(c, fmt.Errorf("group name " + req.Name + " already exists"), "Invalid group name")
 		return
 	}
 	err = query.UpdateGroup(query.GroupInfo{
@@ -108,7 +114,7 @@ func Update(c *gin.Context) {
 		RangeEnd:    req.RangeEnd,
 	})
 	if err != nil {
-		errhandler.Handler(c, err, "Error updating group")
+		errhandler.Error(c, err, "Error updating group")
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -119,17 +125,20 @@ func Update(c *gin.Context) {
 func Remove(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		errhandler.Handler(c, err, "Error retrieving groupID")
+		errhandler.Error(c, err, "Error retrieving group ID")
 		return
 	}
 	// check if the group exists
-	if err := checkID(id); err != nil {
-		errhandler.Handler(c, err, "Invalid group ID")
+	exist, err := query.CheckGroupID(id)
+	if err != nil {
+		errhandler.Error(c, err, "Error checking group ID")
 		return
+	} else if !exist {
+		errhandler.Error(c, fmt.Errorf("groupID " + strconv.Itoa(id) + " does not exist"), "Invalid group ID")
 	}
 	err = query.RemoveGroup(id)
 	if err != nil {
-		errhandler.Handler(c, err, "Error removing group")
+		errhandler.Error(c, err, "Error removing group")
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -140,7 +149,7 @@ func Remove(c *gin.Context) {
 func GetList(c *gin.Context) {
 	groups, err := query.LoadAllGroupInfo()
 	if err != nil {
-		errhandler.Handler(c, err, "Error loading group list")
+		errhandler.Error(c, err, "Error loading group list")
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -152,17 +161,20 @@ func GetList(c *gin.Context) {
 func GetInfo(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		errhandler.Handler(c, err, "Error retrieving groupID")
+		errhandler.Error(c, err, "Error retrieving group ID")
 		return
 	}
 	// check if the group exists
-	if err := checkID(id); err != nil {
-		errhandler.Handler(c, err, "Invalid group ID")
+	exist, err := query.CheckGroupID(id)
+	if err != nil {
+		errhandler.Error(c, err, "Error checking group ID")
 		return
+	} else if !exist {
+		errhandler.Info(c, fmt.Errorf("groupID " + strconv.Itoa(id) + " does not exist"), "Invalid group ID")
 	}
 	info, err := query.LoadGroupInfo(id)
 	if err != nil {
-		errhandler.Handler(c, err, "Error loading group info")
+		errhandler.Error(c, err, "Error loading group info")
 		return
 	}
 	res := groupInfoResponse{
@@ -180,24 +192,24 @@ func GetInfo(c *gin.Context) {
 func Join(c *gin.Context) {
 	req := updateDevicesRequest{}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errhandler.Handler(c, err, "Invalid request format")
+		errhandler.Info(c, err, "Invalid request format")
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 	// check if the all group exists
 	err := checkAllID(req.Groups)
 	if err != nil {
-		errhandler.Handler(c, err, "Invalid group ID")
+		errhandler.Error(c, err, "Invalid group ID")
 		return
 	}
 	// check devices
 	if err := device.CheckAllID(req.Devices); err != nil {
-		errhandler.Handler(c, err, "Invalid device ID")
+		errhandler.Error(c, err, "Invalid device ID")
 		return
 	}
 	err = query.AddGroupDevices(req.Groups, req.Devices)
 	if err != nil {
-		errhandler.Handler(c, err, "Error adding devices to group")
+		errhandler.Error(c, err, "Error adding devices to group")
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -209,24 +221,24 @@ func Leave(c *gin.Context) {
 	// Remove devices from group
 	req := updateDevicesRequest{}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errhandler.Handler(c, err, "Invalid request format")
+		errhandler.Info(c, err, "Invalid request format")
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 	// check if the all group exists
 	err := checkAllID(req.Groups)
 	if err != nil {
-		errhandler.Handler(c, err, "Invalid group ID")
+		errhandler.Error(c, err, "Invalid group ID")
 		return
 	}
 	// check devices
 	if err := device.CheckAllID(req.Devices); err != nil {
-		errhandler.Handler(c, err, "Invalid device ID")
+		errhandler.Error(c, err, "Invalid device ID")
 		return
 	}
 	err = query.RemoveGroupDevices(req.Groups, req.Devices)
 	if err != nil {
-		errhandler.Handler(c, err, "Error removing devices from group")
+		errhandler.Error(c, err, "Error removing devices from group")
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -234,19 +246,14 @@ func Leave(c *gin.Context) {
 	})
 }
 
-func checkID(id int) error {
-	if exist, err := query.CheckGroupID(id); err != nil {
-		return err
-	} else if !exist {
-		return fmt.Errorf("groupID " + strconv.Itoa(id) + " does not exist")
-	}
-	return nil
-}
-
 func checkAllID(groups []int) error {
 	for _, id := range groups {
-		if err := checkID(id); err != nil {
+		exist, err := query.CheckGroupID(id)
+		if err != nil {
 			return err
+		}
+		if !exist {
+			return fmt.Errorf("groupID " + strconv.Itoa(id) + " does not exist")
 		}
 	}
 	return nil

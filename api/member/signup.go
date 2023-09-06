@@ -3,7 +3,7 @@ package member
 import (
 	"edetector_API/pkg/errhandler"
 	"edetector_API/pkg/logger"
-	"edetector_API/pkg/mariadb"
+	"edetector_API/pkg/mariadb/query"
 	"fmt"
 	"net/http"
 
@@ -27,52 +27,24 @@ func Signup(c *gin.Context) {
 	// Receive request
 	var req SignUpRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errhandler.Handler(c, err, "Invalid request format")
+		errhandler.Info(c, err, "Invalid request format")
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 
 	// Check if username already exist
 	var message string
-	var exist bool
 	verified := false
 
-	query := "SELECT EXISTS(SELECT 1 FROM user WHERE username = ?)"
-	err := mariadb.DB.QueryRow(query, req.Username).Scan(&exist)
+	exist, err := query.CheckUsername(req.Username)
 	if err != nil {
-		errhandler.Handler(c, err, "Error checking username existence")
+		errhandler.Error(c, err, "Error checking username existence")
 		return
 	}
-
 	if !exist {
-
-		// Store user password to db
-		query = "INSERT INTO user (username, password) VALUES (?, MD5(?))"
-		_, err = mariadb.DB.Exec(query, req.Username, req.Password)
-		if err != nil {
-			errhandler.Handler(c, err, "Error storing user data")
-			return
-		}
-
-		// Retrieve user id
-		var userId int
-		query := "SELECT id FROM user WHERE username = ?"
-		err := mariadb.DB.QueryRow(query, req.Username).Scan(&userId)
-		if err != nil {
-			errhandler.Handler(c, err, "Error retrieving user id")
-			return
-		}
-
-		// Storing other user data
-		query = "INSERT INTO user_info (id, token, email) VALUES (?, ?, ?)"
-		_, err = mariadb.DB.Exec(query, userId, req.Token, req.Email)
-		if err != nil {
-			errhandler.Handler(c, err, "Error storing user data")
-			return
-		}
+		query.AddUser(req.Username, req.Password, req.Token, req.Email)
 		verified = true
 		message = "signup success"
-
 	} else {
 		verified = false
 		message = "username already exist"

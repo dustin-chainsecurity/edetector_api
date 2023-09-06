@@ -33,14 +33,14 @@ func SendMission(c *gin.Context) {
 
 	var req MissionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errhandler.Handler(c, err, "Invalid request format")
+		errhandler.Info(c, err, "Invalid request format")
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 
 	// check devices
 	if err := device.CheckAllID(req.Devices); err != nil {
-		errhandler.Handler(c, err, "Invalid device ID")
+		errhandler.Error(c, err, "Invalid device ID")
 		return
 	}
 
@@ -48,7 +48,7 @@ func SendMission(c *gin.Context) {
 	for _, deviceId := range req.Devices {
 		taskId, err := addTask(deviceId, req.Action, messageMap[req.Action])
 		if err != nil {
-			errhandler.Handler(c, err, "Error adding task")
+			errhandler.Error(c, err, "Error adding task")
 			return
 		}
 		tasks = append(tasks, taskId)

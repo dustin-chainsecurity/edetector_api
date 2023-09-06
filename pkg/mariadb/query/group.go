@@ -2,7 +2,6 @@ package query
 
 import (
 	"edetector_API/pkg/mariadb"
-	"fmt"
 )
 
 type GroupInfo struct {
@@ -216,18 +215,16 @@ func CheckGroupName(groupName string) (bool, error) {
 	return exist, nil
 }
 
-func CheckGroupNameForUpdate(groupID int, groupName string) (error) {
+func CheckGroupNameForUpdate(groupID int, groupName string) (bool, error) {
 	query := `
 		SELECT EXISTS(SELECT group_id FROM group_info WHERE group_name = ? AND group_id != ?);
 	`
 	var exist bool
 	err := mariadb.DB.QueryRow(query, groupName, groupID).Scan(&exist)
 	if err != nil {
-		return err
-	} else if exist {
-		return fmt.Errorf("group name " + groupName + " already exists")
+		return false, err
 	}
-	return nil
+	return exist, nil
 }
 
 func InGroup(groupID int, deviceID string) (bool, error) {

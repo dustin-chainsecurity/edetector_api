@@ -21,14 +21,14 @@ func DetectionMode(c *gin.Context) {
 	var req DetectionModeRequest
 	var message = "Success"
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errhandler.Handler(c, err, "Invalid request format")
+		errhandler.Info(c, err, "Invalid request format")
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 
 	// check devices
 	if err := device.CheckAllID(req.Devices); err != nil {
-		errhandler.Handler(c, err, "Invalid device ID")
+		errhandler.Error(c, err, "Invalid device ID")
 		return
 	}
 
@@ -43,7 +43,7 @@ func DetectionMode(c *gin.Context) {
 		}
 		process, network, err := query.GetDetectMode(deviceId)
 		if err != nil {
-			errhandler.Handler(c, err, "Error retrieving current client setting")
+			errhandler.Error(c, err, "Error retreiving current client setting")
 			return
 		}
 
@@ -51,12 +51,12 @@ func DetectionMode(c *gin.Context) {
 		if m != process || m != network {
 			_, err := addTask(deviceId, "ChangeDetectMode", fmt.Sprintf("%d|%d", m, m))
 			if err != nil {
-				errhandler.Handler(c, err, "Error adding ChangeDetectMode task")
+				errhandler.Error(c, err, "Error adding ChangeDetectMode task")
 				return
 			}
 			err = query.UpdateDetectMode(m, deviceId)
 			if err != nil {
-				errhandler.Handler(c, err, "Error updating client_setting table")
+				errhandler.Error(c, err, "Error updating client_setting table")
 				return
 			}
 		} else {
