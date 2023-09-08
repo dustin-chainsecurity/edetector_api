@@ -44,10 +44,8 @@ func API_init(LOG_PATH string, HOSTNAME string, APP string) {
 		return
 	}
 	// Init Logger
-	if enable, err := fflag.FFLAG.FeatureEnabled("logger"); enable && err == nil {
-		logger.InitLogger(config.Viper.GetString(LOG_PATH), HOSTNAME, APP)
-		logger.Log.Info("Logger enabled, log file: " + config.Viper.GetString(LOG_PATH))
-	}
+	logger.InitLogger(config.Viper.GetString(LOG_PATH), HOSTNAME, APP)
+	logger.Log.Info("Logger enabled, log file: " + config.Viper.GetString(LOG_PATH))
 	// Connect to Redis
 	if db := redis.Redis_init(); db == nil {
 		logger.Error("Error connecting to redis")
