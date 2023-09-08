@@ -14,7 +14,7 @@ Functions :
 - Task allocation for working server
 - Task scheduling for working server
 
-### v1.0.1 (2023.08.24)
+### v1.0.1 (2023.09.08)
 Enhancements :
 - Integrated zap logger with syslog
 

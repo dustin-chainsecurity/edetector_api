@@ -20,7 +20,7 @@ Functions :
 Enhancements :
 - Integrated zap logger with syslog
 
-### v1.0.2 (2023.09.01)
+### v1.0.2 (2023.09.08)
 Enhancements :
 - Integrated gin logger with zap logger
 Fixes:
@@ -28,4 +28,3 @@ Fixes:
 
 ---
 
-## REST API
