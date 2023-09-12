@@ -144,8 +144,21 @@ func Main(version string) {
 	// Setting Group
 	settingGroup := router.Group("/setting")
 	settingGroup.Use(token.TokenAuth())
-	settingGroup.GET("/:field", setting.GetSettingField)
-	settingGroup.POST("/:field", setting.UpdateSettingField)
+	settingGroup.GET("/system/:field", setting.GetSettingField)
+	settingGroup.POST("/system/:field", setting.UpdateSettingField)
+	settingGroup.GET("/user", setting.GetUserInfo)
+	settingGroup.POST("/user", setting.AddUser)
+	settingGroup.PUT("/user/:userid", setting.UpdateUserInfo)
+	settingGroup.DELETE("/user", setting.DeleteUser)
+	settingGroup.GET("/whitelist", setting.GetWhiteList)
+	settingGroup.POST("/whitelist", setting.AddWhiteList)
+	settingGroup.DELETE("/whitelist", setting.DeleteWhiteList)
+	settingGroup.GET("/blacklist", setting.GetBlackList)
+	settingGroup.POST("/blacklist", setting.AddBlackList)
+	settingGroup.DELETE("/blacklist", setting.DeleteBlackList)
+	settingGroup.GET("/hacklist", setting.GetHackList)
+	settingGroup.POST("/hacklist", setting.AddHackList)
+	settingGroup.DELETE("/hacklist", setting.DeleteHackList)
 
 	// Start API service
 	srv := &http.Server{

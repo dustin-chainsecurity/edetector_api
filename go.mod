@@ -14,7 +14,6 @@ require (
 	github.com/spf13/viper v1.16.0
 	go.uber.org/zap v1.24.0
 	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1
-	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
 require (
