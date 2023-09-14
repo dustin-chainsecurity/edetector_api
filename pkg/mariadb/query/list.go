@@ -3,6 +3,7 @@ package query
 import (
 	"edetector_API/pkg/mariadb"
 	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -65,8 +66,9 @@ func GetHackList() ([]HackList, error) {
 
 func AddList(table string, l List) (string, error) {
 	id := uuid.NewString()
+	path := strings.ReplaceAll(l.Path, "\\", "\\\\")
 	query := fmt.Sprintf("INSERT INTO %s (id, filename, md5, signature, path, setup_user, reason) VALUES (?, ?, ?, ?, ?, ?, ?)", table)
-	_, err := mariadb.DB.Exec(query, id, l.Filename, l.MD5, l.Signature, l.Path, l.SetupUser, l.Reason)
+	_, err := mariadb.DB.Exec(query, id, l.Filename, l.MD5, l.Signature, path, l.SetupUser, l.Reason)
 	if err != nil {
 		return "", err
 	}
@@ -75,8 +77,10 @@ func AddList(table string, l List) (string, error) {
 
 func AddHackList(l HackList) (string, error) {
 	id := uuid.NewString()
+	cmd := strings.ReplaceAll(l.CMD, "\\", "\\\\")
+	path := strings.ReplaceAll(l.Path, "\\", "\\\\")
 	query := "INSERT INTO hack_list (id, process_name, cmd, path, adding_point) VALUES (?, ?, ?, ?, ?)"
-	_, err := mariadb.DB.Exec(query, id, l.ProcessName, l.CMD, l.Path, l.AddingPoint)
+	_, err := mariadb.DB.Exec(query, id, l.ProcessName, cmd, path, l.AddingPoint)
 	if err != nil {
 		return "", err
 	}
