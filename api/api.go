@@ -143,6 +143,7 @@ func Main(version string) {
 
 	// Setting Group
 	settingGroup := router.Group("/setting")
+	settingGroup.Use(CORS())
 	settingGroup.Use(token.TokenAuth())
 	settingGroup.GET("/system/:field", setting.GetSettingField)
 	settingGroup.POST("/system/:field", setting.UpdateSettingField)
