@@ -96,7 +96,7 @@ func Main(version string) {
 	adminGroup.DELETE("/redis", clear.ClearRedis)
 	adminGroup.DELETE("/maria", clear.ClearMaria)
 	adminGroup.DELETE("/elastic", clear.ClearElastic)
-	adminGroup.POST("/signup", member.Signup)
+	adminGroup.POST("/signup", setting.AddUser)
 
 	// Login
 	router.POST("/login", member.Login)
@@ -147,10 +147,12 @@ func Main(version string) {
 	settingGroup.Use(token.TokenAuth())
 	settingGroup.GET("/system/:field", setting.GetSettingField)
 	settingGroup.POST("/system/:field", setting.UpdateSettingField)
+
 	settingGroup.GET("/user", setting.GetUserInfo)
 	settingGroup.POST("/user", setting.AddUser)
-	settingGroup.PUT("/user/:userid", setting.UpdateUserInfo)
+	settingGroup.PUT("/user/:id", setting.UpdateUserInfo)
 	settingGroup.DELETE("/user", setting.DeleteUser)
+
 	settingGroup.GET("/whitelist", setting.GetWhiteList)
 	settingGroup.POST("/whitelist", setting.AddWhiteList)
 	settingGroup.DELETE("/whitelist", setting.DeleteWhiteList)
@@ -160,6 +162,15 @@ func Main(version string) {
 	settingGroup.GET("/hacklist", setting.GetHackList)
 	settingGroup.POST("/hacklist", setting.AddHackList)
 	settingGroup.DELETE("/hacklist", setting.DeleteHackList)
+
+	settingGroup.GET("keyImage/:type", setting.GetKeyImage)
+	settingGroup.POST("keyImage/:type", setting.AddKeyImage)
+	settingGroup.DELETE("keyImage", setting.DeleteKeyImage)
+	settingGroup.PUT("keyImage/:type", setting.UpdateKeyImage)
+
+	settingGroup.GET("/logs", setting.GetLogs)
+	settingGroup.DELETE("/removeAgent", setting.RemoveAgent)
+	settingGroup.GET("/license", setting.GetLicense)
 
 	// Start API service
 	srv := &http.Server{
