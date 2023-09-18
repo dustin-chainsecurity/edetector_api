@@ -51,11 +51,13 @@ func API_init(LOG_PATH string, HOSTNAME string, APP string) {
 		logger.Error("Error connecting to redis")
 		return
 	}
+	logger.Info("Redis connected")
 	// Connect to MariaDB
 	if err = mariadb.Connect_init(); err != nil {
 		logger.Error("Error connecting to mariadb: " + err.Error())
 		return
 	}
+	logger.Info("MariaDB connected")
 }
 
 func Main(version string) {
@@ -167,9 +169,9 @@ func Main(version string) {
 	settingGroup.PUT("/hacklist", setting.UpdateHackList)
 
 	settingGroup.GET("keyImage/:type", setting.GetKeyImage)
-	settingGroup.POST("keyImage/:type", setting.AddKeyImage)
+	settingGroup.POST("keyImage", setting.AddKeyImage)
 	settingGroup.DELETE("keyImage", setting.DeleteKeyImage)
-	settingGroup.PUT("keyImage/:type", setting.UpdateKeyImage)
+	settingGroup.PUT("keyImage", setting.UpdateKeyImage)
 
 	settingGroup.GET("/logs", setting.GetLogs)
 	settingGroup.DELETE("/removeAgent", setting.RemoveAgent)

@@ -3,7 +3,6 @@ package mariadb
 import (
 	"database/sql"
 	"edetector_API/config"
-	"edetector_API/pkg/logger"
 	"fmt"
 	"time"
 
@@ -26,6 +25,5 @@ func Connect_init() error {
 		return err
 	}
 	DB.SetConnMaxLifetime(time.Minute * 5)
-	logger.Info("MariaDB Connected")
 	return nil
 }
