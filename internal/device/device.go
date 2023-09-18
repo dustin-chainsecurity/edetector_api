@@ -38,6 +38,7 @@ type Device struct {
 	DeviceName         string         `json:"deviceName"`
 	Groups             []string       `json:"groups"`
 	DetectionMode      bool           `json:"detectionMode"`
+	Version			   string         `json:"version"`
 	ScanSchedule       []string       `json:"scanSchedule"`
 	ScanFinishTime     processing     `json:"scanFinishTime"`
 	CollectSchedule    dateForm       `json:"collectSchedule"`
@@ -52,6 +53,7 @@ type Detail struct {
 	InnerIP            string         `json:"ip"`
 	Mac                string         `json:"macAddress"`
 	DeviceName         string         `json:"name"`
+	Version			   string         `json:"version"`
 	Groups             []string       `json:"group"`
 }
 
@@ -62,6 +64,8 @@ func ProcessDeviceDetail(r mq.RawDevice) (Detail, error) {
 	d.InnerIP = r.InnerIP
 	d.Mac = r.Mac
 	d.DeviceName = r.DeviceName
+	d.Version = r.Version
+
 	// group
 	d.Groups, err = mq.LoadGroups(d.DeviceID)
 	if err != nil {
@@ -77,6 +81,7 @@ func ProcessRawDevice(r mq.RawDevice) (Device, error) {
 	d.DeviceID = r.DeviceID
 	d.InnerIP = r.InnerIP
 	d.DeviceName = r.DeviceName
+	d.Version = r.Version
 
 	// group
 	d.Groups, err = mq.LoadGroups(d.DeviceID)

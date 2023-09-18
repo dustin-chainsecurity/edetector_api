@@ -17,6 +17,7 @@ type RawDevice struct {
 	Network            int
 	Process            int
 	DeviceName         string
+	Version            string
 	ScanSchedule       sql.NullString
 	ScanFinishTime     sql.NullString
 	CollectSchedule    sql.NullString
@@ -34,7 +35,7 @@ type ClientOnlineStatus struct {
 func LoadDeviceInfo(deviceId string) (RawDevice, error) {
 	var d RawDevice
 	query := `
-	SELECT C.client_id, C.ip, C.mac, S.networkreport, S.processreport, I.computername, 
+	SELECT C.client_id, C.ip, C.mac, S.networkreport, S.processreport, I.computername, I.fileversion,
 		T.scan_schedule, T.scan_finish_time, T.collect_schedule, T.collect_finish_time, 
 		T.file_schedule, T.file_finish_time, T.image_finish_time
 	FROM client AS C
@@ -50,6 +51,7 @@ func LoadDeviceInfo(deviceId string) (RawDevice, error) {
 		&d.Network,
 		&d.Process,
 		&d.DeviceName,
+		&d.Version,
 		&d.ScanSchedule,
 		&d.ScanFinishTime,
 		&d.CollectSchedule,
@@ -67,7 +69,7 @@ func LoadDeviceInfo(deviceId string) (RawDevice, error) {
 func LoadAllDeviceInfo() ([]RawDevice, error) {
 	var devices []RawDevice
 	query := `
-	SELECT C.client_id, C.ip, C.mac, S.networkreport, S.processreport, I.computername, 
+	SELECT C.client_id, C.ip, C.mac, S.networkreport, S.processreport, I.computername, I.fileversion, 
 		T.scan_schedule, T.scan_finish_time, T.collect_schedule, T.collect_finish_time, 
 		T.file_schedule, T.file_finish_time, T.image_finish_time
 	FROM client AS C
@@ -90,6 +92,7 @@ func LoadAllDeviceInfo() ([]RawDevice, error) {
 			&d.Network,
 			&d.Process,
 			&d.DeviceName,
+			&d.Version,
 			&d.ScanSchedule,
 			&d.ScanFinishTime,
 			&d.CollectSchedule,
