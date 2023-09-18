@@ -1,211 +1,211 @@
 [
     {
         "path": "root:\\windows\\system32\\sru\\",
-        "AppType": "",
+        "apptype": "",
         "keyword": "srudb.dat",
         "type": "default"
     },
     {
         "path": "\\ConnectedDevicesPlatform\\*\\",
-        "AppType": "LOCALAPPDATA",
+        "apptype": "LOCALAPPDATA",
         "keyword": "ActivitiesCache.db",
         "type": "default"
     },
     {
         "path": "\\Google\\Chrome\\User Data\\*\\",
-        "AppType": "LOCALAPPDATA",
+        "apptype": "LOCALAPPDATA",
         "keyword": "History",
         "type": "advanced"
     },
     {
         "path": "\\Google\\Chrome\\User Data\\*\\",
-        "AppType": "LOCALAPPDATA",
+        "apptype": "LOCALAPPDATA",
         "keyword": "Login Data",
         "type": "advanced"
     },
     {
         "path": "\\Mozilla\\Firefox\\Profiles\\*\\",
-        "AppType": "APPDATA",
+        "apptype": "APPDATA",
         "keyword": "places.sqlite",
         "type": "advanced"
     },
     {
         "path": "\\Mozilla\\Firefox\\Profiles\\*\\",
-        "AppType": "APPDATA",
+        "apptype": "APPDATA",
         "keyword": "logins.json",
         "type": "advanced"
     },
     {
         "path": "\\Microsoft\\Windows\\WebCache\\",
-        "AppType": "LOCALAPPDATA",
+        "apptype": "LOCALAPPDATA",
         "keyword": "WebCacheV01.dat",
         "type": "advanced"
     },
     {
         "path": "\\Microsoft\\Windows\\History\\History.IE5\\",
-        "AppType": "LOCALAPPDATA",
+        "apptype": "LOCALAPPDATA",
         "keyword": "WebCacheV01.dat",
         "type": "advanced"
     },
     {
         "path": "\\Packages\\Microsoft.MicrosoftEdge_*\\AC\\MicrosoftEdge\\User\\Default\\DataStore\\Data\\nouser1\\*\\DBStore\\",
-        "AppType": "LOCALAPPDATA",
+        "apptype": "LOCALAPPDATA",
         "keyword": "spartan.edb",
         "type": "advanced"
     },
     {
         "path": "root:\\Users\\*\\",
-        "AppType": "",
+        "apptype": "",
         "keyword": "NTUSER.DAT",
         "type": "default"
     },
     {
         "path": "\\Microsoft\\windows\\",
-        "AppType": "LOCALAPPDATA",
+        "apptype": "LOCALAPPDATA",
         "keyword": "UsrClass.dat",
         "type": "default"
     },
     {
         "path": "root:\\windows\\system32\\config\\",
-        "AppType": "",
+        "apptype": "",
         "keyword": "SYSTEM",
         "type": "default"
     },
     {
         "path": "root:\\windows\\system32\\config\\",
-        "AppType": "",
+        "apptype": "",
         "keyword": "SOFTWARE",
         "type": "default"
     },
     {
         "path": "root:\\windows\\system32\\config\\",
-        "AppType": "",
+        "apptype": "",
         "keyword": "SAM",
         "type": "default"
     },
     {
         "path": "root:\\windows\\system32\\config\\",
-        "AppType": "",
+        "apptype": "",
         "keyword": "SECURITY",
         "type": "default"
     },
     {
         "path": "root:\\Windows\\inf\\",
-        "AppType": "",
+        "apptype": "",
         "keyword": "setupapi.dev.log",
         "type": "default"
     },
     {
         "path": "\\FileZilla\\",
-        "AppType": "APPDATA",
+        "apptype": "APPDATA",
         "keyword": "filezilla.xml",
         "type": "advanced"
     },
     {
         "path": "\\FileZilla\\",
-        "AppType": "APPDATA",
+        "apptype": "APPDATA",
         "keyword": "recentservers.xml",
         "type": "advanced"
     },
     {
         "path": "root:\\Windows\\System32\\winevt\\Logs\\",
-        "AppType": "",
+        "apptype": "",
         "keyword": ".evtx",
         "type": "default"
     },
     {
         "path": "root:\\Windows\\System32\\Config\\",
-        "AppType": "",
+        "apptype": "",
         "keyword": ".evt",
         "type": "default"
     },
     {
         "path": "root:\\ProgramData\\Microsoft\\Wlansvc\\Profiles\\Interfaces\\*\\",
-        "AppType": "",
+        "apptype": "",
         "keyword": ".xml",
         "type": "default"
     },
     {
         "path": "\\Microsoft\\OneDrive\\logs\\Common\\FileCoAuth-",
-        "AppType": "LOCALAPPDATA",
+        "apptype": "LOCALAPPDATA",
         "keyword": ".odl",
         "type": "advanced"
     },
     {
         "path": "\\Microsoft\\terminal server client\\cache\\cache",
-        "AppType": "LOCALAPPDATA",
+        "apptype": "LOCALAPPDATA",
         "keyword": ".bin",
         "type": "default"
     },
     {
         "path": "\\Microsoft\\OneDrive\\logs\\Personal\\",
-        "AppType": "APPDATA",
+        "apptype": "APPDATA",
         "keyword": "ObfuscationStringMap.txt",
         "type": "advanced"
     },
     {
         "path": "\\Microsoft\\windows\\recent\\",
-        "AppType": "APPDATA",
+        "apptype": "APPDATA",
         "keyword": "automaticdestinations",
         "type": "default"
     },
     {
         "path": "\\Microsoft\\windows\\",
-        "AppType": "APPDATA",
+        "apptype": "APPDATA",
         "keyword": "recent",
         "type": "default"
     },
     {
         "path": "root:\\",
-        "AppType": "",
+        "apptype": "",
         "keyword": "windows\\prefetch\\",
         "type": "default"
     },
     {
         "path": "\\Dropbox",
-        "AppType": "LOCALAPPDATA",
+        "apptype": "LOCALAPPDATA",
         "keyword": "info.json",
         "type": "advanced"
     },
     {
         "path": "\\Dropbox\\instance1",
-        "AppType": "LOCALAPPDATA",
+        "apptype": "LOCALAPPDATA",
         "keyword": "config.dbx",
         "type": "advanced"
     },
     {
         "path": "\\Dropbox\\instance1",
-        "AppType": "LOCALAPPDATA",
+        "apptype": "LOCALAPPDATA",
         "keyword": "deleted.dbx",
         "type": "advanced"
     },
     {
         "path": "\\Dropbox\\instance1",
-        "AppType": "LOCALAPPDATA",
+        "apptype": "LOCALAPPDATA",
         "keyword": "filecache.dbx",
         "type": "advanced"
     },
     {
         "path": "\\LINE\\Data\\db",
-        "AppType": "LOCALAPPDATA",
+        "apptype": "LOCALAPPDATA",
         "keyword": ".edb",
         "type": "advanced"
     },
     {
         "path": "root:\\",
-        "AppType": "",
+        "apptype": "",
         "keyword": "inetpub\\logs",
         "type": "default"
     },
     {
         "path": "\\Microsoft.SkypeApp_kzf8qxf38zg5c\\",
-        "AppType": "LOCALAPPDATA",
+        "apptype": "LOCALAPPDATA",
         "keyword": "LocalState",
         "type": "advanced"
     },
     {
         "path": "\\Microsoft\\Skype for Desktop\\IndexedDB\\",
-        "AppType": "APPDATA",
+        "apptype": "APPDATA",
         "keyword": "file__0.indexeddb.leveldb",
         "type": "advanced"
     }

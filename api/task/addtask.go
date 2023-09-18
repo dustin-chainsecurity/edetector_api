@@ -12,7 +12,7 @@ import (
 type TaskPacket struct {
 	Key     string `json:"key"`
 	Work    string `json:"work"`
-	User    string `json:"user"`
+	User    int    `json:"user"`
 	Message string `json:"message"`
 }
 
@@ -34,7 +34,7 @@ type ScheduleRequest struct {
 	Devices []string `json:"deviceId"`
 }
 
-func addTask(deviceId string, work string, msg string) (string, error) {
+func addTask(userId int, deviceId string, work string, msg string, imagetype string) (string, error) {
 	// check processing tasks
 	if exist, err := query.CheckProcessingTask(deviceId, work); err != nil {
 		return "", err
@@ -55,11 +55,21 @@ func addTask(deviceId string, work string, msg string) (string, error) {
 		return "", err
 	}
 	// store into redis
-	pkt := TaskPacket{
-		Key:     deviceId,
-		Work:    work,
-		User:    "1",
-		Message: msg,
+	var pkt TaskPacket
+	if work == "StartGetImage" {
+		pkt = TaskPacket{
+			Key:     deviceId,
+			Work:    work,
+			User:	 userId,
+			Message: imagetype,
+		}
+	} else {
+		pkt = TaskPacket{
+			Key:     deviceId,
+			Work:    work,
+			User:    userId,
+			Message: msg,
+		}
 	}
 	pktString, err := json.Marshal(pkt)
 	if err != nil {

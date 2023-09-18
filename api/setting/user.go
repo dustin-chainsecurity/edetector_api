@@ -29,14 +29,14 @@ func AddUser(c *gin.Context) {
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", user))
 	if user.Username == "" || user.Password == "" {
-		errhandler.Info(c, nil, "Username or password cannot be empty")
+		errhandler.Info(c, fmt.Errorf("username or password cannot be empty"), "Error checking username existence")
 		return
 	}
 	if exist, err := query.CheckUsername(user.Username); err != nil {
 		errhandler.Error(c, err, "Error checking username existence")
 		return
 	} else if exist {
-		errhandler.Info(c, err, "Username already exist")
+		errhandler.Info(c, fmt.Errorf("username already exist"), "Error checking username existence")
 		return
 	}
 	userId, err := query.AddUser(user); 

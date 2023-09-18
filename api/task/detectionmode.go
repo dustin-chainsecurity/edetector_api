@@ -17,7 +17,6 @@ type DetectionModeRequest struct {
 }
 
 func DetectionMode(c *gin.Context) {
-
 	var req DetectionModeRequest
 	var message = "Success"
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -25,15 +24,16 @@ func DetectionMode(c *gin.Context) {
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
-
 	// check devices
 	if err := device.CheckAllID(req.Devices); err != nil {
 		errhandler.Error(c, err, "Invalid device ID")
 		return
 	}
-
+	// get userID
+	userId, _ := c.Get("userID")
+	uid, _ := userId.(int)
+	// add task
 	for _, deviceId := range req.Devices {
-
 		// fetch agent current setting
 		var m int
 		if req.Mode {
@@ -46,10 +46,9 @@ func DetectionMode(c *gin.Context) {
 			errhandler.Error(c, err, "Error retreiving current client setting")
 			return
 		}
-
 		// check if the changes are needed
 		if m != process || m != network {
-			_, err := addTask(deviceId, "ChangeDetectMode", fmt.Sprintf("%d|%d", m, m))
+			_, err := addTask(uid, deviceId, "ChangeDetectMode", fmt.Sprintf("%d|%d", m, m), "")
 			if err != nil {
 				errhandler.Error(c, err, "Error adding ChangeDetectMode task")
 				return
@@ -63,7 +62,6 @@ func DetectionMode(c *gin.Context) {
 			message = "No changes needed"
 		}
 	}
-
 	res := TaskResponse{
 		IsSuccess: true,
 		Message:   message,
