@@ -150,18 +150,21 @@ func Main(version string) {
 
 	settingGroup.GET("/user", setting.GetUserInfo)
 	settingGroup.POST("/user", setting.AddUser)
-	settingGroup.PUT("/user/:id", setting.UpdateUserInfo)
+	settingGroup.PUT("/user", setting.UpdateUserInfo)
 	settingGroup.DELETE("/user", setting.DeleteUser)
 
 	settingGroup.GET("/whitelist", setting.GetWhiteList)
 	settingGroup.POST("/whitelist", setting.AddWhiteList)
 	settingGroup.DELETE("/whitelist", setting.DeleteWhiteList)
+	settingGroup.PUT("/whitelist", setting.UpdateWhiteList)
 	settingGroup.GET("/blacklist", setting.GetBlackList)
 	settingGroup.POST("/blacklist", setting.AddBlackList)
 	settingGroup.DELETE("/blacklist", setting.DeleteBlackList)
+	settingGroup.PUT("/blacklist", setting.UpdateBlackList)
 	settingGroup.GET("/hacklist", setting.GetHackList)
 	settingGroup.POST("/hacklist", setting.AddHackList)
 	settingGroup.DELETE("/hacklist", setting.DeleteHackList)
+	settingGroup.PUT("/hacklist", setting.UpdateHackList)
 
 	settingGroup.GET("keyImage/:type", setting.GetKeyImage)
 	settingGroup.POST("keyImage/:type", setting.AddKeyImage)

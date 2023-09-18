@@ -83,7 +83,7 @@ func DeleteUser(ids []int) error {
 	return nil
 }
 
-func CheckUserId(id string) (bool, error) {
+func CheckUserId(id int) (bool, error) {
 	var exist bool
 	query := "SELECT EXISTS(SELECT 1 FROM user WHERE id = ?)"
 	err := mariadb.DB.QueryRow(query, id).Scan(&exist)

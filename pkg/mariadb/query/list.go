@@ -3,13 +3,10 @@ package query
 import (
 	"edetector_API/pkg/mariadb"
 	"fmt"
-	"strings"
-
-	"github.com/google/uuid"
 )
 
 type List struct {
-	ID         string  `json:"id"`
+	ID         int     `json:"id"`
 	Filename   string  `json:"filename"`
 	MD5        string  `json:"md5"`
 	Signature  string  `json:"signature"`
@@ -19,7 +16,7 @@ type List struct {
 }
 
 type HackList struct {
-	ID            string  `json:"id"`
+	ID            int     `json:"id"`
 	ProcessName   string  `json:"processName"`
 	CMD 		  string  `json:"cmd"`
 	Path 		  string  `json:"path"`
@@ -64,30 +61,51 @@ func GetHackList() ([]HackList, error) {
 	return list, nil
 }
 
-func AddList(table string, l List) (string, error) {
-	id := uuid.NewString()
-	path := strings.ReplaceAll(l.Path, "\\", "\\\\")
-	query := fmt.Sprintf("INSERT INTO %s (id, filename, md5, signature, path, setup_user, reason) VALUES (?, ?, ?, ?, ?, ?, ?)", table)
-	_, err := mariadb.DB.Exec(query, id, l.Filename, l.MD5, l.Signature, path, l.SetupUser, l.Reason)
+func AddList(table string, l List) (int, error) {
+	query := fmt.Sprintf("INSERT INTO %s (filename, md5, signature, path, setup_user, reason) VALUES (?, ?, ?, ?, ?, ?)", table)
+	result, err := mariadb.DB.Exec(query, l.Filename, l.MD5, l.Signature, l.Path, l.SetupUser, l.Reason)
 	if err != nil {
-		return "", err
+		return -1, err
 	}
-	return id, nil
+	id, err := result.LastInsertId()
+	if err != nil {
+		return -1, err
+	}
+	return int(id), nil
 }
 
-func AddHackList(l HackList) (string, error) {
-	id := uuid.NewString()
-	cmd := strings.ReplaceAll(l.CMD, "\\", "\\\\")
-	path := strings.ReplaceAll(l.Path, "\\", "\\\\")
-	query := "INSERT INTO hack_list (id, process_name, cmd, path, adding_point) VALUES (?, ?, ?, ?, ?)"
-	_, err := mariadb.DB.Exec(query, id, l.ProcessName, cmd, path, l.AddingPoint)
+func AddHackList(l HackList) (int, error) {
+	query := "INSERT INTO hack_list (process_name, cmd, path, adding_point) VALUES (?, ?, ?, ?)"
+	result, err := mariadb.DB.Exec(query, l.ProcessName, l.CMD, l.Path, l.AddingPoint)
 	if err != nil {
-		return "", err
+		return -1, err
 	}
-	return id, nil
+	id, err := result.LastInsertId()
+	if err != nil {
+		return -1, err
+	}
+	return int(id), nil
 }
 
-func DeleteList(table string, ids []string) error {
+func UpdateList(table string, l List) error {
+	query := fmt.Sprintf("UPDATE %s SET filename = ?, md5 = ?, signature = ?, path = ?, setup_user = ?, reason = ? WHERE id = ?", table)
+	_, err := mariadb.DB.Exec(query, l.Filename, l.MD5, l.Signature, l.Path, l.SetupUser, l.Reason, l.ID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateHackList(l HackList) error {
+	query := "UPDATE hack_list SET process_name = ?, cmd = ?, path = ?, adding_point = ? WHERE id = ?"
+	_, err := mariadb.DB.Exec(query, l.ProcessName, l.CMD, l.Path, l.AddingPoint, l.ID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func DeleteList(table string, ids []int) error {
 	for _, id := range ids {
 		query := fmt.Sprintf("DELETE FROM %s WHERE id = ?", table)
 		_, err := mariadb.DB.Exec(query, id)
@@ -98,7 +116,7 @@ func DeleteList(table string, ids []string) error {
 	return nil
 }
 
-func DeleteHackList(ids []string) error{
+func DeleteHackList(ids []int) error{
 	for _, id := range ids {
 		query := "DELETE FROM hack_list WHERE id = ?"
 		_, err := mariadb.DB.Exec(query, id)
