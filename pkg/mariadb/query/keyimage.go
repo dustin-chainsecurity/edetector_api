@@ -33,15 +33,42 @@ func LoadStaticImageToDB() (error) {
 	}
 	for _, keyImage := range keyImages {
 		query := "INSERT INTO key_image (type, apptype, path, keyword) VALUES (?, ?, ?, ?)"
-		result, err := mariadb.DB.Exec(query, keyImage.Type, keyImage.Apptype, keyImage.Path, keyImage.Keyword)
+		_, err := mariadb.DB.Exec(query, keyImage.Type, keyImage.Apptype, keyImage.Path, keyImage.Keyword)
 		if err != nil {
 			return err
 		}
-		id, err := result.LastInsertId()
-		if err != nil {
-			return err
+	}
+	return nil
+}
+
+func ResetCustomizedImage() error {
+	query := "DELETE FROM key_image WHERE type = 'customized'"
+	_, err := mariadb.DB.Exec(query)
+	if err != nil {
+		return err
+	}
+	var keyImages []KeyImage
+	file, err := os.Open(config.Viper.GetString("KEYIMAGE_PATH"))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	bytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal([]byte(bytes), &keyImages)
+	if err != nil {
+		return err
+	}
+	for _, keyImage := range keyImages {
+		if (keyImage.Type == "advanced") {
+			query := "INSERT INTO key_image (type, apptype, path, keyword) VALUES ('customized', ?, ?, ?)"
+			_, err := mariadb.DB.Exec(query, keyImage.Apptype, keyImage.Path, keyImage.Keyword)
+			if err != nil {
+				return err
+			}
 		}
-		keyImage.Id = int(id)
 	}
 	return nil
 }

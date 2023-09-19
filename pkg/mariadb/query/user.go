@@ -19,9 +19,8 @@ type User struct {
 func GetUsers() ([]User, error) {
 	var users []User
 	query := `
-	SELECT user.id, username, department, email, permission, status 
-	FROM user LEFT JOIN user_info 
-	ON user.id = user_info.id`
+	SELECT user.id, username, password, department, email, permission, status 
+	FROM user LEFT JOIN user_info ON user.id = user_info.id`
 	rows, err := mariadb.DB.Query(query)
 	if err != nil {
 		return nil, err
@@ -30,7 +29,7 @@ func GetUsers() ([]User, error) {
 	for rows.Next() {
 		var user User
 		var permission string
-		err := rows.Scan(&user.UserID, &user.Username, &user.Department, &user.Email, &permission, &user.Status)
+		err := rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Department, &user.Email, &permission, &user.Status)
 		if err != nil {
 			return nil, err
 		}
@@ -38,6 +37,20 @@ func GetUsers() ([]User, error) {
 		users = append(users, user)
 	}
 	return users, nil
+}
+
+func GetUserById(id int) (User, error) {
+	var user User
+	query := `
+	SELECT user.id, username, password, department, email, permission, status 
+	FROM user LEFT JOIN user_info ON user.id = user_info.id WHERE user.id = ?`
+	var permission string
+	err := mariadb.DB.QueryRow(query, id).Scan(&user.UserID, &user.Username, &user.Password, &user.Department, &user.Email, &permission, &user.Status)
+	if err != nil {
+		return user, err
+	}
+	user.Permission = strings.Split(permission, "|")
+	return user, nil
 }
 
 func AddUser(user User) (int, error) {

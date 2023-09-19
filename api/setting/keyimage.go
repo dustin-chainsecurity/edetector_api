@@ -122,3 +122,14 @@ func UpdateKeyImage(c *gin.Context) {
 		"message": "Key image updated",
 	})
 }
+
+func ResetCustomizedImage(c *gin.Context) {
+	if err := query.ResetCustomizedImage(); err != nil {
+		errhandler.Error(c, err, "Error resetting customized image")
+		return
+	}
+	c.JSON(200, gin.H{
+		"isSuccess": true,
+		"message": "Customized image reset",
+	})
+}
