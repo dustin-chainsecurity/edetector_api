@@ -12,7 +12,7 @@ import (
 func GetWhiteList(c *gin.Context) {
 	whitelists, err := query.GetList("white_list")
 	if err != nil {
-		errhandler.Error(c, err, "Error retreiving whitelists")
+		errhandler.Error(c, err, "Error retrieving whitelists")
 	}
 	c.JSON(200, gin.H{
 		"isSuccess": true,
@@ -177,6 +177,13 @@ func UpdateHackList(c *gin.Context) {
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
+	if exist, err := query.CheckHackListID(req.ID); err != nil {
+		errhandler.Error(c, err, "Error checking hacklist existence")
+		return
+	} else if !exist {
+		errhandler.Error(c, fmt.Errorf("hacklist ID does not exist"), "Error checking hacklist existence")
+		return
+	}
 	err := query.UpdateHackList(req)
 	if err != nil {
 		errhandler.Error(c, err, "Error updating hacklist")
@@ -197,6 +204,15 @@ func DeleteHackList(c *gin.Context) {
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
+	for _, id := range req.IDS {
+		if exist, err := query.CheckHackListID(id); err != nil {
+			errhandler.Error(c, err, "Error checking hacklist existence")
+			return
+		} else if !exist {
+			errhandler.Error(c, fmt.Errorf("hacklist ID does not exist"), "Error checking hacklist existence")
+			return
+		}
+	}
 	err := query.DeleteHackList(req.IDS)
 	if err != nil {
 		errhandler.Error(c, err, "Error deleting hacklist")

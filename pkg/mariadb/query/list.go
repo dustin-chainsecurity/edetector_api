@@ -25,7 +25,7 @@ type HackList struct {
 
 func GetList(table string) ([]List, error) {
 	var list []List
-	query := fmt.Sprintf("SELECT * FROM %s", table)
+	query := fmt.Sprintf("SELECT id, filename, md5, signature, path, setup_user, reason FROM %s", table)
 	rows, err := mariadb.DB.Query(query)
 	if err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func GetList(table string) ([]List, error) {
 
 func GetHackList() ([]HackList, error) {
 	var list []HackList
-	query := "SELECT * FROM hack_list"
+	query := "SELECT id, process_name, cmd, path, adding_point FROM hack_list"
 	rows, err := mariadb.DB.Query(query)
 	if err != nil {
 		return nil, err
@@ -125,4 +125,14 @@ func DeleteHackList(ids []int) error{
 		}
 	}
 	return nil
+}
+
+func CheckHackListID(id int) (bool, error) {
+	var exist bool
+	query := "SELECT EXISTS(SELECT 1 FROM hack_list WHERE id = ?)"
+	err := mariadb.DB.QueryRow(query, id).Scan(&exist)
+	if err != nil {
+		return false, err
+	}
+	return exist, nil
 }
