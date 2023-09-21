@@ -12,14 +12,15 @@ import (
 	"edetector_API/api/task"
 	"edetector_API/api/testing"
 	"edetector_API/config"
-	"edetector_API/pkg/fflag"
 	"edetector_API/internal/token"
+	"edetector_API/pkg/fflag"
 	"edetector_API/pkg/logger"
 	"edetector_API/pkg/mariadb"
 	"edetector_API/pkg/mariadb/query"
 	"edetector_API/pkg/redis"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -37,13 +38,15 @@ func API_init(LOG_PATH string, HOSTNAME string, APP string) {
 	if fflag.FFLAG == nil {
 		logger.Error("Error loading feature flag")
 		return
-	}	
+	}
 	// Load configuration
 	if config.LoadConfig() == nil {
 		fmt.Println("Error loading config file")
 		return
 	}
 	// Init Logger
+	log.Printf("Log path: %s", config.Viper.GetString(LOG_PATH))
+	log.Printf("Hostname: %s, App: %s", HOSTNAME, APP)
 	logger.InitLogger(config.Viper.GetString(LOG_PATH), HOSTNAME, APP)
 	logger.Log.Info("Logger enabled, log file: " + config.Viper.GetString(LOG_PATH))
 	// Connect to Redis
@@ -127,7 +130,7 @@ func Main(version string) {
 	taskGroup.Use(token.TokenAuth())
 	taskGroup.POST("/sendMission", task.SendMission)
 	taskGroup.POST("/detectionMode", task.DetectionMode)
-	
+
 	// Group
 	groupGroup := router.Group("/group")
 	groupGroup.Use(token.TokenAuth())
@@ -152,7 +155,7 @@ func Main(version string) {
 		Addr:    ":" + os.Args[1],
 		Handler: router,
 	}
-	go func () {
+	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Error("Error starting API server: " + err.Error())
 			os.Exit(1)
@@ -177,14 +180,14 @@ func Main(version string) {
 }
 
 func CORS() gin.HandlerFunc {
-    return func(c *gin.Context) {
-        c.Header("Access-Control-Allow-Origin", "*")
-        c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-        c.Header("Access-Control-Allow-Methods", "POST, HEAD, PATCH, OPTIONS, GET, PUT")
-        if c.Request.Method == "OPTIONS" {
-            c.AbortWithStatus(204)
-            return
-        }
-        c.Next()
-    }
+	return func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Header("Access-Control-Allow-Methods", "POST, HEAD, PATCH, OPTIONS, GET, PUT")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+		c.Next()
+	}
 }
