@@ -1,5 +1,5 @@
 *.log
-app.env
+# app.env
 server_files
 *.exe
 settings.json
