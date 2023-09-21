@@ -44,6 +44,7 @@ func API_init(LOG_PATH string, HOSTNAME string, APP string) {
 		fmt.Println("Error loading config file")
 		return
 	}
+	log.Printf("Viper read successful")
 	// Init Logger
 	log.Printf("Log path: %s", config.Viper.GetString(LOG_PATH))
 	log.Printf("Hostname: %s, App: %s", HOSTNAME, APP)
