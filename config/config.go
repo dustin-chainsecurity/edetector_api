@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/spf13/viper"
 )
@@ -16,7 +17,13 @@ func LoadConfig() *viper.Viper {
 	vp.AutomaticEnv()
 	if err := vp.ReadInConfig(); err != nil {
 		fmt.Printf("Env file not found")
+	} else {
+		fmt.Println("Config file loaded successfully")
 	}
 	Viper = vp
+	log.Printf("Viper configuration:")
+	for _, key := range Viper.AllKeys() {
+		log.Printf("%s: %s", key, Viper.GetString(key))
+	}
 	return vp
 }
