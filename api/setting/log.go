@@ -15,6 +15,6 @@ func GetLogs(c *gin.Context) {
 	}
 	c.JSON(200, gin.H{
 		"isSuccess": true,
-		"logs": logs,
+		"data": logs,
 	})
 }

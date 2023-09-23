@@ -154,7 +154,7 @@ func GetList(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"isSuccess": true,
-		"groups":    groups,
+		"data":    groups,
 	})
 }
 
