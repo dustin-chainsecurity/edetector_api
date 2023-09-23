@@ -26,5 +26,8 @@ Enhancements :
 Fixes:
 - Changed API return status and body messages when error occurs
 
+### v1.0.3
+- Logging to database
+
 ---
 

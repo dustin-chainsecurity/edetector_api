@@ -9,13 +9,17 @@ go run cmd/taskservice/taskservice.go
 You can view service logs from the console, `./cmd/taskservice/*.log`, and `/var/log/syslog`
 
 # Version
-### v1.0.0 (2023.08.21)
+### v1.0.0
 Functions :
 - Task allocation for working server
 - Task scheduling for working server
 
-### v1.0.1 (2023.09.08)
+### v1.0.1
 Enhancements :
 - Integrated zap logger with syslog
+
+### v1.0.2
+Enhancements : 
+- Logging to database
 
 ---
