@@ -45,6 +45,13 @@ func UpdateWhiteList(c *gin.Context) {
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
+	if exist, err := query.CheckListID("white_list", req.ID); err != nil {
+		errhandler.Error(c, err, "Error checking whitelist existence")
+		return
+	} else if !exist {
+		errhandler.Error(c, fmt.Errorf("whitelist ID does not exist"), "Error checking whitelist existence")
+		return
+	}
 	err := query.UpdateList("white_list", req)
 	if err != nil {
 		errhandler.Error(c, err, "Error updating whitelist")
@@ -65,6 +72,15 @@ func DeleteWhiteList(c *gin.Context) {
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
+	for _, id := range req.IDS {
+		if exist, err := query.CheckListID("white_list", id); err != nil {
+			errhandler.Error(c, err, "Error checking whitelist existence")
+			return
+		} else if !exist {
+			errhandler.Error(c, fmt.Errorf("whitelist ID does not exist"), "Error checking whitelist existence")
+			return
+		}
+	}
 	err := query.DeleteList("white_list", req.IDS)
 	if err != nil {
 		errhandler.Error(c, err, "Error deleting whitelist")
@@ -111,6 +127,13 @@ func UpdateBlackList(c *gin.Context) {
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
+	if exist, err := query.CheckListID("black_list", req.ID); err != nil {
+		errhandler.Error(c, err, "Error checking blacklist existence")
+		return
+	} else if !exist {
+		errhandler.Error(c, fmt.Errorf("blacklist ID does not exist"), "Error checking blacklist existence")
+		return
+	}
 	err := query.UpdateList("black_list", req)
 	if err != nil {
 		errhandler.Error(c, err, "Error updating blacklist")
@@ -131,6 +154,15 @@ func DeleteBlackList(c *gin.Context) {
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
+	for _, id := range req.IDS {
+		if exist, err := query.CheckListID("black_list", id); err != nil {
+			errhandler.Error(c, err, "Error checking blacklist existence")
+			return
+		} else if !exist {
+			errhandler.Error(c, fmt.Errorf("blacklist ID does not exist"), "Error checking blacklist existence")
+			return
+		}
+	}
 	err := query.DeleteList("black_list", req.IDS)
 	if err != nil {
 		errhandler.Error(c, err, "Error deleting blacklist")
@@ -177,7 +209,7 @@ func UpdateHackList(c *gin.Context) {
 		return
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
-	if exist, err := query.CheckHackListID(req.ID); err != nil {
+	if exist, err := query.CheckListID("hack_list", req.ID); err != nil {
 		errhandler.Error(c, err, "Error checking hacklist existence")
 		return
 	} else if !exist {
@@ -205,7 +237,7 @@ func DeleteHackList(c *gin.Context) {
 	}
 	logger.Info("Request content: " + fmt.Sprintf("%+v", req))
 	for _, id := range req.IDS {
-		if exist, err := query.CheckHackListID(id); err != nil {
+		if exist, err := query.CheckListID("hack_list", id); err != nil {
 			errhandler.Error(c, err, "Error checking hacklist existence")
 			return
 		} else if !exist {

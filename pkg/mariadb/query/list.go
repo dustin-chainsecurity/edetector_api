@@ -127,9 +127,9 @@ func DeleteHackList(ids []int) error{
 	return nil
 }
 
-func CheckHackListID(id int) (bool, error) {
+func CheckListID(table string, id int) (bool, error) {
 	var exist bool
-	query := "SELECT EXISTS(SELECT 1 FROM hack_list WHERE id = ?)"
+	query := fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM %s WHERE id = ?)", table)
 	err := mariadb.DB.QueryRow(query, id).Scan(&exist)
 	if err != nil {
 		return false, err
